@@ -13,6 +13,7 @@ Leer en este orden antes de proponer nada:
 | `docs/game-design-mechanics.md` | **Empezar aquí.** Diseño del juego: núcleo jugable, overworld, ciclo de turno, progresión, arquitectura Godot. |
 | `docs/mud-engineer-reference.md` | Datos del dominio: matriz de contaminaciones, cálculos de tanque, píldoras, diagnóstico reológico, pruebas de laboratorio. **Fuente de datos de la simulación.** |
 | `docs/mud-programs.md` | 6 sistemas base agua, tabla de vulnerabilidades cruzadas, 3 pozos ficticios, formato del programa de lodos. **Contenido de los niveles.** |
+| `docs/rig-tank-system.md` | Tanques del taladro: qué contiene cada uno, cómo se conectan, reglas de mezcla y volumen, cambio de fluido (síntesis por validar). **Base del manejo de tanques.** |
 | `docs/domain-research.md` | Entorno del taladro: circulación, válvulas, control de pozo. Hoy es **contexto**, no mecánica — relevante solo para la expansión futura de circulación. |
 
 ## Decisiones cerradas — no re-litigar
@@ -26,6 +27,9 @@ Leer en este orden antes de proponer nada:
 - **Tiempo por turnos / días de pozo.**
 - **Feedback explícito al fallar**: el juego explica el porqué, no solo marca el error.
 - Documentación y UI **en español**.
+- **Motor: Godot 4.7.2 (stable)**, la última estable de mantenimiento al momento de decidir. No usar betas ni versiones de desarrollo.
+- **Chequeo de rutina** al inicio del turno: balanza, Fann (PV, YP, VA), geles, filtrado API, pH, Pm, Pf/Mf, cloruros, dureza. Detalle en `game-design-mechanics.md`.
+- **Observación visual** (espuma, viscosidad a ojo, recortes, nivel, color/olor, sedimento) es la alarma entre chequeos. Nunca identifica el contaminante químico.
 
 ## Invariantes de diseño — romper esto rompe el juego
 
@@ -43,13 +47,13 @@ Leer en este orden antes de proponer nada:
 
 ## Próximos pasos
 
-1. **Esqueleto del proyecto Godot** (no se ha creado). Definir primero la versión de Godot a usar.
-2. Modelo de datos puro y testeable: estado del lodo (físico + químico), tanque, contaminante, prueba de laboratorio, programa de sección.
+1. **Esqueleto del proyecto Godot 4.7.2** (no se ha creado).
+2. Modelo de datos puro y testeable: estado del lodo (físico + químico + aire atrapado), tanque, conexión, layout del taladro, contaminante, prueba de laboratorio, observación, programa de sección.
 3. Implementar las fórmulas reales de `mud-engineer-reference.md` con pruebas unitarias.
 4. Primer vertical slice: sección superficial del pozo CAIMÁN-3 — pruebas básicas, densificar, diluir.
 
 **Pendientes de investigación:**
-- Procedimiento de **desplazamiento / cambio de fluido** (baches, secuencia, criterios de limpieza). El manual API no lo trae y es el nivel más complejo del juego — hace falta otra fuente.
+- Procedimiento de **desplazamiento / cambio de fluido**: hay una secuencia propuesta en `rig-tank-system.md` §5, pero es síntesis de fuentes escasas. **Validar con el autor** (preguntas en §7) antes de diseñar ese nivel.
 - **Gráficos I y II** de tratamiento de carbonatos: son imágenes del PDF y no sobrevivieron a la extracción de texto. **Solo recuperables en la máquina local** (ver abajo).
 - Estética concreta: paleta, tamaño de tile, sprite del personaje.
 

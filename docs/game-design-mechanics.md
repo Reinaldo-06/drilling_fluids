@@ -6,6 +6,7 @@ Documentos hermanos:
 - `docs/domain-research.md` — entorno del taladro, circulación, válvulas, control de pozo.
 - `docs/mud-engineer-reference.md` — matriz de contaminaciones, cálculos de tanque, píldoras, diagnóstico reológico. **Es la fuente de datos del juego.**
 - `docs/mud-programs.md` — catálogo de sistemas base agua, vulnerabilidades cruzadas y programas de pozo ficticios. **Es el contenido de los niveles.**
+- `docs/rig-tank-system.md` — estructura de tanques del taladro, conexiones, dinámica del lodo en superficie y cambio de fluido.
 
 ## Visión
 
@@ -55,10 +56,10 @@ Mapa cenital caminable. Cada estación es un lugar al que hay que ir físicament
 | Estación | Qué se hace |
 |---|---|
 | **Caseta de lodos (laboratorio)** | Correr pruebas: balanza, embudo Marsh, reómetro, filtro prensa API/HTHP, retorta, MBT, titulaciones Pf/Mf/Pm, dureza, cloruros, pH |
-| **Tanques / pits** | Ver volúmenes y niveles, transferir entre tanques, tomar muestra |
+| **Tanques / pits** | Ver volúmenes y niveles, observar el lodo, transferir entre tanques, tomar muestra |
 | **Hopper de mezcla** | Adicionar producto al sistema activo |
 | **Bodega de químicos** | Inventario y costo de productos |
-| **Zarandas / control de sólidos** | Estado del equipo, evaluar si el problema es de sólidos (clave para PV alto) |
+| **Zarandas / control de sólidos** | Estado del equipo, observar retorno y recortes, evaluar si el problema es de sólidos (clave para PV alto) |
 | **Piso de perforación** | Hablar con el driller: profundidad, formación que se está atravesando, avisos |
 | **Oficina / company man** | Programa de lodos, entregar el reporte diario |
 
@@ -67,14 +68,79 @@ Caminar cuesta tiempo del turno. No es relleno: obliga a planear el recorrido, q
 ## Ciclo de juego (día de pozo)
 
 1. **Inicio del turno** — el driller informa profundidad y formación en curso. Posible aviso de evento.
-2. **Chequeo de rutina** — tomar muestra, correr el set básico de pruebas.
+2. **Chequeo de rutina** — tomar muestra, correr el set básico de pruebas (ver abajo).
 3. **Comparar contra el programa de lodos** — ¿está en especificación para esta sección?
-4. **Diagnosticar** si algo se salió — pruebas químicas dirigidas.
-5. **Tratar** — calcular dosis, adicionar por el hopper, transferir, preparar píldora.
-6. **Verificar** — volver a correr la prueba y confirmar que el tratamiento funcionó.
-7. **Cerrar el día** — entregar el reporte de lodo; el pozo avanza en profundidad.
+4. **Ronda por los tanques** — observar el lodo durante el turno (ver *Observación visual*). Es el sistema de alarma entre chequeos.
+5. **Diagnosticar** si algo se salió — pruebas químicas dirigidas.
+6. **Tratar** — calcular dosis, adicionar por el hopper, transferir, preparar píldora.
+7. **Verificar** — volver a correr la prueba y confirmar que el tratamiento funcionó.
+8. **Cerrar el día** — entregar el reporte de lodo; el pozo avanza en profundidad.
 
 El tiempo del turno es el recurso escaso. El costo de productos es el segundo.
+
+### Cómo conviven el chequeo de rutina y el acertijo
+
+El chequeo de rutina incluye las pruebas químicas básicas, así que podría parecer que resuelve el acertijo solo. No lo hace, por tres razones:
+
+- **Es una foto del inicio del turno.** Las contaminaciones ocurren *después*, mientras se perfora. A media jornada el jugador solo tiene lo que ve en los tanques.
+- **Re-correr todo cuesta caro.** Cuando una observación dispara la alarma, el jugador decide qué pruebas repetir. Correr el set completo otra vez siempre es posible, pero se come el turno.
+- **Las pruebas ampliadas no están en la rutina.** Separar calcio y magnesio, el Garrett Gas Train, la MBT o el filtrado HTHP solo se corren si el jugador sospecha algo. Ahí se resuelven los casos difíciles (carbonatos, carnalita, H₂S).
+
+## Chequeo de rutina
+
+Set básico que se corre al inicio de cada turno. Los tiempos son una **propuesta inicial** a calibrar jugando, sobre un turno de 12 h (720 min).
+
+| Prueba | Muestra | Tiempo activo | Espera | Revela |
+|---|---|---|---|---|
+| **Balanza de lodo** (atmosférica) | Lodo | 5 min | — | Densidad. **Lee bajo si hay aire o gas atrapado** |
+| **Viscosímetro Fann** (600/300/6/3 RPM) | Lodo | 10 min | — | Θ600, Θ300 → **PV, YP, VA**; Θ6/Θ3 para limpieza |
+| **Geles 10 s / 10 min** | Lodo | 5 min | 10 min | Geles; tixotropía |
+| **Filtrado API** (30 min @ 100 psi) | Lodo | 5 min | **30 min** | Filtrado (ml/30 min), revoque. **Produce el filtrado** para las pruebas químicas |
+| **pH** | Lodo | 2 min | — | pH |
+| **Pm** | Lodo | 10 min | — | Alcalinidad del lodo; exceso de cal |
+| **Pf / Mf** | **Filtrado** | 10 min | — | Alcalinidad del filtrado; relación Mf/Pf |
+| **Cloruros** | **Filtrado** | 10 min | — | Cl⁻ |
+| **Dureza (Ca²⁺)** | **Filtrado** | 10 min | — | Calcio en filtrado |
+
+`VA (cP) = Θ600 / 2`. La viscosidad aparente del Fann es el número que corresponde a lo que el jugador "ve" en los tanques.
+
+**Dependencia real que es mecánica:** Pf/Mf, cloruros y dureza se corren sobre el **filtrado**, así que no se pueden hacer hasta que el filtro prensa termine. Las pruebas con espera (geles, filtrado) corren en paralelo: el jugador las arranca y mientras tanto hace otra cosa. Planear el orden en el laboratorio es parte del oficio.
+
+**Pruebas ampliadas** (fuera de la rutina, para el acertijo): retorta (da el `Fw` de las dosis), MBT, calcio y magnesio por separado, Garrett Gas Train, contenido de arena, filtrado HTHP, balanza presurizada.
+
+> **Por decidir:** la retorta da el `Fw` que necesitan todas las fórmulas de dosis. Puede ir en la rutina o usarse el último valor medido con la opción de re-medir.
+
+## Observación visual
+
+Lo que el jugador ve al caminar por los tanques y las zarandas, sin entrar al laboratorio. Cuesta solo el tiempo de caminar. Es el **sistema de alarma** entre chequeos.
+
+**Regla de diseño:** una observación puede decir *que algo cambió* y a veces *qué familia de problema es*. **Nunca identifica el contaminante químico.** Eso sigue siendo trabajo del laboratorio (invariante 1).
+
+Cada observación se deriva del estado de la simulación con umbrales, y es un **Resource**, igual que las pruebas: qué variable la genera, qué umbrales, qué texto muestra, dónde se ve.
+
+| Observación | Dónde se ve | Qué la genera | Qué sugiere | Qué no dice |
+|---|---|---|---|---|
+| **Espuma y burbujas** en la superficie | Tanques, caja de llegada, zarandas | Aire o gas atrapado: hopper, pistolas de lodo, agitación fuerte, aditivos con tensoactivos, gas de formación | Hay aire o gas en el lodo | Si es aire de superficie o gas del pozo. Para eso: balanza presurizada y comparar llegada contra succión |
+| **Viscosidad a ojo**: cómo corre el lodo por la canaleta, el remolino del agitador, cómo escurre de la jarra | Tanques, zarandas | VA y geles, en cuatro niveles: *fluido · normal · espeso · muy espeso* | Que la viscosidad cambió | Si es PV (sólidos) o YP (química). Para eso: Fann |
+| **Lodo rebosando las zarandas** | Zarandas | Viscosidad alta o mallas tapadas | Se está perdiendo lodo en superficie | La causa de la viscosidad |
+| **Cantidad y forma de recortes** | Zarandas | Tasa de penetración y estabilidad del pozo | Derrumbes (*cavings*): astillados → posible sobrepresión; en bloque → esfuerzos en lutitas | Nada químico. Es información para el company man sobre el peso del lodo |
+| **Nivel de tanques** fuera de lo esperado | Tanques | Ganancia o pérdida de volumen | Posible kick o pérdida de circulación → avisar al driller | — |
+| **Lodo ennegrecido y olor a huevo podrido** | Caja de llegada, zarandas | Sulfuros (H₂S) | **H₂S**: emergencia de seguridad | La concentración. Para eso: Garrett Gas Train |
+| **Sedimento en el fondo** de un tanque | Tanques sin agitar | Asentamiento de barita y sólidos | Hay que agitar antes de transferir o usar ese lodo | — |
+
+### Trampas que salen de la observación
+
+- **Espuma y balanza.** Con aire atrapado la balanza atmosférica lee **bajo**. El jugador que ve "densidad baja" y densifica termina **sobre-densificado** cuando el aire se va. Lo correcto: antiespumante y revisar la fuente (hopper, pistolas), y confirmar con balanza presurizada.
+- **"Se ve espeso" no es un diagnóstico.** Diluir porque el lodo se ve espeso es correcto si es PV alto (sólidos) y un error si es YP alto (química). El ojo no distingue; el Fann sí.
+- **Muestra en el lugar equivocado.** Lo que viene del pozo se ve primero en la caja de llegada. La muestra de succión es lo que entra al pozo, después de los equipos de sólidos.
+
+**Fuentes de la observación visual:**
+- [Air-cut mud](https://glossary.slb.com/en/terms/a/air-cut_mud), [Gas-cut mud](https://glossary.slb.com/en/terms/g/gas-cut_mud) y [Pressurized mud balance](https://glossary.slb.com/en/terms/p/pressurized_mud_balance) — SLB Energy Glossary: el aire y el gas bajan la densidad leída; la balanza presurizada elimina ese efecto.
+- [EP 0339762 — defoamer para lodos base agua (EPO)](https://data.epo.org/publication-server/rest/v1.2/patents/EP0339762NWA2/document.html): la espuma baja el peso del lodo, afecta bombas y desgasificadores, y altera la reología.
+- [Defoamer Anti-Foam Agent for Drilling Fluids — PP Drilling Fluids](https://ppdrillingfluids.in/defoamer-anti-foam-agent-for-drilling-fluids/): causas comunes de espuma (agitación, gas, aditivos con tensoactivos, aire en el manejo). Es material de proveedor.
+- [An Observation from Cavings at Shale Shakers — Search and Discovery](https://www.searchanddiscovery.com/documents/2012/41095kumar/ndx_kumar) y [Cavings — Wild Well Control](https://www.wildwell.com/glossary/cavings-heaving-or-spalling-shale): formas de derrumbes y lo que indican.
+- [Mud tank — Wikipedia](https://en.wikipedia.org/wiki/Mud_tank): agitadores para evitar asentamiento.
+- H₂S: `mud-engineer-reference.md` §1.8.
 
 ## Manejo de tanques
 
@@ -86,8 +152,11 @@ El eje que el jugador más quiere dominar. Operaciones disponibles, todas con su
 - **Preparar una píldora**: viscosa, pesada, de LCM, desatascadora. Calcular volumen y altura de columna.
 - **Cambio / desplazamiento de fluido**: planificar el reemplazo del sistema.
 - **Construir lodo nuevo** en el tanque de mezcla.
+- **Reponer volumen**: el sistema pierde lodo cada día (hueco nuevo, descarte de sólidos), así que hay que construir lodo de forma continua.
 
-> **Hueco de fuente:** el manual API no trae procedimiento de desplazamiento/cambio de fluido (baches, secuencia, criterios de limpieza). El **formato de programa de lodos ya está resuelto** en `mud-programs.md`; el procedimiento de desplazamiento sigue pendiente de otra fuente.
+La estructura de tanques, sus conexiones y las reglas de mezcla están en `rig-tank-system.md`. Los tanques y sus conexiones son un **layout por taladro** (Resource): un taladro con poca reserva es más difícil sin tocar la simulación.
+
+> **Cambio de fluido:** `rig-tank-system.md` §5 propone una secuencia (construir en reserva, desplazar, desviar viejo / interfase / nuevo, reasignar tanques). Es una **síntesis por validar** con el autor: las fuentes públicas cubren poco el procedimiento en superficie entre dos lodos base agua.
 
 ## Diagnóstico de reología
 
@@ -152,20 +221,24 @@ Se **simplifican** con modelos lineales con techos/pisos: evolución de PV/YP/ge
 
 El estado químico del lodo debe incluir las variables que el diagnóstico necesita — Pm, Pf, Mf, dureza de calcio, cloruros — no solo las físicas. **Sin eso, el acertijo central no existe.**
 
+El estado también necesita **aire atrapado** (fracción de volumen). No es una propiedad que se reporte, pero genera la observación de espuma y hace que la balanza atmosférica lea bajo.
+
 ## Arquitectura en Godot (conceptual)
 
 - **Separación simulación / presentación**: el estado del lodo, los tanques y la química viven en nodos de datos independientes de sprites y mapa. Testeable sin árbol visual (GUT); las fórmulas del manual son casos de prueba con entrada y salida conocidas.
 - **Estado del lodo por tanque**: recurso con propiedades físicas *y químicas*.
 - **Contaminante como dato**: cada uno declara su firma de efectos sobre cada prueba (la Tabla 4 convertida en Resource) y sus tratamientos válidos e inválidos. Agregar un contaminante nuevo = agregar un Resource, sin tocar lógica.
-- **Prueba de laboratorio como dato**: qué variables revela, cuánto tiempo cuesta.
+- **Prueba de laboratorio como dato**: qué variables revela, cuánto tiempo activo y de espera cuesta, sobre qué muestra se corre (lodo o filtrado).
+- **Observación como dato**: qué variable la genera, umbrales, texto, estación donde se ve.
+- **Tanque, conexión y layout del taladro como datos**: ver `rig-tank-system.md` §6.
 - **Nivel/sección como Resource**: profundidad, formación, programa de lodos aplicable, eventos guionados, inventario disponible.
 - **Reglas con explicación embebida**: predicado + texto, juntos.
 - **Overworld**: TileMap cenital con estaciones como áreas interactuables; el costo en tiempo de caminar lo arbitra el gestor de turno.
 
 ## Pendientes
 
-1. Fuente para el **procedimiento de desplazamiento / cambio de fluido** (baches, secuencia, criterios de limpieza) — el manual API no lo trae y es el nivel más complejo del juego.
+1. **Validar con el autor** la secuencia de cambio de fluido y las preguntas de `rig-tank-system.md` §7.
 2. Recuperar los **Gráficos I y II** de tratamiento de carbonatos leyendo esas páginas del PDF como imagen (no sobrevivieron a la extracción de texto).
-3. Calibrar constantes de los modelos simplificados — se ajustan jugando.
-4. Definir el set de pruebas del "chequeo de rutina" inicial y su costo en tiempo.
+3. Calibrar constantes de los modelos simplificados y los tiempos de las pruebas — se ajustan jugando.
+4. Decidir si la retorta va en el chequeo de rutina.
 5. Estética concreta: paleta, tamaño de tile, sprite del personaje.
