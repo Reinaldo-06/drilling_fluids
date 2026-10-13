@@ -1,0 +1,16 @@
+# Manual de referencia — NO se versiona.
+# Es material con derechos de autor (API / manual de fluidos de perforación) y este
+# repositorio es público. Se mantiene solo en la máquina local.
+MANUAL_DE_FLUIDOS_DE_PERFORACION_API_pdf.pdf
+*.pdf
+
+# Godot
+.godot/
+.import/
+export.cfg
+export_presets.cfg
+*.translation
+
+# Sistema
+.DS_Store
+Thumbs.db
