@@ -28,7 +28,9 @@ Leer en este orden antes de proponer nada:
 - **Feedback explícito al fallar**: el juego explica el porqué, no solo marca el error.
 - Documentación y UI **en español**.
 - **Motor: Godot 4.7.2 (stable)**, la última estable de mantenimiento al momento de decidir. No usar betas ni versiones de desarrollo.
-- **Chequeo de rutina** al inicio del turno: balanza, Fann (PV, YP, VA), geles, filtrado API, pH, Pm, Pf/Mf, cloruros, dureza. Detalle en `game-design-mechanics.md`.
+- **Chequeo de rutina** al inicio del turno: balanza, Fann (PV, YP, VA), geles, filtrado API, pH, Pm, Pf/Mf, cloruros, dureza, retorta (da Fw). Detalle en `game-design-mechanics.md`.
+- **El jugador opera las válvulas de tanques** caminando hasta ellas. El "hopper" se llama **embudo de mezcla** en el juego.
+- **Cambio de fluido entre lodos base agua: desplazamiento directo**, sin bache espaciador. Layout base: dos reservas + fractanques; circuito corto en el activo durante los preparativos (`rig-tank-system.md` §5).
 - **Observación visual** (espuma, viscosidad a ojo, recortes, nivel, color/olor, sedimento) es la alarma entre chequeos. Nunca identifica el contaminante químico.
 
 ## Invariantes de diseño — romper esto rompe el juego
@@ -53,7 +55,7 @@ Leer en este orden antes de proponer nada:
 4. Primer vertical slice: sección superficial del pozo CAIMÁN-3 — pruebas básicas, densificar, diluir.
 
 **Pendientes de investigación:**
-- Procedimiento de **desplazamiento / cambio de fluido**: hay una secuencia propuesta en `rig-tank-system.md` §5, pero es síntesis de fuentes escasas. **Validar con el autor** (preguntas en §7) antes de diseñar ese nivel.
+- Procedimiento de **desplazamiento / cambio de fluido**: secuencia en `rig-tank-system.md` §5, ya validada en parte por el autor. Quedan abiertos el criterio para desviar retornos y la composición del circuito corto (§7).
 - **Gráficos I y II** de tratamiento de carbonatos: son imágenes del PDF y no sobrevivieron a la extracción de texto. **Solo recuperables en la máquina local** (ver abajo).
 - Estética concreta: paleta, tamaño de tile, sprite del personaje.
 

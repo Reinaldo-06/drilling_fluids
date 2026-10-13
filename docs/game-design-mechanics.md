@@ -21,7 +21,7 @@ Lo que el juego enseña, en orden de prioridad:
 
 ## Decisiones de alcance
 
-- **Rol: ingeniería de fluidos únicamente.** Laboratorio, tanques, hopper, transferencias, dosificación, píldoras, reporte. El driller, el BOP y las bombas son del resto de la cuadrilla: actúan solos y te generan eventos. **La circulación queda como expansión posterior**, no se construye ahora.
+- **Rol: ingeniería de fluidos únicamente.** Laboratorio, tanques, válvulas, embudo de mezcla, transferencias, dosificación, píldoras, reporte. El driller, el BOP y las bombas son del resto de la cuadrilla: actúan solos y te generan eventos. **La circulación queda como expansión posterior**, no se construye ahora.
 - Lodos **base agua (WBM)**.
 - **Unidades de campo** (ppg, bbl, psi, lb/bbl, lb/100 ft², cP, mg/l).
 - **Pozos ficticios** con parámetros plausibles.
@@ -57,7 +57,7 @@ Mapa cenital caminable. Cada estación es un lugar al que hay que ir físicament
 |---|---|
 | **Caseta de lodos (laboratorio)** | Correr pruebas: balanza, embudo Marsh, reómetro, filtro prensa API/HTHP, retorta, MBT, titulaciones Pf/Mf/Pm, dureza, cloruros, pH |
 | **Tanques / pits** | Ver volúmenes y niveles, observar el lodo, transferir entre tanques, tomar muestra |
-| **Hopper de mezcla** | Adicionar producto al sistema activo |
+| **Embudo de mezcla** (*hopper*) | Vaciar sacos de producto al sistema activo o al tanque de mezcla |
 | **Bodega de químicos** | Inventario y costo de productos |
 | **Zarandas / control de sólidos** | Estado del equipo, observar retorno y recortes, evaluar si el problema es de sólidos (clave para PV alto) |
 | **Piso de perforación** | Hablar con el driller: profundidad, formación que se está atravesando, avisos |
@@ -72,7 +72,7 @@ Caminar cuesta tiempo del turno. No es relleno: obliga a planear el recorrido, q
 3. **Comparar contra el programa de lodos** — ¿está en especificación para esta sección?
 4. **Ronda por los tanques** — observar el lodo durante el turno (ver *Observación visual*). Es el sistema de alarma entre chequeos.
 5. **Diagnosticar** si algo se salió — pruebas químicas dirigidas.
-6. **Tratar** — calcular dosis, adicionar por el hopper, transferir, preparar píldora.
+6. **Tratar** — calcular dosis, adicionar por el embudo de mezcla, transferir, preparar píldora.
 7. **Verificar** — volver a correr la prueba y confirmar que el tratamiento funcionó.
 8. **Cerrar el día** — entregar el reporte de lodo; el pozo avanza en profundidad.
 
@@ -101,14 +101,28 @@ Set básico que se corre al inicio de cada turno. Los tiempos son una **propuest
 | **Pf / Mf** | **Filtrado** | 10 min | — | Alcalinidad del filtrado; relación Mf/Pf |
 | **Cloruros** | **Filtrado** | 10 min | — | Cl⁻ |
 | **Dureza (Ca²⁺)** | **Filtrado** | 10 min | — | Calcio en filtrado |
+| **Retorta** | Lodo | 5 min | **60 min** | % agua, % aceite, % sólidos → **Fw** y reparto de sólidos (ver abajo) |
 
 `VA (cP) = Θ600 / 2`. La viscosidad aparente del Fann es el número que corresponde a lo que el jugador "ve" en los tanques.
 
 **Dependencia real que es mecánica:** Pf/Mf, cloruros y dureza se corren sobre el **filtrado**, así que no se pueden hacer hasta que el filtro prensa termine. Las pruebas con espera (geles, filtrado) corren en paralelo: el jugador las arranca y mientras tanto hace otra cosa. Planear el orden en el laboratorio es parte del oficio.
 
-**Pruebas ampliadas** (fuera de la rutina, para el acertijo): retorta (da el `Fw` de las dosis), MBT, calcio y magnesio por separado, Garrett Gas Train, contenido de arena, filtrado HTHP, balanza presurizada.
+**Pruebas ampliadas** (fuera de la rutina, para el acertijo): MBT, calcio y magnesio por separado, Garrett Gas Train, contenido de arena, filtrado HTHP, balanza presurizada.
 
-> **Por decidir:** la retorta da el `Fw` que necesitan todas las fórmulas de dosis. Puede ir en la rutina o usarse el último valor medido con la opción de re-medir.
+### Qué se ve en la retorta
+
+La retorta calienta una muestra de lodo hasta evaporar el agua (y el aceite, si hay), los condensa en una probeta graduada y deja los sólidos en la cámara. El jugador lee tres números: **% agua, % aceite y % sólidos** en volumen.
+
+De ahí salen dos cosas que el juego usa:
+
+1. **Fw = % agua / 100.** Es la fracción de agua que piden todas las fórmulas de dosis (`mud-engineer-reference.md` §1.2). Sin retorta, el jugador dosifica con un Fw viejo o supuesto, y la dosis sale mal.
+2. **Qué tipo de sólidos hay.** Con la densidad del lodo y el % sólidos se separan los sólidos en **pesados** (barita, SG ~4,2) y **livianos** (LGS: arcilla y sólidos perforados, SG ~2,6). Esto conecta directo con la regla `PV alta = sólidos`:
+   - % sólidos alto y casi todo **barita** → el lodo está pesado a propósito; la PV alta es esperable.
+   - % sólidos alto y mucho **LGS** → hay **sólidos perforados acumulados**: dilución o control de sólidos.
+
+La retorta tarda en la vida real (una fuente habla de dos horas o más con el calentamiento a 950 °F); los 60 min de espera son una propuesta a calibrar. Corre en paralelo con el filtro prensa.
+
+Fuentes: [Retort Analysis Drilling Fluid — Drilling Manual](https://www.drillingmanual.com/retort-analysis-drilling-fluid/), [Suspended solids — SLB Energy Glossary](https://glossary.slb.com/en/terms/s/suspended_solids), [US 5519214 — Method for analysis of drilling fluids (USPTO)](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/5519214). El reparto barita/LGS sale del balance de masas de `mud-engineer-reference.md` §2 con densidades supuestas de 4,2 y 2,6; es aproximado, igual que en el campo.
 
 ## Observación visual
 
@@ -120,7 +134,7 @@ Cada observación se deriva del estado de la simulación con umbrales, y es un *
 
 | Observación | Dónde se ve | Qué la genera | Qué sugiere | Qué no dice |
 |---|---|---|---|---|
-| **Espuma y burbujas** en la superficie | Tanques, caja de llegada, zarandas | Aire o gas atrapado: hopper, pistolas de lodo, agitación fuerte, aditivos con tensoactivos, gas de formación | Hay aire o gas en el lodo | Si es aire de superficie o gas del pozo. Para eso: balanza presurizada y comparar llegada contra succión |
+| **Espuma y burbujas** en la superficie | Tanques, caja de llegada, zarandas | Aire o gas atrapado: embudo de mezcla, pistolas de lodo, agitación fuerte, aditivos con tensoactivos, gas de formación | Hay aire o gas en el lodo | Si es aire de superficie o gas del pozo. Para eso: balanza presurizada y comparar llegada contra succión |
 | **Viscosidad a ojo**: cómo corre el lodo por la canaleta, el remolino del agitador, cómo escurre de la jarra | Tanques, zarandas | VA y geles, en cuatro niveles: *fluido · normal · espeso · muy espeso* | Que la viscosidad cambió | Si es PV (sólidos) o YP (química). Para eso: Fann |
 | **Lodo rebosando las zarandas** | Zarandas | Viscosidad alta o mallas tapadas | Se está perdiendo lodo en superficie | La causa de la viscosidad |
 | **Cantidad y forma de recortes** | Zarandas | Tasa de penetración y estabilidad del pozo | Derrumbes (*cavings*): astillados → posible sobrepresión; en bloque → esfuerzos en lutitas | Nada químico. Es información para el company man sobre el peso del lodo |
@@ -130,7 +144,7 @@ Cada observación se deriva del estado de la simulación con umbrales, y es un *
 
 ### Trampas que salen de la observación
 
-- **Espuma y balanza.** Con aire atrapado la balanza atmosférica lee **bajo**. El jugador que ve "densidad baja" y densifica termina **sobre-densificado** cuando el aire se va. Lo correcto: antiespumante y revisar la fuente (hopper, pistolas), y confirmar con balanza presurizada.
+- **Espuma y balanza.** Con aire atrapado la balanza atmosférica lee **bajo**. El jugador que ve "densidad baja" y densifica termina **sobre-densificado** cuando el aire se va. Lo correcto: antiespumante y revisar la fuente (embudo de mezcla, pistolas), y confirmar con balanza presurizada.
 - **"Se ve espeso" no es un diagnóstico.** Diluir porque el lodo se ve espeso es correcto si es PV alto (sólidos) y un error si es YP alto (química). El ojo no distingue; el Fann sí.
 - **Muestra en el lugar equivocado.** Lo que viene del pozo se ve primero en la caja de llegada. La muestra de succión es lo que entra al pozo, después de los equipos de sólidos.
 
@@ -240,5 +254,4 @@ El estado también necesita **aire atrapado** (fracción de volumen). No es una 
 1. **Validar con el autor** la secuencia de cambio de fluido y las preguntas de `rig-tank-system.md` §7.
 2. Recuperar los **Gráficos I y II** de tratamiento de carbonatos leyendo esas páginas del PDF como imagen (no sobrevivieron a la extracción de texto).
 3. Calibrar constantes de los modelos simplificados y los tiempos de las pruebas — se ajustan jugando.
-4. Decidir si la retorta va en el chequeo de rutina.
-5. Estética concreta: paleta, tamaño de tile, sprite del personaje.
+4. Estética concreta: paleta, tamaño de tile, sprite del personaje.
