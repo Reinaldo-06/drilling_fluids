@@ -29,6 +29,10 @@ Documentos hermanos: `docs/game-design-mechanics.md` (diseño) · `docs/rig-tank
 | 9 | Reporte diario de lodo: qué contiene, costos, inventario | ✅ hecho |
 | 10 | Eventos: pérdidas, influjo, gas de conexión, maniobras (viajes) desde la vista del ingeniero | ✅ hecho |
 | 11 | Temperatura del lodo: entrada y salida, efecto en reología | ✅ hecho |
+| 12 | **Modelo consolidado**: variables de estado y qué cambia en cada hora de juego (une los temas 1–11) | pendiente |
+| 13 | Lutitas reactivas: MBT, consumo de KCl y PHPA, recortes blandos | pendiente |
+| 14 | Lodo de matada: cómo prepara el ingeniero el peso de matada y el lodo pesado de reserva | pendiente |
+| 15 | Asentamiento de barita (*sag*) en tanques y en el pozo | pendiente |
 
 ---
 
