@@ -61,23 +61,24 @@ func test_guiones_de_caiman_cubren_las_secciones_del_programa() -> void:
 		var s = pozo.secciones[i]
 		var g := _guion(nombres[i])
 		verificar(g.seccion == s.seccion, "%s: sección %s" % [nombres[i], s.seccion])
-		verificar_cerca(g.profundidad_desde, s.profundidad_desde, 1e-9, "%s: desde" % nombres[i])
+		verificar_cerca(g.profundidad_desde, s.profundidad_de_arranque(), 1e-9, "%s: desde (arranque de la broca)" % nombres[i])
 		verificar_cerca(g.profundidad_hasta, s.profundidad_hasta, 1e-9, "%s: hasta" % nombres[i])
 
 
 # mud-programs.md — "contaminación de cemento al iniciar la intermedia"
-func test_intermedia_dispara_el_cemento_al_pasar_la_zapata() -> void:
+# El evento solo AVISA al llegar al collar flotador; la contaminación sale de
+# rotar el cemento (formación en_revestimiento; tests/test_operacion_pozo.gd).
+func test_intermedia_avisa_el_cemento_al_llegar_al_collar_flotador() -> void:
 	var tanques := _tanques()
-	var pm0: float = tanques[0].lodo.pm()
+	var antes: EstadoLodoScript = tanques[0].lodo.copiar()
 	var ej := Ejecucion.new(_guion("caiman_3_intermedia"))
-	verificar(ej.paso(tanques, 2490.0, 10.0).is_empty(), "antes de la zapata no pasa nada")
-	var avisos: Array = ej.paso(tanques, 2500.0, 10.0)
-	verificar(avisos.size() == 1 and avisos[0]["id"] == "c3i_cemento_zapata", "al llegar a la zapata")
+	verificar(ej.paso(tanques, 2400.0, 10.0).is_empty(), "antes del collar no pasa nada")
+	var avisos: Array = ej.paso(tanques, 2420.0, 10.0)
+	verificar(avisos.size() == 1 and avisos[0]["id"] == "c3i_cemento_zapata", "al llegar al collar flotador")
 	verificar(avisos[0]["quien_avisa"] == "driller", "lo avisa el driller")
 	for i in 12:
-		ej.paso(tanques, 2510.0, 10.0)
-	verificar(tanques[0].lodo.pm() > pm0 + 0.5, "el Pm sube (%.2f → %.2f)" % [pm0, tanques[0].lodo.pm()])
-	verificar(ej.disparados.has("c3i_lodo_espeso"), "el encuellador ve el lodo espeso (pH %.2f)" % tanques[0].lodo.ph())
+		ej.paso(tanques, 2450.0, 10.0)
+	verificar_cerca(tanques[0].lodo.pm(), antes.pm(), 1e-9, "el evento no contamina por sí solo: una sola fuente")
 	verificar(not ej.disparados.has("c3i_gas_conexion_1"), "el gas viene más abajo")
 
 

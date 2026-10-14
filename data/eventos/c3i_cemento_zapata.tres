@@ -1,20 +1,16 @@
-[gd_resource type="Resource" script_class="Evento" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
 
 [ext_resource type="Script" path="res://sim/evento.gd" id="1"]
-[ext_resource type="Resource" path="res://data/contaminantes/cemento.tres" id="2"]
 
 [resource]
 script = ExtResource("1")
 id = "c3i_cemento_zapata"
 titulo = "Cemento de la zapata"
-tipo = "contaminacion"
+tipo = "aviso"
 disparador = "profundidad"
-profundidad_ft = 2500.0
-duracion_h = 1.5
-contaminante = ExtResource("2")
-cantidad = 0.4
+profundidad_ft = 2420.0
 quien_avisa = "driller"
-aviso = "Estamos rotando el cemento y la zapata del revestimiento superficial. En hora y media salimos a formación nueva."
+aviso = "Llegamos al collar flotador, a {profundidad} ft. Vamos a rotar unos 80 ft de cemento hasta la zapata antes de salir a formación nueva."
 aviso_es_observacion = false
 explicacion = "Al rotar el cemento entra cal (Ca(OH)₂) al lodo: sube el pH, el Pm y el Pf, y entra calcio. La mitad llega como finos que se siguen disolviendo en las vueltas siguientes. En KCl/PHPA el calcio y el pH alto floculan el lodo e hidrolizan el PHPA. Se diagnostica con Pm, Pf y dureza (no con el embudo) y se trata con bicarbonato de sodio o ácido cítrico por debajo de la dosis estequiométrica; nunca con carbonato de sodio, que deja más alcalinidad. Si podías, pretratar antes de rotar el cemento era lo mejor."
 referencia = "mud-programs.md, CAIMÁN-3; mud-engineer-reference.md §1.3"

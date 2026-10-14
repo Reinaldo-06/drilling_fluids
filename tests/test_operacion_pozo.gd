@@ -177,3 +177,58 @@ func test_con_volumen_de_la_reserva_las_bombas_vuelven() -> void:
 	t.esperar(10.0)
 	verificar(not o.bombas_paradas, "con nivel, vuelven las bombas")
 	verificar(t.caudal_gpm > 0.0, "y el caudal")
+
+
+# --- Cemento de la zapata: se rota dentro del revestidor, una sola fuente (auditoría C4) ---
+
+const GUION_INT := preload("res://data/guiones/caiman_3_intermedia.tres")
+const PROGRAMA_INT := preload("res://data/programas/caiman_3_intermedia.tres")
+const CEMENTO := preload("res://data/formaciones/caiman_3_cemento_zapata.tres")
+const INTERMEDIA_SUP := preload("res://data/formaciones/caiman_3_intermedia_superior.tres")
+
+
+func _intermedia() -> Array:
+	var tanques := [
+		Tanque.crear("Proceso", 500.0, "proceso", 400.0, Base.disperso_lignosulfonato()),
+		Tanque.crear("Succión", 500.0, "succion", 400.0, Base.disperso_lignosulfonato()),
+		Tanque.crear("Reserva", 500.0, "reserva", 300.0, Base.disperso_lignosulfonato(), false),
+	]
+	var t = Turno.crear(tanques, PROGRAMA_INT, {"barita": 500.0})
+	t.caudal_gpm = 600.0
+	t.profundidad_ft = PROGRAMA_INT.profundidad_de_arranque()
+	t.volumen_pozo_bbl = 0.15 * 2500.0
+	var o = Operacion.crear([CEMENTO, INTERMEDIA_SUP], GUION_INT, 60.0, 12.25)
+	o.conectar(t)
+	return [t, o]
+
+
+func test_la_intermedia_arranca_en_el_collar_flotador_y_rota_el_cemento() -> void:
+	verificar_cerca(PROGRAMA_INT.profundidad_de_arranque(), 2420.0, 1e-9, "80 ft sobre la zapata")
+	var par := _intermedia()
+	var t = par[0]
+	var pm0: float = t.tanque("Succión").lodo.pm()
+	t.esperar(60.0)   # 60 ft: todavía en el cemento
+	verificar(t.profundidad_ft > 2420.0 and t.profundidad_ft < 2500.0, "rotando cemento a %.0f ft" % t.profundidad_ft)
+	var avisos: Array = t.tomar_avisos()
+	var del_cemento: Array = avisos.filter(func(a): return a.get("id", "") == "c3i_cemento_zapata")
+	verificar(del_cemento.size() == 1 and del_cemento[0]["quien_avisa"] == "driller",
+		"el driller avisa una vez que rota cemento")
+	verificar(t.tanque("Succión").lodo.pm() > pm0 + 0.3, "el Pm sube: la contaminación sale de perforarlo")
+	verificar(t.tanque("Succión").lodo.finos_cemento > 0.0, "entran finos de cemento")
+
+
+func test_el_cemento_contamina_una_sola_vez() -> void:
+	# Antes (C4) el cemento entraba por la formación Y por el evento. Ahora la
+	# cal aportada es la de los pies de cemento rotados y nada más.
+	var par := _intermedia()
+	var t = par[0]
+	t.esperar(100.0)    # 100 min a 60 ft/h → pasa los 80 ft de cemento
+	verificar(t.profundidad_ft > 2500.0, "ya en formación nueva: %.0f ft" % t.profundidad_ft)
+	var cal_y_finos: float = t.tanque("Succión").lodo.cal_exceso + t.tanque("Succión").lodo.finos_cemento
+	var cemento_bbl: float = 80.0 * 0.1458   # 12,25" → ~0,146 bbl/ft
+	var cal_maxima: float = CEMENTO.contaminante_por_bbl_roca * cemento_bbl * (1.0 - CEMENTO.porosidad) / 800.0
+	verificar(cal_y_finos > 0.0 and cal_y_finos < 0.2 + cal_maxima + 0.1,
+		"cal total %.2f lb/bbl ≤ base 0,2 + lo que aportan 80 ft de cemento (%.2f)" % [cal_y_finos, cal_maxima])
+	var historial: Array = par[1].guion.historial
+	verificar(historial.filter(func(a): return a["id"] == "c3i_cemento_zapata").size() == 1, "un solo aviso")
+	verificar(not historial.any(func(a): return a["tipo"] == "contaminacion"), "ningún evento contamina además")

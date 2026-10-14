@@ -8,6 +8,7 @@ pozo = "CAIMÁN-3"
 seccion = "Intermedia"
 diametro = "12¼\""
 profundidad_desde = 2500.0
+pies_de_cemento_en_zapata = 80.0
 profundidad_hasta = 8000.0
 sistema = "kcl_phpa"
 objetivo = "Atravesar la lutita reactiva desde 3.200 ft con inhibición iónica (K⁺) y encapsulamiento (PHPA), manteniendo la densidad dentro de la ventana hasta 8.000 ft."

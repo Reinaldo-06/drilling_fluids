@@ -157,13 +157,23 @@ func test_lutita_fragil() -> void:
 
 
 func test_formaciones_por_profundidad() -> void:
-	var lista := [SUPERFICIAL, CEMENTO, INTERMEDIA, LUTITA, ARENA]
-	verificar(Perforacion.formacion_en(lista, 1000.0) == SUPERFICIAL, "superficial")
-	verificar(Perforacion.formacion_en(lista, 2450.0) == CEMENTO, "cemento al iniciar la intermedia")
-	verificar(Perforacion.formacion_en(lista, 3500.0) == LUTITA, "lutita reactiva desde 3.200 ft")
-	verificar(Perforacion.formacion_en(lista, 9000.0) == ARENA, "arena productora")
-	for i in range(lista.size() - 1):
-		verificar_cerca(lista[i].base_ft, lista[i + 1].tope_ft, 1e-9, "sin huecos entre formaciones")
+	# Las listas son por sección: la superficial termina en la zapata (2.500 ft) y
+	# la intermedia arranca con el cemento rotado dentro del revestidor.
+	var superficie := [SUPERFICIAL]
+	var perforado := [CEMENTO, INTERMEDIA, LUTITA, ARENA]
+	verificar(Perforacion.formacion_en(superficie, 2450.0) == SUPERFICIAL, "la superficial llega hasta la zapata")
+	verificar(Perforacion.formacion_en(perforado, 2450.0) == CEMENTO, "cemento al iniciar la intermedia")
+	verificar(not CEMENTO.fragil_mecanicamente and CEMENTO.en_revestimiento, "es cemento en el revestidor")
+	verificar(not SUPERFICIAL.en_revestimiento, "la superficial es formación")
+	verificar(Perforacion.formacion_en(perforado, 3500.0) == LUTITA, "lutita reactiva desde 3.200 ft")
+	verificar(Perforacion.formacion_en(perforado, 9000.0) == ARENA, "arena productora")
+	verificar_cerca(SUPERFICIAL.base_ft, CEMENTO.base_ft, 1e-9, "la zapata está donde termina la superficial")
+	for i in range(perforado.size() - 1):
+		verificar_cerca(perforado[i].base_ft, perforado[i + 1].tope_ft, 1e-9, "sin huecos entre formaciones")
+	var prog: Resource = load("res://data/programas/caiman_3_intermedia.tres")
+	verificar_cerca(CEMENTO.base_ft - CEMENTO.tope_ft, prog.pies_de_cemento_en_zapata, 1e-9,
+		"los pies de cemento del programa coinciden con el tramo")
+	verificar_cerca(prog.profundidad_de_arranque(), CEMENTO.tope_ft, 1e-9, "la broca arranca en el collar flotador")
 
 
 # §12.2 — perforación + control + cinética: el pozo crece y el activo se homogeniza

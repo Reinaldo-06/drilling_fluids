@@ -17,6 +17,10 @@ const TIPOS_ARCILLA := ["montmorillonita", "illita", "caolinita", "ninguna"]
 @export_multiline var descripcion := ""
 @export var litologia := ""
 ## Profundidades medidas (ft) donde se la encuentra en el pozo del nivel.
+## true: es cemento que se rota DENTRO del revestidor (tapón, collar flotador,
+## zapata), no formación nueva. Pertenece a la sección que arranca; las listas
+## de formaciones son por sección (la superficial termina en la zapata).
+@export var en_revestimiento := false
 @export var tope_ft := 0.0
 @export var base_ft := 0.0
 ## Fracción de poros: la parte del hueco que no es roca (§6.1).

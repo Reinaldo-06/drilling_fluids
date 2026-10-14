@@ -70,8 +70,10 @@ func test_catalogo_completo_y_valido() -> void:
 		var archivo: String = e.resource_path.get_file().trim_suffix(".tres")
 		verificar(e.id == archivo, "%s: el id coincide con el archivo" % e.id)
 		tipos[e.tipo] = true
+	# "contaminacion" sigue soportado (ver el test de abajo) pero el catálogo ya no
+	# trae ninguno: el cemento de la zapata sale de perforarlo (auditoría C4).
 	for t in ["perdida_circulacion", "influjo", "gas_conexion", "gas_viaje", "viaje",
-			"contaminacion", "sag", "falla_equipo"]:
+			"sag", "falla_equipo"]:
 		verificar(tipos.has(t), "hay al menos un evento de tipo %s" % t)
 
 
@@ -183,11 +185,19 @@ func test_redondeo_del_peso_de_matada() -> void:
 
 # ======================= Contaminación, equipos, viajes =======================
 
-func test_contaminacion_de_cemento_cambia_el_estado() -> void:
+func test_contaminacion_de_un_evento_cambia_el_estado() -> void:
+	# El tipo "contaminacion" lo usan los eventos que traen un contaminante de
+	# afuera (barita sucia, agua de mezcla). El cemento de la zapata NO: sale de
+	# perforarlo (auditoría C4). Aquí se arma un evento de prueba, 0,4 lb/bbl en 1,5 h.
 	var tanques := _tanques()
 	var antes: EstadoLodoScript = tanques[0].lodo.copiar()
 	var ej := Ejecucion.new()
-	var e := _ev("c3i_cemento_zapata")   # 0,4 lb/bbl en 1,5 h
+	var e := EventoScript.new()
+	e.id = "prueba_contaminacion"
+	e.tipo = "contaminacion"
+	e.contaminante = load("res://data/contaminantes/cemento.tres")
+	e.cantidad = 0.4
+	e.duracion_h = 1.5
 	ej.disparar(e, tanques, 2500.0)
 	for i in 9:
 		ej.paso(tanques, 2500.0, 10.0)
@@ -197,6 +207,7 @@ func test_contaminacion_de_cemento_cambia_el_estado() -> void:
 	verificar(lodo.pm() > antes.pm() + 0.5, "sube el Pm (%.2f → %.2f)" % [antes.pm(), lodo.pm()])
 	verificar(lodo.ph() > antes.ph(), "sube el pH")
 	verificar(tanques[2].lodo.finos_cemento == antes.finos_cemento, "la reserva no se contamina")
+
 
 
 func test_falla_de_equipo_y_viaje_duran_lo_dicho() -> void:

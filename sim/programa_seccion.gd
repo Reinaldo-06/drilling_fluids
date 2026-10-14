@@ -18,6 +18,10 @@ const Props := preload("res://sim/propiedades_lodo.gd")
 @export var diametro := ""
 @export var profundidad_desde := 0.0   ## ft
 @export var profundidad_hasta := 0.0   ## ft
+## Pies de cemento por rotar dentro del revestidor antes de formación nueva
+## (collar flotador → zapata). La sección arranca con la broca ahí. 🧩 Supuesto
+## de prototipo hasta confirmar con el autor (auditoría, pregunta 3).
+@export var pies_de_cemento_en_zapata := 0.0
 ## Id del sistema en data/sistemas/ (p. ej. "bentonitico").
 @export var sistema := ""
 @export_multiline var objetivo := ""
@@ -203,3 +207,8 @@ func densidad_en(profundidad_ft: float) -> float:
 		if profundidad_ft >= float(tramo[0]):
 			ppg = float(tramo[1])
 	return ppg
+
+
+## Profundidad con la que arranca la broca: sobre la zapata, en el cemento.
+func profundidad_de_arranque() -> float:
+	return profundidad_desde - pies_de_cemento_en_zapata

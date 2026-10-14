@@ -5,10 +5,11 @@
 [resource]
 script = ExtResource("1")
 nombre = "Cemento de la zapata (CAIMÁN-3)"
-descripcion = "Al iniciar la intermedia se perfora el cemento del revestimiento superficial y la zapata. Aporta cal libre y finos de cemento: el evento guionado del pozo (mud-programs.md, CAIMÁN-3; mud-engineer-reference.md §1.3)."
+descripcion = "Al iniciar la intermedia se rota, dentro del revestidor de 13⅜\", el cemento entre el collar flotador (2.420 ft) y la zapata (2.500 ft). No es formación nueva. Aporta cal libre y finos de cemento: es la ÚNICA fuente de esta contaminación (mud-programs.md, CAIMÁN-3; mud-engineer-reference.md §1.3)."
 litologia = "cemento fraguado"
+en_revestimiento = true
 tope_ft = 2420.0
-base_ft = 2510.0
+base_ft = 2500.0
 porosidad = 0.35
 cic_meq_100g = 0.0
 tipo_arcilla = "ninguna"

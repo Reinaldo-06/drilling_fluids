@@ -115,7 +115,17 @@ El campo `vulnerabilidades` de los sistemas no lo lee ningún código.
 - Variable `nh3` para el olor a amoníaco.
 - Prueba de Tabla 4 por sistema que exija el orden spud < disperso < KCl/PHPA.
 
-### C4. El cemento de la zapata está en el hueco de 17½" y se cuenta dos veces
+### ~~C4. El cemento de la zapata está en el hueco de 17½" y se cuenta dos veces~~ ✅ resuelto
+
+**Resolución (con supuestos de prototipo, pregunta 3 abierta).**
+
+- La zapata queda a 2.500 ft y la superficial termina ahí. Los 80 ft de cemento sobre ella (collar flotador a 2.420 ft) son una formación con `en_revestimiento = true` que pertenece a la intermedia.
+- El programa trae `pies_de_cemento_en_zapata = 80` 🧩 y la broca arranca en `profundidad_de_arranque()` = 2.420 ft.
+- El evento `c3i_cemento_zapata` pasó a ser solo el aviso del perforador. La contaminación sale únicamente de perforar el cemento.
+- Pruebas: `test_operacion_pozo.gd` (una sola fuente; con el evento viejo fallan) y `test_perforacion.gd`.
+- Pendiente: FIT/LOT después de la zapata (no modelado todavía).
+
+Hallazgo original:
 
 **Qué pasa.**
 
