@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "ph"
+nombre = "pH (electrodo)"
+descripcion = "pH con electrodo, a 0,1. Con cloruros altos se usa sonda compensada para sales (mud-engineer-reference.md §7)."
+muestra = "lodo"
+minutos_activos = 2
+minutos_espera = 0
+requiere = PackedStringArray()
+nivel = "rapido"
+chequeos = PackedStringArray("rapido", "completo")
+equipo = "phmetro"
+produce = ""
+lecturas = [{"nombre": "ph", "fuente": "ph", "unidad": "", "resolucion": 0.1}]

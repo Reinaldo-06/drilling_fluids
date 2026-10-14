@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "ggt_carbonatos"
+nombre = "Garrett Gas Train (carbonatos)"
+descripcion = "Carbonatos solubles totales (CO₃²⁻ + HCO₃⁻) expresados como mg/l de CO₃²⁻, con tubo de CO₂ (mud-engineer-reference.md §7, §1.7). 🧩 25 min; paso de 20 mg/l hasta 1.000 y de 100 mg/l por encima."
+muestra = "filtrado"
+minutos_activos = 25
+minutos_espera = 0
+requiere = PackedStringArray("filtrado_api")
+nivel = "ampliada"
+chequeos = PackedStringArray()
+equipo = "garrett"
+produce = ""
+lecturas = [{"nombre": "carbonatos_totales", "fuente": "carbonatos_totales", "unidad": "mg/l como CO₃²⁻", "resolucion": 20.0, "limite_fino": 1000.0, "resolucion_gruesa": 100.0}]

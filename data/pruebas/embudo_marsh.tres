@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "embudo_marsh"
+nombre = "Embudo Marsh"
+descripcion = "Viscosidad de embudo en s/qt (agua ≈ 26). Indicador grueso de cambio; primera alarma numérica (mud-engineer-reference.md §7). 🧩 3 min para que el chequeo rápido quede en 10 min."
+muestra = "lodo"
+minutos_activos = 3
+minutos_espera = 0
+requiere = PackedStringArray()
+nivel = "rapido"
+chequeos = PackedStringArray("rapido")
+equipo = "embudo"
+produce = ""
+lecturas = [{"nombre": "viscosidad_embudo", "fuente": "viscosidad_embudo", "unidad": "s/qt", "resolucion": 1.0}]

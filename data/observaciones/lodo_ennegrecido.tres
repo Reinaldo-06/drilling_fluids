@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Observacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/observacion.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "lodo_ennegrecido"
+nombre = "Lodo ennegrecido y olor a huevo podrido"
+estaciones = PackedStringArray("caja_de_llegada", "zarandas")
+variable = "sulfuro"
+umbrales = PackedFloat64Array(5.0)
+niveles = PackedStringArray("normal", "ennegrecido")
+textos = PackedStringArray("El color y el olor del lodo son los de siempre.", "El lodo que llega se ve ennegrecido y hay olor a huevo podrido. Alerta de seguridad: gas tóxico. Máscara, alejarse viento arriba y avisar al piso.")
+nivel_normal = 0
+alerta_seguridad = true
+notas = "Sulfuros en el lodo. Según el diseño es una emergencia de seguridad: alerta_seguridad dispara el protocolo de gas tóxico. El texto no nombra la especie química (decisión de diseño: la regla de no nombrar contaminantes se aplica sin excepciones); la concentración y la confirmación salen del Garrett Gas Train. 🧩 Umbral: 5 mg/l de sulfuros."

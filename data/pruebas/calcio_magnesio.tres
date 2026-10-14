@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "calcio_magnesio"
+nombre = "Calcio y magnesio por separado"
+descripcion = "Dureza total con EDTA y calcio solo con indicador calcón; el magnesio sale por diferencia (mud-engineer-reference.md §7). 🧩 15 min."
+muestra = "filtrado"
+minutos_activos = 15
+minutos_espera = 0
+requiere = PackedStringArray("filtrado_api")
+nivel = "ampliada"
+chequeos = PackedStringArray()
+equipo = ""
+produce = ""
+lecturas = [{"nombre": "dureza_total", "fuente": "dureza_total", "unidad": "mg/l como Ca²⁺", "resolucion": 20.0}, {"nombre": "ca", "fuente": "ca", "unidad": "mg/l", "resolucion": 20.0}, {"nombre": "mg", "fuente": "mg_por_diferencia", "unidad": "mg/l", "resolucion": 1.0}]

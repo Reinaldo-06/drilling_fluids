@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "fann"
+nombre = "Viscosímetro Fann (600/300/6/3)"
+descripcion = "Lecturas de dial enteras a 600, 300, 6 y 3 RPM; VP = Θ600 − Θ300, PC = Θ300 − VP, VA = Θ600/2. Se corre en copa térmica a 120 °F; en frío lee más alto (simulation-logic.md §11). 🧩 Θ6 y Θ3 se derivan del estado (ver sim/prueba_laboratorio.gd)."
+muestra = "lodo"
+minutos_activos = 10
+minutos_espera = 0
+requiere = PackedStringArray()
+nivel = "completo"
+chequeos = PackedStringArray("completo")
+equipo = "fann"
+produce = ""
+lecturas = [{"nombre": "fann_600", "fuente": "lectura_600", "unidad": "dial", "resolucion": 1.0, "frio": true}, {"nombre": "fann_300", "fuente": "lectura_300", "unidad": "dial", "resolucion": 1.0, "frio": true}, {"nombre": "fann_6", "fuente": "fann_6", "unidad": "dial", "resolucion": 1.0, "frio": true}, {"nombre": "fann_3", "fuente": "fann_3", "unidad": "dial", "resolucion": 1.0, "frio": true}, {"nombre": "vp", "fuente": "fann_vp", "unidad": "cP", "resolucion": 1.0}, {"nombre": "pc", "fuente": "fann_pc", "unidad": "lb/100 ft²", "resolucion": 1.0}, {"nombre": "va", "fuente": "fann_va", "unidad": "cP", "resolucion": 0.5}]

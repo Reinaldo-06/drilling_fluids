@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Observacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/observacion.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "viscosidad_a_ojo"
+nombre = "Viscosidad a ojo"
+estaciones = PackedStringArray("tanques", "zarandas")
+variable = "va"
+umbrales = PackedFloat64Array(10.0, 25.0, 45.0)
+niveles = PackedStringArray("fluido", "normal", "espeso", "muy_espeso")
+textos = PackedStringArray("El lodo corre por la canaleta casi como agua y escurre de la jarra sin dejar capa.", "El lodo corre parejo por la canaleta y el agitador hace un remolino normal.", "El lodo se ve espeso: corre lento por la canaleta, el remolino del agitador es chico y deja capa en la jarra.", "El lodo se ve muy espeso: casi no hace remolino y cae de la jarra en grumos.")
+nivel_normal = 1
+alerta_seguridad = false
+notas = "Desde la VA (Θ600/2). Dice que la viscosidad cambió; no si es VP (sólidos) o PC (química): para eso, el Fann. 🧩 Umbrales de VA: 10, 25 y 45 cP."

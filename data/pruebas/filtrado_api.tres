@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "filtrado_api"
+nombre = "Filtrado API (30 min a 100 psi)"
+descripcion = "Volumen de filtrado en 30 min a 100 psi, en ml. Produce el filtrado para Pf/Mf, cloruros, dureza y K⁺."
+muestra = "lodo"
+minutos_activos = 5
+minutos_espera = 30
+requiere = PackedStringArray()
+nivel = "completo"
+chequeos = PackedStringArray("completo")
+equipo = "filtro_prensa"
+produce = "filtrado"
+lecturas = [{"nombre": "filtrado_api", "fuente": "filtrado_api", "unidad": "ml/30 min", "resolucion": 0.1}]

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "retorta"
+nombre = "Retorta"
+descripcion = "% agua, % aceite y % sólidos en volumen, leídos en la probeta a 0,5 %. Da el Fw de las fórmulas de dosis (game-design-mechanics.md, Qué se ve en la retorta). 🧩 60 min de espera."
+muestra = "lodo"
+minutos_activos = 5
+minutos_espera = 60
+requiere = PackedStringArray()
+nivel = "diaria"
+chequeos = PackedStringArray("diaria")
+equipo = "retorta"
+produce = ""
+lecturas = [{"nombre": "agua_pct", "fuente": "retorta_agua_pct", "unidad": "% vol", "resolucion": 0.5}, {"nombre": "aceite_pct", "fuente": "retorta_aceite_pct", "unidad": "% vol", "resolucion": 0.5}, {"nombre": "solidos_pct", "fuente": "retorta_solidos_pct", "unidad": "% vol", "resolucion": 0.5}, {"nombre": "fw", "fuente": "retorta_fw", "unidad": "", "resolucion": 0.005}]

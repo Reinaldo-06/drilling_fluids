@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "cloruros"
+nombre = "Cloruros"
+descripcion = "Titulación con nitrato de plata en gotas de 0,05 ml. 🧩 Hasta 10.000 mg/l con titulante diluido (paso de 50 mg/l); por encima, titulante concentrado (paso de 500 mg/l)."
+muestra = "filtrado"
+minutos_activos = 10
+minutos_espera = 0
+requiere = PackedStringArray("filtrado_api")
+nivel = "completo"
+chequeos = PackedStringArray("completo")
+equipo = ""
+produce = ""
+lecturas = [{"nombre": "cl", "fuente": "cl", "unidad": "mg/l", "resolucion": 50.0, "limite_fino": 10000.0, "resolucion_gruesa": 500.0}]
