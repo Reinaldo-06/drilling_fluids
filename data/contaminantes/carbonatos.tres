@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Contaminante" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/contaminante.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Carbonatos / bicarbonatos"
+descripcion = "CO₂ de formación, del aire por el embudo, degradación térmica o sobretratamiento con bicarbonato. Suben Pf y Mf con pH que baja, y precipita el calcio (§1.7)."
+unidad = "mg/l de HCO₃⁻"
+aportes = {"ion_hco3": 1.0}

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Contaminante" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/contaminante.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Sal (halita)"
+descripcion = "NaCl de un domo o un flujo de agua salada. Dispara cloruros, la arcilla suelta calcio por intercambio y bajan el pH y las alcalinidades (§1.5)."
+unidad = "lb/bbl de NaCl"
+aportes = {"ion_cl": 1730.0, "ion_na": 1120.0, "intercambio_ca": 8.0, "acido_meq": 0.3}

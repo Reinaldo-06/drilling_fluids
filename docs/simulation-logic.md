@@ -295,9 +295,10 @@ El estado de cada tanque **no guarda PV, YP ni filtrado**. Guarda **de qué est�
 | Fases | % agua, % aceite, **% barita**, **% sólidos livianos** (bentonita + perforados), **aire atrapado** |
 | Química del agua | pH, OH⁻ libre, Ca²⁺, Mg²⁺, Na⁺, Cl⁻, K⁺, CO₃²⁻, HCO₃⁻, SO₄²⁻, sulfuros |
 | Productos | lb/bbl activos de cada producto (bentonita hidratada, lignosulfonato, lignito, PAC/almidón, XC, PHPA, amina, cal en exceso…) y su **edad** (para hidratación y degradación) |
-| Estado interno | **floculación** (0–1) |
+| Alcalinidad sin disolver | **cal en exceso** (lb/bbl): cal y finos de cemento; separa Pm de Pf·Fw |
+| Alcalinidad orgánica | aporte de lignosulfonato y lignito a Pf y Mf |
 
-**La floculación es la pieza clave.** Todo contaminante químico (cemento, yeso, sal, carbonatos, H₂S) **sube la floculación**; los desfloculantes la bajan. De la floculación salen YP, geles y filtrado. Así, **por construcción, los síntomas físicos de todos los contaminantes químicos se parecen**, y lo único que los distingue es la química del agua. El invariante 1 queda garantizado por el modelo, no por cuidado al escribir cada contaminante. (`mud-engineer-reference.md` §1.1)
+**La floculación es la pieza clave.** No se guarda: **se calcula** a partir de la química del agua (calcio, magnesio, cloruros, Mf alto, sulfuros), escalada por el MBT y descontando el desfloculante. Así, al tratar la causa química la floculación baja sola. Todo contaminante químico **sube la floculación**; los desfloculantes la bajan. De la floculación salen YP, geles y filtrado. Así, **por construcción, los síntomas físicos de todos los contaminantes químicos se parecen**, y lo único que los distingue es la química del agua. El invariante 1 queda garantizado por el modelo, no por cuidado al escribir cada contaminante. (`mud-engineer-reference.md` §1.1)
 
 **Propiedades derivadas** (funciones puras, se calibran jugando):
 - Densidad ← fases (balance de masas, `mud-engineer-reference.md` §2), menos el aire si la balanza no es presurizada (observación visual).
@@ -438,3 +439,15 @@ Fuentes: [Kill-weight mud — SLB Energy Glossary](https://glossary.slb.com/en/t
 - Es una trampa del tipo "arreglé un problema y creé otro": bajar viscosidad para controlar la PV puede causar sag.
 
 Fuentes: [Barite sag causes, indications & prevention — Drilling Manual](https://drillingmanual.com/barite-sag-prevention-causes-indications) · [Monitoring of barite sag important in deviated drilling — Oil & Gas Journal](https://www.ogj.com/home/article/17238331/monitoring-of-barite-sag-important-in-deviated-drilling) · [AADE — barite sag](https://www.aade.org/download_file/2687/490) · [AADE — barite sag (2)](https://www.aade.org/download_file/1439/396) · [Rheological characterization — Nordic Rheology Society](https://nordicrheologysociety.org/Content/Transactions/2003/Ahmadi%20Tehrani%20Rheological%20Characterization%20of%20Oil-Based%20Drilling%20Fluids%20%E2%80%93.pdf)
+
+### 12.6 Implementación (estado actual)
+
+- `sim/estado_lodo.gd`: estado por composición y propiedades derivadas.
+  - Alcalinidades con las **relaciones API**: `Pf = OH⁻/340 + CO₃²⁻/1200`, `Mf = OH⁻/340 + CO₃²⁻/600 + HCO₃⁻/1220` (mg/l), más el aporte orgánico. `Pm = Pf·Fw + cal en exceso / 0,26`, que es la fórmula del manual al revés.
+  - Reacciones del manual como completas: HCO₃⁻ + OH⁻ → CO₃²⁻; cal + 2 HCO₃⁻ → CaCO₃ + CO₃²⁻; Ca²⁺ + CO₃²⁻ → CaCO₃; Mg²⁺ + 2 OH⁻ → Mg(OH)₂.
+  - La cal se disuelve hasta saturar (pH ≈ 12,4); el resto queda en exceso.
+  - Un ácido consume, en orden: OH⁻, CO₃²⁻ → HCO₃⁻, alcalinidad orgánica, cal en exceso (libera Ca²⁺) y HCO₃⁻.
+- `sim/contaminante.gd` + `data/contaminantes/*.tres`: cemento, yeso, sal, carbonatos, H₂S y sólidos perforados como datos.
+- `tests/test_tabla4.gd`: **los seis contaminantes reproducen las 12 flechas de la Tabla 4.**
+- **Pendiente de calibrar:** sin alcalinidad el pH cae a 7, demasiado bajo (en el campo quedaría cerca de 8,5–9). Las constantes de VP, PC, geles y filtrado son provisionales.
+- **Sólidos nuevos** (la fila de la Tabla 4 que mueve todo) queda para cuando exista la perforación en el paso de simulación.

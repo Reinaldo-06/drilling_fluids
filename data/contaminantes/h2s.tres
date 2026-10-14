@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Contaminante" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/contaminante.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "H₂S"
+descripcion = "Ácido sulfhídrico de la formación. Tóxico. Baja pH y alcalinidades; ennegrece el lodo (§1.8)."
+unidad = "mg/l de sulfuros"
+aportes = {"ion_sulfuro": 1.0, "acido_meq": 0.03}

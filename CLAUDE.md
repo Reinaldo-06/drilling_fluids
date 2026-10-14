@@ -2,7 +2,7 @@
 
 Juego 2D pixelado en **Godot** donde el jugador es un **ingeniero de fluidos de perforación**. Objetivo: que el autor (que trabaja en la industria) aprenda manejo de tanques, diagnóstico de propiedades y tratamiento de contaminaciones.
 
-**Estado actual: esqueleto creado.** Proyecto Godot 4.7.2 con fórmulas de campo y pruebas pasando. El siguiente paso es el modelo de datos del lodo (`simulation-logic.md` §12). Estructura y cómo correr las pruebas en `README.md`.
+**Estado actual: esqueleto + modelo del lodo.** Proyecto Godot 4.7.2 con fórmulas de campo, estado del lodo por composición y seis contaminantes que reproducen la Tabla 4 del manual. El siguiente paso son los tratamientos (productos químicos) y el tanque. Estructura y cómo correr las pruebas en `README.md`; estado de la implementación en `simulation-logic.md` §12.6.
 
 ## Mapa de documentos
 
@@ -32,7 +32,7 @@ Leer en este orden antes de proponer nada:
 - **Chequeos:** rápido (densidad, embudo, pH; lo hace el jugador, ≤ 10 min) varias veces por turno; **completo** (balanza, Fann con PV/YP/VA, geles, filtrado API, pH, Pm, Pf/Mf, cloruros, dureza) al inicio del turno y opcional a media jornada; **retorta** (da Fw) una vez al día. Detalle en `game-design-mechanics.md`.
 - **El jugador opera las válvulas de tanques** caminando hasta ellas. El "hopper" se llama **embudo de mezcla** en el juego; hay dos (arriba en el tanque de píldoras y abajo junto a la bomba centrífuga).
 - **Las mezclas largas en el embudo las ejecuta el encuellador** por orden del jugador, a 50 sacos/h (250 con cuadrilla prestada en emergencias). `simulation-logic.md` §5 y §8.
-- **Modelo de simulación:** cada tanque guarda composición + floculación; las propiedades se derivan. Paso de 10 min de juego. `simulation-logic.md` §12.
+- **Modelo de simulación:** cada tanque guarda la composición; la floculación y todas las propiedades se derivan. Paso de 10 min de juego. `simulation-logic.md` §12.
 - **Cambio de fluido entre lodos base agua: desplazamiento directo**, sin bache espaciador. Layout base: dos reservas + fractanques; circuito corto en el activo durante los preparativos (`rig-tank-system.md` §5).
 - **Observación visual** (espuma, viscosidad a ojo, recortes, nivel, color/olor, sedimento) es la alarma entre chequeos. Nunca identifica el contaminante químico.
 
@@ -53,8 +53,7 @@ Leer en este orden antes de proponer nada:
 ## Próximos pasos
 
 1. ~~Esqueleto del proyecto Godot 4.7.2~~ ✅ hecho. Pruebas: `godot --headless --path . --script res://tests/run_tests.gd`.
-2. Modelo de datos puro y testeable según `simulation-logic.md` §12: estado del lodo (composición + floculación + aire atrapado), tanque, conexión, layout del taladro, contaminante, prueba de laboratorio, observación, programa de sección.
-   La **Tabla 4 del manual** sirve como batería de pruebas: la firma de cada contaminante derivada por la simulación debe coincidir con sus flechas.
+2. Modelo de datos según `simulation-logic.md` §12: ✅ estado del lodo y contaminantes (la Tabla 4 pasa entera). Faltan: **tratamientos** (productos que corrigen cada contaminación, con las dosis del manual), tanque, conexión, layout del taladro, prueba de laboratorio, observación, programa de sección.
 3. Fórmulas reales de `mud-engineer-reference.md`: ✅ las de tanque, volumen, presión, reología, dosis y píldoras están en `sim/formulas.gd` con pruebas. Faltan las que dependan del modelo de estado.
 4. Primer vertical slice: sección superficial del pozo CAIMÁN-3 — pruebas básicas, densificar, diluir.
 

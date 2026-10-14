@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Contaminante" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/contaminante.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Sólidos perforados (antiguos)"
+descripcion = "Sólidos ya dispersos que el control de sólidos no sacó. Suben PV, geles y % sólidos sin cambios químicos (§1.9)."
+unidad = "% vol"
+aportes = {"lgs_frac": 0.01}
