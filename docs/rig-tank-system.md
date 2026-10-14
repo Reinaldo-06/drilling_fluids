@@ -35,8 +35,9 @@ Los tanques son módulos sobre patín de unos 8 ft de alto, 10 ft de ancho y 30 
   │                                     │ (succión + mezcla)   │  │
   │                                     └──────────────────────┘  │
   │                                               ▲               │
-  │                          EMBUDO DE MEZCLA ────┘               │
-  │                          (hopper)                             │
+  │                 EMBUDO DE MEZCLA (abajo) ─────┘               │
+  │                 junto a la bomba centrífuga                   │
+  │                 + otro embudo arriba, en el tanque de píldoras│
   └───────────────────────────────────────────────────────────────┘
           ▲  bomba de transferencia / múltiple (válvulas)  │
           │                                                 ▼
@@ -78,7 +79,7 @@ Los tanques son módulos sobre patín de unos 8 ft de alto, 10 ft de ancho y 30 
 | **Línea igualadora** (*equalizer*) | Conecta por el fondo dos módulos para que niveles y lodo se igualen | El jugador la abre o cierra |
 | **Succión y descarga de los equipos de sólidos** | Bomba centrífuga toma de un compartimiento, el equipo procesa; el *overflow* limpio va al siguiente compartimiento y el *underflow* sale como descarte | Encender o apagar el equipo (estado del equipo) |
 | **Bomba de transferencia y múltiple** | Mueve lodo entre cualquier par de tanques, incluyendo reserva ↔ activo y fractanques | El jugador: **abre y cierra las válvulas**, elige origen, destino y volumen |
-| **Embudo de mezcla** (*hopper*) | Embudo donde se vacían los sacos de producto. Abajo tiene un venturi: el lodo pasa a alta velocidad y succiona el polvo hacia la línea, que descarga en el tanque de succión o de mezcla | El jugador: producto, cantidad, tanque destino |
+| **Embudo de mezcla** (*hopper*) | Embudo donde se vacían los sacos de producto. Abajo tiene un venturi: el lodo pasa a alta velocidad y succiona el polvo hacia la línea. **Hay dos** (*autor*): uno **arriba, en el tanque de píldoras**, y otro **abajo de los tanques, junto a la bomba centrífuga**, que alimenta el sistema | El jugador: embudo, producto, cantidad, tanque destino |
 | **Succión de bombas de lodo** | Las bombas toman del último tanque activo de la serie | El driller. El jugador decide **qué tanque es succión** solo en un cambio de fluido |
 
 > **Decisión (*autor*):** en la práctica el ingeniero de lodos da instrucciones y también opera. En el juego, **el jugador camina hasta las válvulas y las mueve él mismo**. Alinear mal una válvula es un error posible y explicable.

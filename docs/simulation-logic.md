@@ -1,0 +1,109 @@
+# Lógica de simulación — verificación contra fuentes
+
+Documento de trabajo para que la dinámica del juego se comporte **como un simulador**. Cada regla de simulación se contrasta con fuentes públicas antes de entrar al diseño.
+
+Documentos hermanos: `docs/game-design-mechanics.md` (diseño) · `docs/rig-tank-system.md` (tanques) · `docs/mud-engineer-reference.md` (datos del manual).
+
+## Protocolo de verificación
+
+- Cada dato se contrasta con **al menos dos fuentes independientes**. Patentes, glosarios técnicos (SLB), wikis profesionales (AAPG, PetroWiki), manuales públicos y publicaciones del sector cuentan. Material de proveedores cuenta como fuente, pero se marca.
+- Cada regla lleva una marca de confianza:
+  - ✅ **verificado**: dos o más fuentes coinciden.
+  - ⚠️ **una fuente**: falta contrastar.
+  - 🧩 **diseño**: decisión de juego o síntesis propia, no un hecho de campo.
+  - 👷 **autor**: confirmado por la experiencia de campo del autor.
+- **Videos de YouTube:** no son accesibles desde la sesión en la nube (la red bloquea el dominio). Si el autor encuentra videos útiles, puede pegar la transcripción en el chat y se procesa igual que cualquier otra fuente.
+
+## Temas
+
+| # | Tema | Estado |
+|---|---|---|
+| 1 | Parámetros que se ven en el taladro | ✅ hecho |
+| 2 | Tiempos de circulación: emboladas, retorno de fondo, ciclo completo | ✅ hecho |
+| 3 | Frecuencia de pruebas y puntos de muestreo | ✅ hecho |
+| 4 | Monitoreo de volumen de tanques y falsas alarmas | ✅ hecho |
+| 5 | Quién hace qué en la cuadrilla (encuellador, mud logger, driller, company man) | pendiente |
+| 6 | Cómo cambian las propiedades al perforar: sólidos, temperatura, degradación | pendiente |
+| 7 | Control de sólidos: eficiencia de cada equipo, tasa de dilución | pendiente |
+| 8 | Mezcla con el embudo: sacos por hora, tiempo de hidratación de bentonita y polímeros | pendiente |
+| 9 | Reporte diario de lodo: qué contiene, costos, inventario | pendiente |
+| 10 | Eventos: pérdidas, influjo, gas de conexión, maniobras (viajes) desde la vista del ingeniero | pendiente |
+| 11 | Temperatura del lodo: entrada y salida, efecto en reología | pendiente |
+
+---
+
+## 1. Parámetros que se ven en el taladro
+
+**Qué es real.** La consola del driller y el sistema de registro muestran de forma continua: profundidad, **ROP** (tasa de penetración), **WOB** (peso sobre la broca), **RPM**, **torque**, **carga en el gancho** (*hookload*), **presión de bomba** (*standpipe*), **emboladas y caudal** de bombas, **flujo de retorno** (% de flujo en el flowline) y **volumen de tanques**. ✅
+El WOB no se mide en la broca: se calcula a partir de la carga en el gancho. ✅
+
+**Cómo entra al juego.**
+- En el **piso de perforación** hay un panel de solo lectura con estos parámetros. El jugador no los controla (decisión cerrada: no opera bombas ni perforación), pero los **lee** y le dan información. 🧩
+- Los que alimentan la simulación del lodo:
+  - **ROP y diámetro** → cuánto sólido perforado entra al lodo por hora y cuánto hueco nuevo hay que llenar. 🧩
+  - **Caudal de bombas** → velocidad de circulación (tema 2).
+  - **Volumen de tanques y flujo de retorno** → detección de pérdidas o influjo (tema 4).
+- Torque, hookload y presión de bomba pueden mostrar síntomas de problemas del pozo (empaquetamiento, limpieza deficiente), que se leen **cruzando varios canales**, no uno solo. ⚠️ (una fuente informal; contrastar en el tema 10)
+
+Fuentes: [Cornell University Borehole Observatory — Pason drilling parameters (GDR / OpenEI)](https://gdr.openei.org/submissions/1849) · [US 4507735 — Method and apparatus for monitoring and controlling well drilling parameters](https://patents.justia.com/patent/4507735) · [Estimation of the free rotating hook load for WOB estimation (UiS)](https://uis.brage.unit.no/uis-xmlui/handle/11250/3018193) · [Multi-parameter drilling instrumentation system (proveedor)](https://www.goldsupplier.com/provide/p119545127.html)
+
+---
+
+## 2. Tiempos de circulación
+
+**Qué es real.** ✅ (AAPG Wiki, Drilling Manual, ToolGrit coinciden en método)
+
+```
+Salida de bomba (bbl/emb)   = desplazamiento teórico × eficiencia volumétrica (~95 %)
+Capacidad (bbl/ft)          = ID² / 1.029,4
+Volumen anular (bbl/ft)     = (D_hueco² − D_tubería²) / 1.029,4
+Emboladas superficie→broca  = volumen interno de la sarta / salida por embolada
+Emboladas de retorno (lag)  = volumen anular / salida por embolada
+Tiempo (min)                = emboladas / emboladas por minuto
+```
+
+Ejemplo de AAPG: bomba triplex de 0,0962 bbl/emb al 95 % → 0,0914 bbl/emb. Un anular de 378,9 bbl son 4.146 emboladas, unos **42 min a 98 emb/min**.
+
+Las fórmulas son las mismas de `mud-engineer-reference.md` §2.5, así que hay coherencia con el manual.
+
+**Cómo entra al juego.**
+- **Retorno de fondo** (*bottoms up*): cuánto tarda en llegar a superficie lo que pasa en el fondo. Un contaminante perforado aparece en la caja de llegada **un retorno después** de entrar al lodo. 🧩
+- **Ciclo completo** = (volumen del pozo + volumen activo de superficie) / caudal. Es el tiempo que tarda un tratamiento en **homogenizarse** en todo el sistema. 🧩
+- **Ejemplo de calibración** para CAIMÁN-3 superficial (cálculo propio con las fórmulas de arriba): hueco de 17½" a 2.000 ft con tubería de 5" → anular ≈ 546 bbl. A 600 gpm (≈ 14,3 bbl/min) el retorno de fondo es ≈ **38 min**. Con 600 bbl en superficie, el ciclo completo es ≈ **84 min**. Un tratamiento tarda alrededor de hora y media en verse parejo en las pruebas. 🧩
+
+Fuentes: [AAPG Wiki — cálculo de lag](https://wiki.aapg.org/Special:MobileDiff/1399) · [Lag Time In Drilling — Drilling Manual](https://www.drillingmanual.com/drilling-lag-time-calculations-calculator/) · [Lag Time Planning Guide — ToolGrit](https://www.toolgrit.com/guides/lag-time-bottoms-up)
+
+---
+
+## 3. Frecuencia de pruebas y puntos de muestreo
+
+**Qué es real.**
+- El ingeniero llena el **reporte de lodo** cada día, con resultados de pruebas hechas **varias veces al día**, más uso de productos, inventario y recomendaciones. ✅ (SLB Glossary, Rigzone)
+- Los procedimientos estándar de prueba para lodos base agua están en **API RP 13B-1** (densidad, viscosidad y geles, filtrado, agua/aceite/sólidos, arena, pH, alcalinidad, cloruros). ✅
+- **Puntos de muestreo:** tanque activo (bien mezclado), flowline (retorno) y succión. ✅ (coincide con `rig-tank-system.md` §4, regla 7)
+- **Frecuencias de referencia** de una guía del sector (no del estándar API): densidad, viscosidad de embudo y pH **por parada o cada hora**; reología completa, geles, filtrado API y cloruros **2 a 4 veces al día**; retorta y HTHP **una vez al día**. ⚠️ (una fuente; contrastar)
+
+**Cómo entra al juego.** Esto ajusta el diseño del chequeo de rutina:
+- **Chequeos rápidos frecuentes** (densidad, embudo, pH): baratos, varias veces por turno. Son la segunda capa de alarma, junto con la observación visual. 🧩
+- **Chequeo completo** (Fann, geles, filtrado, químicas): una o dos veces por turno de 12 h, en vez de "uno al inicio". 🧩
+- **Retorta**: una vez al día, no en cada chequeo. 🧩
+- Pendiente del tema 5: confirmar si los chequeos rápidos los hace el **encuellador** y le reporta al ingeniero. Si es así, puede ser un personaje que trae datos al jugador.
+
+Fuentes: [Mud report — SLB Energy Glossary](https://glossary.slb.com/en/terms/m/mud_report) · [How to perform mud testing during drilling operations — Rigzone](https://www.rigzone.com/insights/operational-questions-8/how-to-perform-mud-testing-during-drilling-operations-1009) · [API RP 13B-1 (ficha del estándar)](https://standards.nimonik.com/products/api/rp-13b-1/) · [What does testing tell me about drilling fluids — The Driller](https://www.thedriller.com/articles/91946-what-does-testing-tell-me-about-drilling-fluids?v=preview)
+
+---
+
+## 4. Monitoreo de volumen de tanques
+
+**Qué es real.**
+- El **totalizador de volumen de tanques** (PVT) mide el volumen de los tanques activos y alarma ante cambios inesperados. ✅ (Pason, patentes)
+- Si nadie movió lodo en superficie: **ganancia de volumen → posible influjo (kick)**; **pérdida → posible pérdida de circulación**. ✅
+- **Las transferencias entre tanques generan falsas alarmas**: el sistema las confunde con ganancias o pérdidas del pozo. ✅ (dos patentes)
+- El nivel de tanques **reacciona tarde**; la medición de flujo en el flowline detecta antes. ✅
+- Que el pozo siga fluyendo con bombas apagadas puede ser un kick, pero también expansión térmica, compresibilidad o "respiración" del pozo. ⚠️
+
+**Cómo entra al juego.** Mecánica directa:
+- **Avisar antes de transferir.** Si el jugador mueve lodo entre tanques activos o desde reserva sin avisar al driller y al mud logger, el PVT dispara una alarma falsa: se para la perforación, se pierde tiempo y el driller se queja. El juego explica por qué. 🧩
+- **Pérdida o ganancia real** llega como evento: el jugador la ve en el nivel de tanques o se la informan. Su trabajo es la respuesta de fluidos (material de pérdida, densificar), no el control del pozo. 🧩
+
+Fuentes: [Pit Volume Totalizer — Pason](https://pason.com/products/pit-volume-totalizer-pvt) · [US 6234250 — Real time wellbore pit volume monitoring](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/6234250) · [WO 2021087509 — Automated kick and loss detection](https://patents.google.com/patent/WO2021087509A1) · [Insights into automatic gain/loss detection (SPE)](https://file.streaming.spe.org/wp-content/uploads/2024/02/22130907/Insights-Into-the-Physical-Phenomena-That-Influence-Automatic-GainLoss-Detection-During-Drilling-Operations.pdf) · [Offshore Engineer, sep/oct 2014](https://magazines.marinelink.com/Magazines/OffshoreEngineer/201409/page/66)
