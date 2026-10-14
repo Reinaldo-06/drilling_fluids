@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Personaje" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/personaje.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "mud_logger"
+nombre = "Lucía Ferreyra"
+rol = "Mud logger"
+estacion = "cabina_mud_logger"
+hoja = "res://assets/personajes/mud_logger.png"
+retrato = ""
+dialogos = {
+"saludo": ["Hola, inge. Acá estoy con el cromatógrafo.", "Si ves algo raro en los recortes, pasá."],
+"gas_conexion": ["Inge, tuve un pico de gas en la conexión.", "Con las bombas paradas, el lodo queda corto.", "Ya les avisé al perforador y al company man."],
+"gas_fondo_sube": ["El gas de fondo viene subiendo hace rato.", "Puede ser una zona permeable. Ojo con la balanza.", "Si piden más peso, el trabajo es tuyo."],
+"recortes_raros": ["Inge, cambió el recorte en las muestras.", "Viene más grande y astillado. Lo anoto."]
+}
+notas = "Geóloga de mud logging, argentina. Curiosa, habla de vos. Vigila gas de fondo, gas de conexión y recortes; avisa al driller y al company man. Otra fuente de alarma: describe el gas y el recorte, no el lodo."

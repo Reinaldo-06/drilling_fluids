@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Personaje" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/personaje.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "cuadrillero"
+nombre = "Kevin Ortiz"
+rol = "Cuadrillero (ayudante de zarandas)"
+estacion = "zarandas"
+hoja = "res://assets/personajes/cuadrillero.png"
+retrato = ""
+dialogos = {
+"saludo": ["¡Qué más, inge! Aquí cuidando las zarandas.", "Si quiere ver los recortes, yo le muestro."],
+"recortes_raros": ["Inge, mire: están saliendo lajas grandes.", "Unas como astillas con filo, otras en bloque.", "No es el recorte de siempre. Yo le cuento lo que veo."],
+"rebose_zarandas": ["Inge, la zaranda está botando lodo por encima.", "Ya revisé las mallas y no están rotas."],
+"olor_raro": ["¡Inge! Hay un olor feo en la zaranda.", "Como a huevo podrido. Me retiré y avisé al piso."],
+"perdida": ["Inge, casi no está llegando lodo a la zaranda.", "Antes venía más. Ya le avisé al perforador."]
+}
+notas = "Ayudante nuevo, casco verde (en el taladro el casco verde marca al novato). Entusiasta y preguntón. Cuida las zarandas y cuenta con detalle lo que sale por ellas, sin sacar conclusiones."

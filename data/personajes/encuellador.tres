@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="Personaje" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/personaje.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "encuellador"
+nombre = "Yesenia Barrios"
+rol = "Encuelladora (derrickman)"
+estacion = "tanques"
+hoja = "res://assets/personajes/encuellador.png"
+retrato = ""
+dialogos = {
+"saludo": ["¡Hola, inge! Aquí en los tanques, como siempre.", "Si hay que mezclar algo largo, me da la orden."],
+"orden_mezcla": ["Entendido, inge. Lo echo por el embudo.", "Voy a buen ritmo, unos 50 sacos por hora.", "Cuando termine, pase a medirlo. Eso es suyo."],
+"mezcla_terminada": ["Inge, terminé la mezcla. Ya está en el tanque.", "Dejé los agitadores prendidos. Venga a medirlo."],
+"perdida": ["Inge, el activo viene bajando y no he transferido nada.", "Ya le avisé al perforador. ¿Preparo algo?"],
+"recortes_raros": ["Inge, en la zaranda salen pedazos grandes,", "como astillas. No es el recorte fino de siempre.", "Yo no sé qué será. Usted verá qué hace."],
+"lodo_espeso": ["Inge, el lodo corre más pesado por la canaleta.", "El remolino del agitador casi no se mueve.", "No sé por qué será. Usted dirá qué pruebas corre."]
+}
+notas = "Encuelladora. Trabaja en la torre en los viajes y cuida los tanques el resto del tiempo. Rápida y ordenada; ejecuta las mezclas largas en el embudo por orden del jugador (50 sacos/h). Cuenta lo que ve, no diagnostica."

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Personaje" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/personaje.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "toolpusher"
+nombre = "Aurelio Mamani"
+rol = "Toolpusher (jefe de taladro)"
+estacion = "bodega"
+hoja = "res://assets/personajes/toolpusher.png"
+retrato = ""
+dialogos = {
+"saludo": ["Buenas, ingeniero. ¿Cómo va ese lodo?", "Lo que necesite de logística, me lo pide a mí."],
+"consejo": ["Mida dos veces y trate una. El saco que entra no sale.", "Antes de mover lodo, avise en el piso. El PVT no adivina.", "Lo que ve en el tanque dice que algo cambió, no qué fue.", "Pruebe en la jarra antes de tratar todo el sistema.", "Tenga barita en la bodega. En una emergencia no hay tiempo.", "Un lodo pesado muy adelgazado se asienta en la parada.", "Deje claro en el reporte qué debe hacer la noche."]
+}
+notas = "Jefe del taladro en sitio, responsable de todas las cuadrillas y de la logística (por eso se lo encuentra cerca de la bodega). Veterano, paciente, da consejos de oficio. En 'consejo' cada página es un consejo suelto: la interfaz puede mostrar una al azar."

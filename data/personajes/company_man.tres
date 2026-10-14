@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="Personaje" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/personaje.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "company_man"
+nombre = "Patricia Salcedo"
+rol = "Company man (operadora)"
+estacion = "oficina"
+hoja = "res://assets/personajes/company_man.png"
+retrato = ""
+dialogos = {
+"saludo": ["Buenos días. El programa está en mi escritorio.", "Quiero el reporte completo al cierre del turno."],
+"fuera_de_especificacion": ["Ingeniero, el lodo está fuera del programa.", "No me basta con que lo arregle: quiero saber por qué pasó.", "¿Qué prueba le dio la causa y qué va a hacer?"],
+"costo_alto": ["El costo de lodos va por encima del presupuesto.", "Cada saco sin diagnóstico lo paga la operadora.", "Antes de tratar, muéstreme la prueba que lo justifica."],
+"reporte_recibido": ["Recibido. Lo reviso con el programa en la mano.", "Si veo casillas vacías, le voy a preguntar por qué."],
+"pedido_densificar": ["El mud logger reporta gas en las conexiones.", "Suba la densidad dos décimas, por favor.", "Avíseme cuando el lodo esté en peso."]
+}
+notas = "Representante de la operadora. Exigente, formal, con el programa siempre en la mano. Recibe el reporte diario y pide explicaciones cuando algo sale de especificación o el costo sube. Quiere el porqué, no excusas."

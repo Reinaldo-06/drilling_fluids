@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Personaje" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/personaje.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "jugador"
+nombre = "Alex Rivas"
+rol = "Ingeniero/a de fluidos"
+estacion = "caseta_lodos"
+hoja = "res://assets/personajes/jugador.png"
+retrato = ""
+dialogos = {
+"saludo": ["(Primer día en el pozo. Calma: medir,", "diagnosticar y después tratar.)"],
+"inicio_turno": ["(Muestra, chequeo completo y a comparar", "contra el programa. Después, la ronda.)"]
+}
+notas = "Protagonista. Ingeniero/a de fluidos recién llegado/a al taladro. Diseño base neutral; nombre y aspecto personalizables más adelante. Sus líneas son pensamientos entre paréntesis."

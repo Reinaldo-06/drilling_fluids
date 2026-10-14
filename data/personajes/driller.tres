@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="Personaje" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/personaje.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "driller"
+nombre = "Ramón Quintero"
+rol = "Perforador (driller)"
+estacion = "piso_perforacion"
+hoja = "res://assets/personajes/driller.png"
+retrato = ""
+dialogos = {
+"saludo": ["¡Epa, inge! Aquí seguimos dándole al hueco.", "Si va a mover lodo, me avisa primero."],
+"inicio_turno": ["Buen día, inge. Vamos en {profundidad} pies.", "Estamos perforando {formacion}.", "Lo de la noche está en el reporte.", "Cualquier novedad, me llama."],
+"aviso_transferencia": ["Listo, inge. Anoto la transferencia.", "Le aviso al mud logger para que no salte el PVT.", "Cuando termine me dice y vuelvo a cuadrar el nivel."],
+"falsa_alarma_pvt": ["¡Inge! Saltó la alarma del PVT y paré la mesa.", "Movió lodo sin avisarme. El PVT no sabe si fue usted o el pozo.", "Si el nivel sube puede ser un kick. Hay que revisar.", "Perdimos tiempo. La próxima, avíseme antes de abrir válvulas."],
+"kick": ["¡Inge, cerramos el pozo! Ganancia en los tanques.", "Presión de cierre en la tubería: {sidpp} psi.", "El company man pide lodo de matada de {peso_matada} ppg.", "Confírmelo con su cálculo y prepárelo ya.", "El pozo lo manejo yo. Usted, el lodo."],
+"perdida": ["Inge, el nivel de los tanques viene bajando.", "Nadie movió lodo en superficie. El pozo está tomando.", "Mida cuánto se va por hora y me dice qué preparamos."],
+"cemento_por_perforar": ["Inge, ya fraguó. En el próximo turno vamos", "a rotar el tapón de cemento y la zapata.", "Téngalo en cuenta para su lodo."]
+}
+notas = "Le dicen Moncho. Veinte años en taladros, directo y de pocas palabras. Opera el taladro; informa profundidad y formación, exige que le avisen antes de mover lodo. Trata de 'usted' y dice 'inge'."
