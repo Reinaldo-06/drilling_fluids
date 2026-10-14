@@ -103,7 +103,11 @@ var _aviso_driller := false
 var horas_periodo := 12.0
 var _noche_simulada := false
 var _muestra_filtrado: RefCounted = null
-var _previo = null
+## Lo que el jugador sabe de cada tanque: tanque → {clave: última lectura}.
+## No se borra entre días (la retorta de ayer sigue dando el Fw).
+var lecturas_por_tanque: Dictionary = {}
+## Lecturas anteriores a la última, por tanque (para tendencias: "previo").
+var lecturas_previas: Dictionary = {}
 
 
 static func crear(tanques_: Array, programa_: Resource = null, inventario_inicial: Dictionary = {}) -> RefCounted:
@@ -310,7 +314,7 @@ func transferir(origen_nombre: String, destino_nombre: String, bbl: float) -> Di
 	_aviso_driller = false
 	var accion := {"tipo": "transferir", "origen": o.nombre, "destino": d.nombre,
 		"volumen_bbl": movido, "afecta_activo": afecta, "aviso_driller": aviso}
-	var h := _evaluar("al_transferir", accion, antes, d.lodo)
+	var h := _evaluar("al_transferir", accion, antes, d.lodo, d.nombre)
 	if afecta and not aviso:
 		alarmas_pvt += 1
 		avisar("alarma_pvt", "Alarma del PVT: el driller ve %+.0f bbl en el activo que nadie le avisó y para la perforación." % (
@@ -354,7 +358,7 @@ func tratar(producto_id: String, lb_bbl: float, tanque_nombre := "", prehidratad
 	_contabilizar(r)
 	var accion := {"tipo": "tratar", "producto": producto_id, "lb_bbl": lb_real,
 		"volumen_bbl": t.volumen_bbl, "prehidratada": prehidratada}
-	var h := _evaluar("al_tratar", accion, antes, t.lodo)
+	var h := _evaluar("al_tratar", accion, antes, t.lodo, t.nombre)
 	tratamientos_previos.append(producto_id)
 	avanzar_tiempo(minutos)
 	acciones.append(Accion.registro("tratar", inicio, reloj.minuto - inicio, accion))
@@ -387,7 +391,7 @@ func ordenar_mezcla(producto_id: String, sacos: float, tanque_nombre := "", cuad
 	previsto.tratar(p, lb_bbl)
 	var accion := {"tipo": "tratar", "producto": producto_id, "lb_bbl": lb_bbl,
 		"volumen_bbl": t.volumen_bbl, "mezcla": true, "sacos": sacos, "cuadrilla": cuadrilla}
-	var h := _evaluar("al_tratar", accion, t.lodo, previsto.lodo)
+	var h := _evaluar("al_tratar", accion, t.lodo, previsto.lodo, t.nombre)
 	tratamientos_previos.append(producto_id)
 	var mezcla: Dictionary = mezclador.ordenar(producto_id, p, sacos, t, cuadrilla, reloj.minuto)
 	var aviso := ""
@@ -419,7 +423,8 @@ func hablar(personaje: String) -> Dictionary:
 func diagnosticar(diagnostico: String) -> Dictionary:
 	var t := tanque_principal()
 	var accion := {"tipo": "diagnosticar", "diagnostico": diagnostico}
-	var h := _evaluar("al_diagnosticar", accion, t.lodo if t else null, t.lodo if t else null)
+	var h := _evaluar("al_diagnosticar", accion, t.lodo if t else null, t.lodo if t else null,
+		t.nombre if t else "")
 	avanzar_tiempo(Accion.minutos("diagnosticar"))
 	acciones.append(Accion.registro("diagnosticar", reloj.minuto, 0.0, accion))
 	return {"minutos": 0.0, "hallazgos": h}
@@ -433,10 +438,10 @@ func entregar_reporte(recomendaciones: Array = []) -> RefCounted:
 	var tarde := not reloj.cabe(costo)
 	_ir_a("oficina")
 	avanzar_tiempo(Accion.minutos("entregar_reporte"))
+	# El company man juzga lo que está en el reporte: solo lo medido.
 	var t := tanque_principal()
-	var props := Props.de(t.lodo if t else null)
-	props.merge(Reporte.medidos(mediciones), true)
-	var h := _evaluar("al_cerrar_dia", {"tipo": "cerrar_dia"}, props, props)
+	var h := _evaluar("al_cerrar_dia", {"tipo": "cerrar_dia"}, t.lodo if t else null,
+		t.lodo if t else null, t.nombre if t else "")
 	reporte = Reporte.desde_turno(self, recomendaciones)
 	reporte.tarde = tarde
 	reporte.hallazgos_cierre = h
@@ -528,8 +533,6 @@ func _chequeo(pruebas: Array, tipo: String, tanque_nombre: String) -> Dictionary
 		todas.merge(lecturas, true)
 	if "filtrado_api" in ids:
 		_muestra_filtrado = muestra
-	if tipo == "chequeo_completo":
-		_previo = muestra
 	acciones.append(Accion.registro(tipo, inicio, reloj.minuto - inicio, {"tanque": t.nombre}))
 	return {"minutos": reloj.minuto - inicio, "plan": plan, "lecturas": todas}
 
@@ -537,16 +540,34 @@ func _chequeo(pruebas: Array, tipo: String, tanque_nombre: String) -> Dictionary
 func _registrar_medicion(id: String, tanque_nombre: String, minuto_muestra: float, minuto: float, lecturas: Dictionary) -> void:
 	if lecturas.has("error"):
 		return
-	mediciones.append({"prueba": id, "tanque": tanque_nombre, "minuto_muestra": minuto_muestra,
-		"minuto": minuto, "lecturas": lecturas})
+	var m := {"prueba": id, "tanque": tanque_nombre, "minuto_muestra": minuto_muestra,
+		"minuto": minuto, "lecturas": lecturas}
+	mediciones.append(m)
+	var actuales: Dictionary = lecturas_por_tanque.get(tanque_nombre, {})
+	var previas: Dictionary = lecturas_previas.get(tanque_nombre, {})
+	var nuevas := Reporte.medidos([m])
+	for clave in nuevas:
+		if actuales.has(clave):
+			previas[clave] = actuales[clave]
+		actuales[clave] = nuevas[clave]
+	lecturas_por_tanque[tanque_nombre] = actuales
+	lecturas_previas[tanque_nombre] = previas
 	if not id in pruebas_corridas:
 		pruebas_corridas.append(id)
 
 
-func _evaluar(momento: String, accion: Dictionary, antes, despues) -> Array:
+## Evalúa las reglas del momento sobre lo que el jugador midió en el tanque
+## (Props.de_medido) y lo que puede prever de su acción. Devuelve los hallazgos
+## inmediatos. Las reglas con debrief_real que solo se disparan con el estado
+## real quedan en "hallazgos" con "fuente": "real", sin aviso (invariante 1).
+func _evaluar(momento: String, accion: Dictionary, antes, despues, tanque_nombre := "") -> Array:
+	var real_antes := Props.de(antes)
+	var real_despues := Props.de(despues)
+	var medido_antes := Props.de_medido(lecturas_por_tanque.get(tanque_nombre, {}))
+	var medido_despues := Props.proyectar(medido_antes, real_antes, real_despues)
+	var medido_previo := Props.de_medido(lecturas_previas.get(tanque_nombre, {}))
 	var ctx := {
-		"antes": antes, "despues": despues,
-		"previo": _previo if _previo != null else antes,
+		"antes": medido_antes, "despues": medido_despues, "previo": medido_previo,
 		"accion": accion,
 		"pruebas_corridas": pruebas_corridas,
 		"tratamientos_previos": tratamientos_previos,
@@ -555,14 +576,30 @@ func _evaluar(momento: String, accion: Dictionary, antes, despues) -> Array:
 	if programa != null:
 		ctx["programa"] = programa
 	var h: Array = evaluador.evaluar(reglas, momento, ctx)
+	var ids: Array = h.map(func(x): return x["id"])
+	var solo_debrief: Array = []
+	var con_real := reglas.filter(func(r): return r.debrief_real and not r.id in ids)
+	if not con_real.is_empty():
+		var ctx_real := ctx.duplicate()
+		ctx_real["antes"] = real_antes
+		ctx_real["despues"] = real_despues
+		ctx_real["previo"] = real_antes
+		solo_debrief = evaluador.evaluar(con_real, momento, ctx_real)
 	for x: Dictionary in h:
-		var registro := x.duplicate()
-		registro["minuto"] = reloj.minuto
-		registro["momento"] = momento
-		registro["accion"] = accion
-		hallazgos.append(registro)
+		_guardar_hallazgo(x, momento, accion, "medido")
 		avisos.append({"minuto": reloj.minuto, "tipo": "hallazgo_" + x["tipo"], "texto": x["titulo"]})
+	for x: Dictionary in solo_debrief:
+		_guardar_hallazgo(x, momento, accion, "real")
 	return h
+
+
+func _guardar_hallazgo(x: Dictionary, momento: String, accion: Dictionary, fuente: String) -> void:
+	var registro := x.duplicate()
+	registro["minuto"] = reloj.minuto
+	registro["momento"] = momento
+	registro["accion"] = accion
+	registro["fuente"] = fuente
+	hallazgos.append(registro)
 
 
 func _contabilizar(r: Dictionary) -> void:

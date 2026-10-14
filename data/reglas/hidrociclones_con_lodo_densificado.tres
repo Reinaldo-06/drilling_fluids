@@ -8,6 +8,7 @@ id = "hidrociclones_con_lodo_densificado"
 titulo = "Hidrociclones con lodo densificado"
 tipo = "error"
 momento = "al_cerrar_dia"
+debrief_real = true
 condicion = "(encendido(\"desarenador\") or encendido(\"deslimador\")) and despues.frac_barita > 0.02"
 explicacion = "El lodo lleva barita y dejaste el desarenador o el deslimador encendidos. La barita mide entre 2 y 80 μm, justo en el rango que cortan los hidrociclones: botan cerca de la mitad por el underflow. Pierdes densidad y plata. Con lodo densificado se apagan y se usa la centrífuga, que recupera la barita y descarta los sólidos livianos."
 referencia = "simulation-logic.md §7"

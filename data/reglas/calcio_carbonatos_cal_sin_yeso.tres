@@ -8,6 +8,7 @@ id = "calcio_carbonatos_cal_sin_yeso"
 titulo = "Cal sola con pH entre 10,3 y 11,3"
 tipo = "consejo"
 momento = "al_tratar"
+debrief_real = true
 condicion = "accion.producto == \"cal\" and antes.mf > 5.0 and antes.mf_carbonatos > 2.5 and antes.ph >= 10.3 and antes.ph <= 11.3 and veces_tratado(\"yeso\") == 0"
 explicacion = "Con el pH entre 10,3 y 11,3 el manual pide cal y yeso juntos: así das calcio sin mover el pH. La cal sola va a pasar el pH de 11,3. Combínala con yeso."
 referencia = "mud-engineer-reference.md §1.7"

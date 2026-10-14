@@ -8,6 +8,7 @@ id = "soda_caustica_con_carnalita"
 titulo = "Soda cáustica con magnesio (carnalita)"
 tipo = "error"
 momento = "al_tratar"
+debrief_real = true
 condicion = "accion.producto == \"soda_caustica\" and antes.mg > 2000.0"
 explicacion = "El filtrado tiene mucho magnesio, la firma de la carnalita. El OH⁻ de la soda cáustica precipita Mg(OH)₂, una sustancia gelatinosa que actúa como viscosificante: con apenas 0,03 lb/bbl el lodo ya espesa. Es la excepción a «si baja el pH, echa cáustica». Valora calcio y magnesio por separado para confirmarlo y, si hay que controlar calcio, usa sulfato de sodio. Subir el pH a 11 con NaOH solo vale para magnesio leve, tipo agua salada."
 referencia = "mud-engineer-reference.md §1.5 y §1.6"

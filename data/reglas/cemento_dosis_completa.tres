@@ -8,6 +8,7 @@ id = "cemento_dosis_completa"
 titulo = "Cemento tratado con la dosis completa"
 tipo = "advertencia"
 momento = "al_tratar"
+debrief_real = true
 condicion = "accion.producto in [\"bicarbonato_de_sodio\", \"sapp\", \"acido_citrico\"] and antes.cal_exceso > 0.25 and accion.lb_bbl >= dosis_cemento(accion.producto, antes.pm, antes.pf, antes.fw)"
 explicacion = "Echaste de una vez la dosis estequiométrica completa (o más) para el exceso de cal. El manual pide tratar primero con una cantidad insuficiente, observar y recién después añadir más: los finos de cemento se siguen disolviendo y pasarse de bicarbonato crea un problema de carbonatos, que es peor que el cemento."
 referencia = "mud-engineer-reference.md §1.3"

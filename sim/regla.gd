@@ -31,5 +31,11 @@ extends Resource
 @export_multiline var condicion := ""
 ## Por qué está mal (o qué conviene), en español, para el jugador.
 @export_multiline var explicacion := ""
+## Las reglas se evalúan sobre lo que el jugador MIDIÓ (Props.de_medido): una
+## regla nunca revela lo que nadie midió (invariante 1). Si además esto es true,
+## la regla se revisa contra el estado real; si ahí se dispara y con lo medido
+## no, queda solo para el debrief ("lo que de verdad había"), sin aviso
+## inmediato.
+@export var debrief_real := false
 ## Sección de docs/ de donde sale la regla.
 @export var referencia := ""

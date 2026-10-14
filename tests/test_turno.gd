@@ -202,3 +202,57 @@ func test_enganches_corren_en_cada_paso() -> void:
 	t.esperar(60.0)
 	verificar(llamadas["antes"] == 6 and llamadas["despues"] == 6, "6 pasos de 10 min")
 	verificar_cerca(llamadas["min"], 60.0, 1e-9, "el enganche recibe dt")
+
+
+# --- Las reglas solo saben lo que el jugador midió (invariante 1; auditoría C1) ---
+
+const CARNALITA := preload("res://data/contaminantes/carnalita.tres")
+
+
+func _turno_con_carnalita() -> RefCounted:
+	var t := _turno()
+	CARNALITA.aplicar(t.tanque("Succión").lodo, 15.0)
+	return t
+
+
+func test_tratar_sin_medir_no_revela_el_contaminante() -> void:
+	var t := _turno_con_carnalita()
+	verificar(t.tanque("Succión").lodo.mg > 2000.0, "el escenario tiene carnalita")
+	var r: Dictionary = t.tratar("soda_caustica", 0.1, "Succión")
+	verificar(not "soda_caustica_con_carnalita" in _ids(r["hallazgos"]),
+		"sin medir el magnesio, el aviso no lo nombra")
+	var avisos: Array = t.tomar_avisos().map(func(a): return a["texto"])
+	verificar(not avisos.any(func(x): return x.to_lower().contains("carnalita")), "ningún aviso la nombra")
+	var debrief: Array = t.hallazgos.filter(func(h): return h["id"] == "soda_caustica_con_carnalita")
+	verificar(debrief.size() == 1 and debrief[0]["fuente"] == "real",
+		"queda para el debrief como lo que de verdad había")
+
+
+func test_con_el_magnesio_medido_la_regla_avisa_al_tratar() -> void:
+	var t := _turno_con_carnalita()
+	t.correr_prueba("filtrado_api", "Succión")
+	t.esperar(40.0)
+	verificar(not t.correr_prueba("calcio_magnesio", "Succión").has("error"), "corre sobre el filtrado")
+	t.esperar(60.0)
+	var r: Dictionary = t.tratar("soda_caustica", 0.1, "Succión")
+	verificar("soda_caustica_con_carnalita" in _ids(r["hallazgos"]),
+		"midió Mg alto y aun así echó soda: aviso inmediato")
+
+
+func test_la_medicion_de_otro_tanque_no_cuenta() -> void:
+	var t := _turno_con_carnalita()
+	t.correr_prueba("filtrado_api", "Proceso")
+	t.esperar(40.0)
+	t.correr_prueba("calcio_magnesio", "Proceso")
+	t.esperar(60.0)
+	var r: Dictionary = t.tratar("soda_caustica", 0.1, "Succión")
+	verificar(not "soda_caustica_con_carnalita" in _ids(r["hallazgos"]),
+		"el magnesio se midió en el proceso, no en la succión")
+
+
+func test_al_cerrar_el_dia_solo_cuenta_lo_medido() -> void:
+	# El lodo base tiene pH 10 y la superficial pide 8,5–9,5, pero nadie lo midió.
+	var t := _turno()
+	var r = t.entregar_reporte()
+	verificar(not "lodo_fuera_de_programa" in _ids(r.hallazgos_cierre),
+		"el company man no sabe lo que no está en el reporte")

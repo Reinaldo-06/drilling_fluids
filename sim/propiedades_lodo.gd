@@ -10,6 +10,8 @@ extends RefCounted
 ## densidad (ppg), embudo (s/qt), vp (cP), pc (lb/100 ft²), geles, filtrado
 ## (ml/30 min), pH, alcalinidades (ml), iones (mg/l), sólidos (% vol).
 
+const F := preload("res://sim/formulas.gd")
+
 const VALORES_POR_OMISION := {
 	"densidad": 0.0, "embudo": 0.0, "vp": 0.0, "pc": 0.0, "va": 0.0,
 	"gel_10s": 0.0, "gel_10min": 0.0, "filtrado": 0.0,
@@ -55,3 +57,33 @@ static func de(estado) -> Dictionary:
 	# finos de cemento): es lo que el jugador deduce de Pm − Pf·Fw.
 	props["cal_exceso"] = estado.cal_exceso + estado.finos_cemento
 	return props
+
+
+## Lo que el jugador SABE del lodo: solo lo medido (invariante 1). Lo no medido
+## queda en NAN, y toda comparación con NAN es falsa: una regla no puede
+## dispararse por algo que nadie midió. "medidos" son lecturas con las claves
+## del reporte (ReporteDiario.medidos). Derivados que el ingeniero calcula de
+## lo medido:
+##   cal_exceso     = fórmula del manual con Pm, Pf y Fw (Fw de la retorta)
+##   mf_carbonatos  ≈ Mf − Pf (la alcalinidad que no es OH⁻)
+static func de_medido(medidos: Dictionary) -> Dictionary:
+	var props := {}
+	for clave in VALORES_POR_OMISION:
+		props[clave] = NAN
+	props.merge(medidos, true)
+	if not medidos.has("cal_exceso"):
+		props["cal_exceso"] = F.exceso_de_cal(props["pm"], props["pf"], props["fw"])
+	if not medidos.has("mf_carbonatos"):
+		props["mf_carbonatos"] = props["mf"] - props["pf"]
+	return props
+
+
+## Lo que el jugador puede prever después de su acción: lo medido más el cambio
+## que la acción produjo (los dos estados reales). Solo para lo que midió.
+static func proyectar(medido: Dictionary, real_antes: Dictionary, real_despues: Dictionary) -> Dictionary:
+	var r := medido.duplicate()
+	for clave in medido:
+		var v = medido[clave]
+		if typeof(v) == TYPE_FLOAT and not is_nan(v) and real_antes.has(clave) and real_despues.has(clave):
+			r[clave] = v + float(real_despues[clave]) - float(real_antes[clave])
+	return r

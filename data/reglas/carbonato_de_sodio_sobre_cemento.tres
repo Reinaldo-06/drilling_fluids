@@ -8,6 +8,7 @@ id = "carbonato_de_sodio_sobre_cemento"
 titulo = "Carbonato de sodio sobre cemento"
 tipo = "error"
 momento = "al_tratar"
+debrief_real = true
 condicion = "accion.producto == \"carbonato_de_sodio\" and antes.cal_exceso > 0.25"
 explicacion = "Hay cal sin disolver en el lodo (el Pm está muy por encima de Pf·Fw): eso es cemento o cal en exceso. El manual prohíbe tratar cemento con carbonato de sodio porque su pH es demasiado alto: el carbonato reacciona con la cal, precipita CaCO₃ y libera 2 OH⁻ por cada mol, así que el pH y la alcalinidad suben en vez de bajar, y la dosis que calculaste con el calcio se gasta en la cal. Para cemento usa bicarbonato de sodio, SAPP o ácido cítrico, calculados con el exceso de cal = 0,26 × (Pm − Pf·Fw)."
 referencia = "mud-engineer-reference.md §1.3 (4C.6) y §1.2"

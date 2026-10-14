@@ -8,6 +8,7 @@ id = "bentonita_seca_en_lodo_salado"
 titulo = "Bentonita seca en lodo salado"
 tipo = "error"
 momento = "al_tratar"
+debrief_real = true
 condicion = "accion.producto == \"bentonita\" and not accion.prehidratada and antes.cl > 10000.0"
 explicacion = "La bentonita no hidrata en agua salada: echada seca a este lodo casi no da viscosidad ni revoque, solo suma sólidos. Se prehidrata en agua dulce en el tanque de premezcla, se protege y después se agrega al sistema."
 referencia = "mud-engineer-reference.md §1.5; simulation-logic.md §8"

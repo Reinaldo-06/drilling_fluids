@@ -8,6 +8,7 @@ id = "soda_caustica_en_carbonatos"
 titulo = "Soda cáustica repetida con carbonatos"
 tipo = "error"
 momento = "al_tratar"
+debrief_real = true
 condicion = "accion.producto == \"soda_caustica\" and antes.mf > 5.0 and antes.mf_carbonatos > 2.5 and (veces_tratado(\"soda_caustica\") > 0 or razon(antes.mf, antes.pf) > razon(previo.mf, previo.pf))"
 explicacion = "Mf sobre 5 ml con la relación Mf/Pf creciendo es la firma de carbonatos. La soda cáustica parece desflocular, pero solo convierte bicarbonato en carbonato: los carbonatos siguen en el lodo y el síntoma vuelve, una y otra vez. Hay que sacarlos precipitándolos con calcio (cal, cal + yeso o yeso, según el pH), no subir el pH. Confírmalo con el Garrett Gas Train si dudas."
 referencia = "mud-engineer-reference.md §1.7 (4C.11)"

@@ -8,6 +8,7 @@ id = "calcio_carbonatos_yeso_con_ph_bajo"
 titulo = "Yeso sobre carbonatos con pH bajo"
 tipo = "error"
 momento = "al_tratar"
+debrief_real = true
 condicion = "accion.producto == \"yeso\" and antes.mf > 5.0 and antes.mf_carbonatos > 2.5 and antes.ph < 10.3"
 explicacion = "Con el pH bajo 10,3 buena parte de los carbonatos está como bicarbonato, y el bicarbonato no precipita con calcio (el Ca(HCO₃)₂ es soluble). El yeso además baja el pH. Usa cal: aporta el OH⁻ que convierte HCO₃⁻ en CO₃²⁻ y el calcio que lo precipita."
 referencia = "mud-engineer-reference.md §1.7"

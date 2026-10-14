@@ -8,6 +8,7 @@ id = "soda_caustica_sobre_cemento"
 titulo = "Soda cáustica con cemento"
 tipo = "advertencia"
 momento = "al_tratar"
+debrief_real = true
 condicion = "accion.producto == \"soda_caustica\" and antes.cal_exceso > 0.25"
 explicacion = "Hay cal sin disolver en el lodo: el cemento ya sube la alcalinidad por su cuenta. El manual pide no añadir soda cáustica con los desfloculantes en una contaminación de cemento. Lo que hace falta es bajar el pH y precipitar el calcio (bicarbonato de sodio, SAPP o ácido cítrico)."
 referencia = "mud-engineer-reference.md §1.3"
