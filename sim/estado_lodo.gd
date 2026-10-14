@@ -52,6 +52,13 @@ const CONTROL_FILTRADO_PHPA := 0.2
 const CONTROL_FILTRADO_LIGNITO := 0.15
 const CONTROL_FILTRADO_CACO3_POR_PCT := 0.3  ## puenteo: por % de volumen
 const DESFLOCULANTE_POR_LB_LIGNITO := 0.06   ## el lignosulfonato es 0,08
+## Arcilla perforada activa (lb/bbl equivalentes de bentonita, lo que suma al
+## MBT): arcilla dispersa que rinde menos que la bentonita comercial. Su volumen
+## ya está en frac_lgs (la VP lo cuenta por ahí). 🧩 calibración de juego.
+const PC_POR_LB_ARCILLA_ACTIVA := 0.5   ## la bentonita es 0,8
+const GEL_POR_LB_ARCILLA_ACTIVA := 0.15 ## la bentonita es 0,25
+## lb de sólido de baja gravedad (SG 2,6) en un bbl de sólido.
+const LB_LGS_POR_BBL := 21.7 * 42.0
 const MG_POR_MMOL_ION := {
 	"oh": 17.01, "co3": 60.01, "hco3": 61.02, "ca": 40.08, "mg": 24.31,
 	"na": 22.99, "k": 39.10, "cl": 35.45, "so4": 96.06, "sulfuro": 32.06,
@@ -279,7 +286,7 @@ func vp() -> float:
 
 func pc() -> float:
 	return 0.8 * bentonita + 4.0 * xc + 25.0 * floculacion() + mg_oh2 / MG_OH2_POR_PUNTO_PC \
-		+ PC_POR_LB_PHPA * phpa
+		+ PC_POR_LB_PHPA * phpa + PC_POR_LB_ARCILLA_ACTIVA * arcilla_activa
 
 
 func lectura_600() -> float:
@@ -296,7 +303,7 @@ func va() -> float:
 
 func gel_10s() -> float:
 	return 0.25 * bentonita + 0.3 * lgs_pct() + 12.0 * floculacion() + 1.5 * xc + mg_oh2 / MG_OH2_POR_PUNTO_GEL \
-		+ GEL_POR_LB_PHPA * phpa
+		+ GEL_POR_LB_PHPA * phpa + GEL_POR_LB_ARCILLA_ACTIVA * arcilla_activa
 
 
 func gel_10min() -> float:
@@ -377,6 +384,42 @@ func agregar_ion(nombre: String, mg_l: float) -> void:
 ## Sólidos perforados inertes (fracción de volumen) que reemplazan agua.
 func agregar_solidos(fraccion: float) -> void:
 	frac_lgs += fraccion
+
+
+## Sólidos perforados que ENTRAN con su volumen (bbl por bbl de lodo inicial):
+## a diferencia de agregar_solidos, el lodo crece por (1 + v) y todo lo que va
+## por bbl de lodo se reparte en el volumen nuevo (como agregar_bentonita).
+## Lo usa la perforación (sim/perforacion.gd; simulation-logic.md §6.1).
+func agregar_solidos_con_volumen(v: float) -> void:
+	if v <= 0.0:
+		return
+	_diluir_por_volumen_agregado(v, false)
+	frac_lgs += v / (1.0 + v)
+
+
+## Saca v bbl de una fase sólida por bbl de lodo (lo que descarta el equipo de
+## sólidos). El lodo queda por bbl del volumen restante (1 − v): las demás
+## cantidades por bbl se concentran y el filtrado no cambia (no sale agua).
+## La capacidad tampón por litro de filtrado tampoco cambia. Devuelve lo sacado.
+func quitar_solidos(campo: String, v: float) -> float:
+	assert(campo in ["frac_barita", "frac_lgs", "frac_caco3"], "Fase desconocida: %s" % campo)
+	var sacado := clampf(v, 0.0, get(campo))
+	if sacado <= 0.0 or sacado >= 1.0:
+		return 0.0
+	var factor := 1.0 / (1.0 - sacado)
+	for c in _CAMPOS_POR_BBL:
+		var valor: float = get(c)
+		if c == campo:
+			valor -= sacado
+		set(c, valor * factor)
+	return sacado
+
+
+## Fracción de sólidos perforados que el equipo de sólidos puede separar: los
+## livianos menos la bentonita (coloidal) y la arcilla activa dispersa. 🧩
+## "bentonita_extra" es la bentonita sin hidratar que guarda el tanque.
+func frac_perforados_separables(bentonita_extra := 0.0) -> float:
+	return maxf(0.0, frac_lgs - (bentonita + bentonita_extra + arcilla_activa) / LB_LGS_POR_BBL)
 
 
 ## Agrega un químico que se disuelve y reacciona (soda, carbonato de sodio, SAPP…).

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="EquipoSolidos" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/equipo_solidos.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Zarandas"
+tipo = "zaranda"
+descripcion = "Mallas vibratorias: descartan los recortes gruesos (> ~100 μm según la malla). Con la malla rota pasan casi todos (simulation-logic.md §7)."
+punto_corte_um = 105.0
+malla_api = 140
+actua_en_entrada = true
+eficiencia_gruesos = 0.9
+eficiencia_medios = 0.1
+eficiencia_finos = 0.0
+caudal_gpm = 0.0
+solidos_en_descarte = 0.7

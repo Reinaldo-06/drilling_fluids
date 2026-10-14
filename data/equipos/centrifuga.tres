@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="EquipoSolidos" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/equipo_solidos.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Centrífuga decantadora"
+tipo = "centrifuga"
+descripcion = "Trabaja sobre una derivación del activo (~40 gpm). Llega a los finos; con lodo densificado recupera la barita y descarta los livianos (simulation-logic.md §7)."
+punto_corte_um = 5.0
+actua_en_entrada = false
+caudal_gpm = 40.0
+eficiencia_perforados_lodo = 0.3
+eficiencia_barita = 0.05
+eficiencia_finos_cemento = 0.6
+solidos_en_descarte = 0.5

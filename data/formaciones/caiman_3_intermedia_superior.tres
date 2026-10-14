@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Formacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/formacion.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Areniscas y limolitas (CAIMÁN-3 intermedia)"
+descripcion = "Intermedia de 12¼\" sobre la lutita: areniscas y limolitas con algo de illita. Poco reactivas."
+litologia = "arenisca y limolita"
+tope_ft = 2510.0
+base_ft = 3200.0
+porosidad = 0.2
+cic_meq_100g = 4.0
+tipo_arcilla = "illita"

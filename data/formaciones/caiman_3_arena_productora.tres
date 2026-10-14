@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Formacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/formacion.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Arena productora (CAIMÁN-3)"
+descripcion = "Sección de producción de 8½\": arenisca porosa con caolinita en los poros. El KCl puede empeorar la caolinita (simulation-logic.md §13.1)."
+litologia = "arenisca"
+tope_ft = 8000.0
+base_ft = 9600.0
+porosidad = 0.22
+cic_meq_100g = 2.0
+tipo_arcilla = "caolinita"

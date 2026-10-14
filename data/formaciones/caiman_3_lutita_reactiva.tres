@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Formacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/formacion.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Lutita reactiva (CAIMÁN-3)"
+descripcion = "Lutita con montmorillonita desde 3.200 ft (mud-programs.md, CAIMÁN-3). Sin inhibición se dispersa: sube MBT, VP y PC. Se come el K⁺, la amina y el PHPA (simulation-logic.md §13.5)."
+litologia = "lutita"
+tope_ft = 3200.0
+base_ft = 8000.0
+porosidad = 0.1
+cic_meq_100g = 25.0
+tipo_arcilla = "montmorillonita"
+fraccion_gruesos = 0.6
+fraccion_medios = 0.25
