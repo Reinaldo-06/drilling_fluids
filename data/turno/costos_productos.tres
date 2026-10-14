@@ -1,0 +1,31 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/turno_tabla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "costos_productos"
+descripcion = "🧩 Costo ficticio por saco (USD) de cada producto de data/productos/, con el tamaño de saco de cada .tres. Valores plausibles de orden de magnitud, no precios reales de ningún proveedor. El agua va por bbl."
+valores = {
+"acido_citrico": 75.0,
+"agua": 2.0,
+"almidon": 35.0,
+"amina": 260.0,
+"barita": 18.0,
+"bentonita": 14.0,
+"bicarbonato_de_sodio": 28.0,
+"cal": 9.0,
+"carbonato_de_calcio": 12.0,
+"carbonato_de_sodio": 24.0,
+"kcl": 22.0,
+"lignito": 20.0,
+"lignosulfonato": 38.0,
+"nacl": 9.0,
+"oxido_de_cinc": 140.0,
+"pac": 165.0,
+"phpa": 185.0,
+"sapp": 60.0,
+"soda_caustica": 42.0,
+"xc": 290.0,
+"yeso": 11.0
+}

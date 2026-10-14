@@ -1,0 +1,20 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/turno_tabla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "tiempos_acciones"
+descripcion = "🧩 Minutos de juego que cuesta cada acción del jugador (punto de partida, a calibrar jugando). Las pruebas de laboratorio no están aquí: su tiempo sale de data/pruebas/ y del planificador (sim/laboratorio.gd). El jugador echa sacos al embudo al mismo ritmo que el encuellador solo (simulation-logic.md §8). La bomba de transferencia mueve ~500 gpm (12 bbl/min)."
+valores = {
+"abrir_valvulas": 5.0,
+"agua_bbl_por_min": 10.0,
+"avisar_driller": 5.0,
+"diagnosticar": 0.0,
+"entregar_reporte": 30.0,
+"hablar": 10.0,
+"orden_encuellador": 5.0,
+"transferencia_bbl_por_min": 12.0,
+"tratar_base": 5.0,
+"tratar_sacos_por_h": 50.0
+}
