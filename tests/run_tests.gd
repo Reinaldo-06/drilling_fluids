@@ -15,7 +15,13 @@ func _initialize() -> void:
 	for archivo in DirAccess.get_files_at(CARPETA):
 		if not (archivo.begins_with("test_") and archivo.ends_with(".gd")) or archivo == "test_case.gd":
 			continue
-		var caso: RefCounted = load("%s/%s" % [CARPETA, archivo]).new()
+		var script: Script = load("%s/%s" % [CARPETA, archivo])
+		if script == null or not script.can_instantiate():
+			# Un archivo que no compila es una falla, no "0 pruebas".
+			total += 1
+			fallas.append("%s: no compila o no se puede instanciar" % archivo)
+			continue
+		var caso: RefCounted = script.new()
 		for metodo in caso.get_method_list():
 			var nombre: String = metodo["name"]
 			if not nombre.begins_with("test_"):
