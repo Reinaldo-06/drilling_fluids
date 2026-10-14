@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Producto" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/producto.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Amina (inhibidor de lutitas)"
+descripcion = "Inhibidor principal del sistema amina/PHPA: se mete entre las láminas de arcilla. Se consume con cada pie de lutita; hay que medirla (simulation-logic.md §13.2)."
+efecto = "aditivo"
+aditivo = "amina"
+peso_molecular = 0.0
+reaccion = {}
+lb_por_saco = 55.0

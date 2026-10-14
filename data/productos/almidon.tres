@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Producto" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/producto.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Almidón modificado"
+descripcion = "Controlador de filtrado que tolera la sal. Sin biocida o sin salinidad alta fermenta con los días y sube el filtrado (simulation-logic.md §6.2)."
+efecto = "aditivo"
+aditivo = "almidon"
+peso_molecular = 0.0
+reaccion = {}
+lb_por_saco = 50.0

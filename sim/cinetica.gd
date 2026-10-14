@@ -20,7 +20,10 @@ const PASO_MIN := 10.0
 ## saturación (mud-engineer-reference.md §1.3 punto 6: "remover los finos antes
 ## de que se disuelvan"). Cada hora se disuelve 1 − e^(−1/τ) de lo que queda,
 ## sin pasar de la saturación de EstadoLodo.OH_MAX_CAL_MG_L. 🧩
-const TAU_DISOLUCION_CAL_H := 4.0
+## Vueltas del lodo para que se disuelva el 63 % de los finos de cemento. 🧩
+const TAU_FINOS_VUELTAS := 1.0
+## Sin circulación (sin vueltas), constante fija. 🧩
+const TAU_FINOS_SIN_CIRCULAR_MIN := 240.0
 
 ## Bentonita: rinde de forma lineal y llega al 100 % a las 6 h en agua dulce
 ## (simulation-logic.md §8; rango de campo 4–6 h). 🧩
@@ -55,10 +58,11 @@ static func avanzar(tanques: Array, minutos: float, caudal_gpm: float, volumen_p
 
 static func paso(tanques: Array, dt_min: float, caudal_gpm: float, volumen_pozo_bbl: float) -> void:
 	var dt_h := dt_min / 60.0
+	var ciclo := ciclo_completo_min(tanques, caudal_gpm, volumen_pozo_bbl)
 	for t: TanqueScript in tanques:
 		if t.volumen_bbl <= 0.0:
 			continue
-		disolver_cal(t.lodo, dt_h)
+		disolver_finos(t.lodo, dt_min, ciclo)
 		hidratar_bentonita(t, dt_h)
 		asentar(t, dt_h)
 	homogenizar_activo(tanques, dt_min, caudal_gpm, volumen_pozo_bbl)
@@ -66,21 +70,21 @@ static func paso(tanques: Array, dt_min: float, caudal_gpm: float, volumen_pozo_
 
 # ======================= Cinética =======================
 
-## Cal en exceso que pasa a solución: 2 OH⁻ y 1 Ca²⁺ por mmol, igual que
-## EstadoLodo.agregar_cal, pero de a poco.
-static func disolver_cal(lodo: EstadoLodoScript, dt_h: float) -> void:
-	if lodo.cal_exceso <= 0.0 or lodo.oh >= EstadoLodoScript.OH_MAX_CAL_MG_L:
+## Finos de cemento que pasan a solución: 2 OH⁻ y 1 Ca²⁺ por mmol, igual que
+## EstadoLodo.agregar_cal, pero de a poco y nunca por encima de saturación.
+## Se disuelven en unas pocas VUELTAS del lodo (decisión del autor: el efecto se
+## ve en una vuelta, que depende de la profundidad y del caudal). Sin circulación
+## se usa una constante fija más lenta. La cal en exceso NO se disuelve sola.
+static func disolver_finos(lodo: EstadoLodoScript, dt_min: float, ciclo_min: float) -> void:
+	if lodo.finos_cemento <= 0.0:
 		return
-	var fw: float = lodo.fw()
-	var mmol_disponible: float = lodo.cal_exceso * EstadoLodoScript.MMOL_CAL_POR_LB_BBL / fw
-	var mmol_espacio: float = (EstadoLodoScript.OH_MAX_CAL_MG_L - lodo.oh) \
-		/ (2.0 * EstadoLodoScript.MG_POR_MEQ_OH)
-	var disuelto := minf(mmol_disponible * (1.0 - exp(-dt_h / TAU_DISOLUCION_CAL_H)), mmol_espacio)
-	lodo.oh += disuelto * 2.0 * EstadoLodoScript.MG_POR_MEQ_OH
-	lodo.ca += disuelto * EstadoLodoScript.MG_POR_MMOL_CA
-	lodo.cal_exceso = maxf(0.0, lodo.cal_exceso - disuelto * fw / EstadoLodoScript.MMOL_CAL_POR_LB_BBL)
-	# El OH⁻ nuevo puede reaccionar (Mg²⁺ → Mg(OH)₂, HCO₃⁻ → CO₃²⁻, Ca²⁺ + CO₃²⁻).
-	lodo.equilibrar()
+	var tau_min := TAU_FINOS_SIN_CIRCULAR_MIN if is_inf(ciclo_min) else TAU_FINOS_VUELTAS * ciclo_min
+	var fraccion := 1.0 - exp(-dt_min / tau_min)
+	var lb := lodo.finos_cemento * fraccion
+	lodo.finos_cemento -= lb
+	# agregar_cal se come primero los carbonatos, se disuelve hasta saturar y deja
+	# el resto como cal en exceso: lo que no cabe en solución pasa a ser reserva.
+	lodo.agregar_cal(lb)
 
 
 ## 1 en agua dulce y blanda; baja con cloruros y calcio altos (§8).

@@ -51,4 +51,7 @@ static func de(estado) -> Dictionary:
 	props["solidos_pct"] = estado.solidos_pct()
 	props["fw"] = estado.fw()
 	props["floculacion"] = estado.floculacion()
+	# Para las reglas, "cal_exceso" es todo el álcali sin disolver (cal en exceso +
+	# finos de cemento): es lo que el jugador deduce de Pm − Pf·Fw.
+	props["cal_exceso"] = estado.cal_exceso + estado.finos_cemento
 	return props

@@ -137,7 +137,7 @@ func test_hallazgos_ordenados_y_filtrados_por_momento() -> void:
 # §1.3 — nunca carbonato de sodio sobre cemento
 func test_carbonato_de_sodio_sobre_cemento() -> void:
 	var cemento = _contaminado("cemento", 1.0)
-	verificar(cemento.cal_exceso > 0.25, "premisa: el cemento deja cal en exceso")
+	verificar(cemento.cal_exceso + cemento.finos_cemento > 0.25, "premisa: el cemento deja álcali sin disolver (cal en exceso + finos)")
 	verificar(_dispara("carbonato_de_sodio_sobre_cemento", "al_tratar", _tratar("carbonato_de_sodio", cemento)),
 		"se dispara con cemento")
 	var yeso = Base.disperso_lignosulfonato()

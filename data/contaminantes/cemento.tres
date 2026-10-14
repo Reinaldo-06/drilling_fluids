@@ -5,6 +5,6 @@
 [resource]
 script = ExtResource("1")
 nombre = "Cemento"
-descripcion = "Ca(OH)₂ de tapones y zapatas, o de barita contaminada. Aporta calcio y un floculante, y sube mucho el pH, el Pm y el Pf (mud-engineer-reference.md §1.3)."
+descripcion = "Ca(OH)₂ de tapones y zapatas, o de barita contaminada. Aporta calcio y un floculante, y sube mucho el pH, el Pm y el Pf. La mitad entra disuelta y la otra mitad como finos que se disuelven en las vueltas siguientes si el equipo de sólidos no los saca (mud-engineer-reference.md §1.3)."
 unidad = "lb/bbl de cal libre"
-aportes = {"cal_lb_bbl": 1.0}
+aportes = {"cal_lb_bbl": 0.5, "finos_cemento": 0.5}

@@ -144,6 +144,8 @@ static func volumen_agregado_por_bbl(efecto: String, cantidad: float) -> float:
 			return cantidad / F.LB_BARITA_POR_BBL                       # 1.470 lb/bbl, §2.1
 		"bentonita":
 			return cantidad / (F.DENSIDAD_LGS_PPG * F.GAL_POR_BBL)      # SG 2,6
+		"carbonato_de_calcio":
+			return cantidad / (EstadoLodoScript.DENSIDAD_CACO3_PPG * F.GAL_POR_BBL)  # SG 2,71
 		"agua":
 			return cantidad                                             # bbl por bbl, §2.2
 	return 0.0

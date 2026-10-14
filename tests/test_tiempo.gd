@@ -58,34 +58,55 @@ func test_sin_circular_no_homogeniza() -> void:
 	verificar_cerca(succion.lodo.cl, 7000.0, 1e-9, "sin bombas cada tanque sigue igual")
 
 
-# mud-engineer-reference.md §1.3 punto 6 — los finos de cemento se disuelven con el tiempo.
-func test_cal_en_exceso_se_disuelve() -> void:
+# Decisión del autor: sin tratamientos, las propiedades no derivan solas durante
+# un día; la cal en exceso es reserva y no se disuelve sola.
+func test_lodo_base_estable_un_dia() -> void:
+	var t = Tanque.crear("Succión", 800.0, "succion", 600.0, Base.disperso_lignosulfonato())
+	var ph0: float = t.lodo.ph()
+	var ca0: float = t.lodo.ca
+	Cinetica.avanzar([t], 24.0 * 60.0, 600.0, 600.0)
+	verificar_cerca(t.lodo.ph(), ph0, 0.05, "el pH no deriva en un día")
+	verificar_cerca(t.lodo.ca, ca0, 5.0, "el calcio no deriva en un día")
+
+
+# mud-engineer-reference.md §1.3 punto 6 — los finos de cemento se disuelven, y
+# (decisión del autor) el efecto se ve en pocas vueltas del lodo, no en horas fijas.
+func test_finos_de_cemento_se_disuelven_en_vueltas() -> void:
 	var lodo = Base.disperso_lignosulfonato()
-	var t = Tanque.crear("Succión", 600.0, "succion", 500.0, lodo)
-	var ph0: float = lodo.ph()
-	var pm0: float = lodo.pm()
-	var ca0: float = lodo.ca
-	verificar_cerca(ph0, 10.0, 0.05, "parte de pH 10")
-	Cinetica.avanzar([t], 60.0, 0.0, 0.0)
-	var ph1: float = t.lodo.ph()
-	Cinetica.avanzar([t], 5.0 * 60.0, 0.0, 0.0)
-	var ph6: float = t.lodo.ph()
-	verificar(ph1 > ph0, "a la hora ya subió el pH (%.2f → %.2f)" % [ph0, ph1])
-	verificar(ph6 > ph1 + 0.3, "sigue subiendo con las horas (%.2f → %.2f)" % [ph1, ph6])
-	verificar(t.lodo.cal_exceso < 0.2 * exp(-5.0 / Cinetica.TAU_DISOLUCION_CAL_H), "queda menos cal sin disolver")
-	verificar(t.lodo.ca > ca0, "sube el calcio")
-	# Disolver no crea ni destruye alcalinidad: el Pm queda casi igual.
-	verificar_cerca(t.lodo.pm(), pm0, 0.05, "el Pm se conserva")
+	lodo.finos_cemento = 0.5
+	var t = Tanque.crear("Succión", 800.0, "succion", 600.0, lodo)
+	var ph0: float = t.lodo.ph()
+	var pm0: float = t.lodo.pm()
+	var vuelta: float = Cinetica.ciclo_completo_min([t], 600.0, 600.0)
+	Cinetica.avanzar([t], vuelta, 600.0, 600.0)
+	verificar(t.lodo.finos_cemento < 0.5 * 0.4, "en una vuelta se disuelve más del 60 %% (%.2f lb/bbl)" % t.lodo.finos_cemento)
+	verificar(t.lodo.ph() > ph0 + 0.3, "el pH ya subió en una vuelta (%.2f → %.2f)" % [ph0, t.lodo.ph()])
+	Cinetica.avanzar([t], 3.0 * vuelta, 600.0, 600.0)
+	verificar(t.lodo.finos_cemento < 0.5 * 0.02, "en cuatro vueltas casi no quedan finos")
+	# Disolver no crea ni destruye alcalinidad: el Pm (lodo entero) se conserva.
+	verificar_cerca(t.lodo.pm(), pm0, 0.1, "el Pm se conserva")
+
+
+# Con más caudal (vuelta más corta) los finos se disuelven antes.
+func test_vuelta_mas_corta_disuelve_antes() -> void:
+	var lento = Base.disperso_lignosulfonato()
+	lento.finos_cemento = 0.5
+	var rapido = lento.copiar()
+	var t1 = Tanque.crear("A", 800.0, "succion", 600.0, lento)
+	var t2 = Tanque.crear("B", 800.0, "succion", 600.0, rapido)
+	Cinetica.avanzar([t1], 60.0, 300.0, 600.0)
+	Cinetica.avanzar([t2], 60.0, 900.0, 600.0)
+	verificar(t2.lodo.finos_cemento < t1.lodo.finos_cemento, "a 900 gpm quedan menos finos que a 300 gpm")
 
 
 func test_cal_no_pasa_de_saturacion() -> void:
 	var lodo := EstadoLodoScript.new()
-	lodo.cal_exceso = 3.0
+	lodo.finos_cemento = 3.0
 	var t = Tanque.crear("Píldora", 100.0, "pildora", 50.0, lodo, false)
 	Cinetica.avanzar([t], 24.0 * 60.0, 0.0, 0.0)
 	verificar(t.lodo.oh <= EstadoLodoScript.OH_MAX_CAL_MG_L + 1e-6, "OH⁻ no pasa de saturación")
 	verificar_cerca(t.lodo.oh, EstadoLodoScript.OH_MAX_CAL_MG_L, 1.0, "llega a saturación")
-	verificar(t.lodo.cal_exceso > 0.0, "el resto queda sin disolver")
+	verificar(t.lodo.cal_exceso > 0.0, "lo que no cabe en solución queda como cal en exceso")
 
 
 # simulation-logic.md §8 — prehidratación: parcial a las 3 h, completa a las 6 h.

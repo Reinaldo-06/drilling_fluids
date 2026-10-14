@@ -21,13 +21,13 @@ rangos = {
 "lgs_pct": [0.0, 2.0],
 "mbt": [0.0, 5.0]
 }
-productos_aprobados = PackedStringArray("kcl", "xc", "soda_caustica", "agua")
+productos_aprobados = PackedStringArray("kcl", "xc", "soda_caustica", "agua", "almidon", "carbonato_de_calcio")
 concentraciones = {
 "xc": [1.0, 2.0],
 "almidon": [4.0, 8.0],
 "carbonato_de_calcio": [15.0, 40.0]
 }
-productos_por_crear = PackedStringArray("almidon", "carbonato_de_calcio")
+productos_por_crear = PackedStringArray()
 advertencias = PackedStringArray("Barita prohibida: es insoluble en ácido y daña la permeabilidad para siempre.", "Cualquier sólido perforado que se quede en el lodo daña el yacimiento: centrífuga y dilución con salmuera limpia.", "La densidad sale de la salmuera y del CaCO₃: el techo es bajo.")
 criterios_cambio_fluido = "Fin del pozo a 9.600 ft."
 explicaciones = {

@@ -491,7 +491,10 @@ Cuatro agentes trabajaron en paralelo, cada uno con archivos propios. Resumen de
 - El ejecutor de pruebas cuenta como falla un archivo que no compila.
 
 **Decisiones abiertas**
-- **Deriva del lodo base:** la cal en exceso del lodo base (0,2 lb/bbl) se disuelve con el tiempo y sube el pH de 10,0 a 11,0 y el calcio de 120 a 442 mg/l en un día, sin que el jugador haga nada. Quitarla rompe la fila de carbonatos de la Tabla 4 (el Pf baja en vez de subir). Opciones: separar "finos de cemento" (se disuelven) de "cal de tratamiento" (inerte), alargar τ, o aceptar la deriva como mecánica (el jugador la corrige con su tratamiento de mantenimiento).
-- Productos que piden los programas y no existen: PHPA, almidón, CaCO₃ dimensionado (y lignito, NaCl, amina para otros sistemas).
+- ~~Deriva del lodo base~~ **Resuelto (decisión del autor):** el efecto de un cambio se ve en **una vuelta del lodo**, que depende de la profundidad, el caudal y el volumen en superficie. Se separaron dos cosas:
+  - **cal en exceso**: reserva alcalina; no se disuelve sola, solo reacciona con ácidos y carbonatos. El lodo base queda estable 24 h.
+  - **finos de cemento**: el cemento entra mitad disuelto y mitad como finos, que se disuelven con τ = 1 vuelta 🧩 (≈ 63 % en una vuelta, casi todo en cuatro). El Pm los cuenta desde el principio.
+  - Ejemplo CAIMÁN-3 superficial (vuelta ≈ 80 min a 600 gpm): 0,3 lb/bbl de finos llevan el pH de 10,0 a 12,05 en una vuelta y a 12,3 en cuatro; el calcio de 120 a ~900 mg/l.
+- ~~Productos faltantes~~ **Creados:** PHPA, almidón, lignito, amina, carbonato de calcio dimensionado (un solo grado por ahora) y NaCl. Aprobados en los programas de CAIMÁN-3 intermedia y producción. Efectos sobre VP, PC, geles y filtrado son calibración 🧩.
 - Variables que piden las observaciones y no existen: sedimento visible al transferir, mallas tapadas, temperatura de la muestra, nivel de tanques, recortes.
 - Solubilidad de Ca(OH)₂ con Ksp (hoy tope fijo de OH⁻); mecanismo real de la caída de pH por yeso y sal (hoy ácidos calibrados).

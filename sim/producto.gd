@@ -8,13 +8,13 @@ extends Resource
 ## - "quimico": se disuelve y reacciona según "reaccion" (por mol de producto,
 ##   ver EstadoLodo.agregar_quimico) y "peso_molecular".
 ## - "cal": Ca(OH)₂, se disuelve hasta saturar y el resto queda en exceso.
-## - "barita", "bentonita": suman volumen de sólidos.
-## - "aditivo": suma lb/bbl al campo "aditivo" del estado (lignosulfonato, pac, xc).
+## - "barita", "bentonita", "carbonato_de_calcio": suman volumen de sólidos.
+## - "aditivo": suma lb/bbl al campo "aditivo" del estado (ver EstadoLodo.ADITIVOS).
 ## - "agua": diluye; la cantidad va en bbl por bbl de lodo.
 
 @export var nombre := ""
 @export_multiline var descripcion := ""
-@export_enum("quimico", "cal", "barita", "bentonita", "aditivo", "agua") var efecto := "quimico"
+@export_enum("quimico", "cal", "barita", "bentonita", "carbonato_de_calcio", "aditivo", "agua") var efecto := "quimico"
 @export var aditivo := ""
 @export var peso_molecular := 0.0
 @export var reaccion: Dictionary = {}
@@ -32,6 +32,8 @@ func aplicar(estado: RefCounted, cantidad: float) -> void:
 			estado.agregar_barita(cantidad)
 		"bentonita":
 			estado.agregar_bentonita(cantidad)
+		"carbonato_de_calcio":
+			estado.agregar_carbonato_de_calcio(cantidad)
 		"aditivo":
 			estado.agregar_aditivo(aditivo, cantidad)
 		"agua":

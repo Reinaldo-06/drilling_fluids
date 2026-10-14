@@ -2,7 +2,7 @@
 
 Juego 2D pixelado en **Godot** donde el jugador es un **ingeniero de fluidos de perforación**. Objetivo: que el autor (que trabaja en la industria) aprenda manejo de tanques, diagnóstico de propiedades y tratamiento de contaminaciones.
 
-**Estado actual: simulación base completa, sin interfaz.** Proyecto Godot 4.7.2 con: química del lodo con equilibrio ácido-base (Tabla 4 entera), 7 contaminantes, 15 productos con dosis del manual, tanques y paso del tiempo, 17 pruebas de laboratorio y 4 observaciones como datos, 19 reglas con explicación y el programa de CAIMÁN-3. 126 pruebas pasando. Resumen en `simulation-logic.md` §12.7. El siguiente paso es decidir los pendientes de §12.7 y empezar la presentación (overworld). Estructura y cómo correr las pruebas en `README.md`; estado de la implementación en `simulation-logic.md` §12.6.
+**Estado actual: simulación base completa, sin interfaz.** Proyecto Godot 4.7.2 con: química del lodo con equilibrio ácido-base (Tabla 4 entera), 7 contaminantes, 21 productos con dosis del manual, tanques y paso del tiempo, 17 pruebas de laboratorio y 4 observaciones como datos, 19 reglas con explicación y el programa de CAIMÁN-3. 135 pruebas pasando. Resumen en `simulation-logic.md` §12.7. El siguiente paso es la presentación (overworld) y lo que falta de la simulación: perforación, control de sólidos y eventos. Estructura y cómo correr las pruebas en `README.md`; estado de la implementación en `simulation-logic.md` §12.6.
 
 ## Mapa de documentos
 
@@ -34,6 +34,7 @@ Leer en este orden antes de proponer nada:
 - **El jugador opera las válvulas de tanques** caminando hasta ellas. El "hopper" se llama **embudo de mezcla** en el juego; hay dos (arriba en el tanque de píldoras y abajo junto a la bomba centrífuga).
 - **Las mezclas largas en el embudo las ejecuta el encuellador** por orden del jugador, a 50 sacos/h (250 con cuadrilla prestada en emergencias). `simulation-logic.md` §5 y §8.
 - **Modelo de simulación:** cada tanque guarda la composición; la floculación y todas las propiedades se derivan. Paso de 10 min de juego. `simulation-logic.md` §12.
+- **El efecto de un cambio se ve en una vuelta del lodo** (depende de profundidad, caudal y volumen en superficie), no en horas fijas. Sin tratamientos, el lodo no deriva solo: la cal en exceso es reserva; solo los finos de cemento se disuelven, en pocas vueltas.
 - **Cambio de fluido entre lodos base agua: desplazamiento directo**, sin bache espaciador. Layout base: dos reservas + fractanques; circuito corto en el activo durante los preparativos (`rig-tank-system.md` §5).
 - **Observación visual** (espuma, viscosidad a ojo, recortes, nivel, color/olor, sedimento) es la alarma entre chequeos. Nunca identifica el contaminante químico.
 

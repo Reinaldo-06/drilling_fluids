@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Producto" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/producto.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Carbonato de calcio dimensionado"
+descripcion = "Puenteo soluble en ácido para el sistema de yacimiento: forma un revoque que después se remueve con ácido. Suma sólidos y peso (SG 2,71). Por ahora un solo grado; fino, medio y grueso quedan para después (mud-programs.md, sistema 6)."
+efecto = "carbonato_de_calcio"
+aditivo = ""
+peso_molecular = 0.0
+reaccion = {}
+lb_por_saco = 100.0

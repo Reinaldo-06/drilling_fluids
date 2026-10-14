@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Producto" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/producto.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Lignito"
+descripcion = "Desfloculante y controlador de filtrado con estabilidad térmica. Entra ácido: necesita soda (1 saco por cada 4). Acompleja calcio: la dureza puede leer calcio que ya no está disponible (mud-engineer-reference.md §7)."
+efecto = "aditivo"
+aditivo = "lignito"
+peso_molecular = 0.0
+reaccion = {}
+lb_por_saco = 50.0

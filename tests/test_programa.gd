@@ -128,7 +128,7 @@ func test_palanca_de_dificultad() -> void:
 	verificar(dificil.puede_usar("bentonita"), "el resto sigue aprobado")
 	verificar(p.puede_usar("barita"), "el programa original no cambia")
 	verificar(not _programa("produccion").puede_usar("barita"), "barita prohibida en el RDF")
-	verificar(not _programa("intermedia").puede_usar("phpa"), "un producto que no existe no se puede usar")
+	verificar(not _programa("intermedia").puede_usar("producto_inexistente"), "un producto que no existe no se puede usar")
 
 
 func test_formato_de_numeros() -> void:

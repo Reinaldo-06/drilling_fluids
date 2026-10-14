@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Producto" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/producto.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Sal (cloruro de sodio)"
+descripcion = "Para saturar el sistema en una sección de sal (~126 lb/bbl hasta saturación). Sube cloruros y densidad del agua (mud-programs.md, sistema 4)."
+efecto = "quimico"
+aditivo = ""
+peso_molecular = 58.44
+reaccion = {"ion_na": 1.0, "ion_cl": 1.0}
+lb_por_saco = 100.0

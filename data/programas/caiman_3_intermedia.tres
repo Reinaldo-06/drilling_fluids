@@ -24,7 +24,7 @@ rangos = {
 "ca": [0.0, 200.0],
 "mbt": [0.0, 15.0]
 }
-productos_aprobados = PackedStringArray("kcl", "xc", "soda_caustica", "barita", "agua", "bicarbonato_de_sodio", "acido_citrico")
+productos_aprobados = PackedStringArray("kcl", "xc", "soda_caustica", "barita", "agua", "bicarbonato_de_sodio", "acido_citrico", "phpa", "almidon")
 concentraciones = {
 "kcl": [10.0, 25.0],
 "phpa": [0.5, 2.0],
@@ -32,7 +32,7 @@ concentraciones = {
 "almidon": [2.0, 6.0],
 "soda_caustica": [0.25, 0.75]
 }
-productos_por_crear = PackedStringArray("phpa", "almidon")
+productos_por_crear = PackedStringArray()
 advertencias = PackedStringArray("Lutita reactiva desde 3.200 ft: medir K⁺, no cloruros. El potasio se consume en las arcillas.", "Al rotar el cemento de la zapata entra calcio: en este sistema la contaminación de cemento es crítica.", "pH sobre 10 hidroliza el PHPA y degrada el almidón: nada de soda cáustica de más.", "Con barita en el lodo, apagar desarenador y deslimador y usar la centrífuga.")
 criterios_cambio_fluido = "A 8.000 ft: entubar y cementar el revestimiento intermedio. El RDF se construye limpio en reserva (sin barita ni sólidos) y se desplaza directo antes de entrar a la arena productora."
 explicaciones = {

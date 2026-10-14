@@ -40,6 +40,18 @@ const PKA1_CARBONATO := 6.35
 const PKA2_CARBONATO := 10.33
 ## mg de producto por litro de lodo en 1 lb/bbl (453,592 g / 158,987 l).
 const MG_L_LODO_POR_LB_BBL := 2853.0
+const DENSIDAD_CACO3_PPG := 22.6       ## SG 2,71
+## Efecto de los aditivos nuevos sobre las propiedades (por lb/bbl). 🧩 calibración
+## de juego, en el orden de magnitud de los demás aditivos del modelo.
+const VP_POR_LB_PHPA := 2.0
+const PC_POR_LB_PHPA := 3.0
+const GEL_POR_LB_PHPA := 0.5
+const VP_POR_LB_ALMIDON := 0.8
+const CONTROL_FILTRADO_ALMIDON := 0.5  ## el PAC es 0,6
+const CONTROL_FILTRADO_PHPA := 0.2
+const CONTROL_FILTRADO_LIGNITO := 0.15
+const CONTROL_FILTRADO_CACO3_POR_PCT := 0.3  ## puenteo: por % de volumen
+const DESFLOCULANTE_POR_LB_LIGNITO := 0.06   ## el lignosulfonato es 0,08
 const MG_POR_MMOL_ION := {
 	"oh": 17.01, "co3": 60.01, "hco3": 61.02, "ca": 40.08, "mg": 24.31,
 	"na": 22.99, "k": 39.10, "cl": 35.45, "so4": 96.06, "sulfuro": 32.06,
@@ -92,6 +104,7 @@ const MG_OH2_POR_PUNTO_GEL := 45.0
 var frac_barita := 0.0
 var frac_lgs := 0.0          ## sólidos de baja gravedad: bentonita + perforados
 var frac_aceite := 0.0
+var frac_caco3 := 0.0        ## carbonato de calcio dimensionado (puenteo soluble en ácido, SG 2,71)
 var aire := 0.0              ## aire atrapado; solo afecta la balanza atmosférica
 
 # --- Productos activos (lb/bbl) ---
@@ -99,10 +112,19 @@ var bentonita := 0.0
 var lignosulfonato := 0.0
 var pac := 0.0
 var xc := 0.0
+var phpa := 0.0              ## encapsulador e inhibidor secundario (simulation-logic §13.3)
+var almidon := 0.0           ## controlador de filtrado; tolera sal (mud-programs, sistemas 3, 4 y 6)
+var lignito := 0.0           ## desfloculante y control de filtrado; entra ácido como el lignosulfonato
+var amina := 0.0             ## inhibidor principal del sistema amina/PHPA (simulation-logic §13.2)
 var arcilla_activa := 0.0    ## arcilla perforada reactiva (suma al MBT)
-## Sólidos alcalinos sin disolver (cal, finos de cemento), en lb/bbl de Ca(OH)₂.
-## Solo reaccionan con ácidos y bicarbonatos; es lo que separa Pm de Pf·Fw.
+## Cal en exceso: reserva alcalina sin disolver, en lb/bbl de Ca(OH)₂. No se
+## disuelve sola; solo reacciona con ácidos, bicarbonatos y carbonatos. Es lo que
+## separa Pm de Pf·Fw. (Los finos de cemento, que sí se disuelven solos, van aparte.)
 var cal_exceso := 0.0
+## Finos de cemento sin disolver (lb/bbl de Ca(OH)₂). A diferencia de la cal en
+## exceso, se disuelven solos en pocas vueltas del lodo (manual §1.3, punto 6:
+## sacarlos con el equipo de sólidos antes de que se disuelvan). Ver sim/cinetica.gd.
+var finos_cemento := 0.0
 
 # --- Química del filtrado (mg/l) ---
 var oh := 0.0
@@ -131,7 +153,7 @@ var alc_org_mf := 0.0
 
 ## Fracción de agua (lo que da la retorta como Fw).
 func fw() -> float:
-	return 1.0 - frac_barita - frac_lgs - frac_aceite
+	return 1.0 - frac_barita - frac_lgs - frac_aceite - frac_caco3
 
 
 func densidad_agua() -> float:
@@ -140,7 +162,7 @@ func densidad_agua() -> float:
 
 func densidad() -> float:
 	return fw() * densidad_agua() + frac_barita * F.DENSIDAD_BARITA_PPG \
-		+ frac_lgs * F.DENSIDAD_LGS_PPG + frac_aceite * 7.0
+		+ frac_lgs * F.DENSIDAD_LGS_PPG + frac_aceite * 7.0 + frac_caco3 * DENSIDAD_CACO3_PPG
 
 
 ## Lo que lee la balanza no presurizada: el aire baja la lectura.
@@ -149,7 +171,7 @@ func densidad_balanza_atmosferica() -> float:
 
 
 func solidos_pct() -> float:
-	return 100.0 * (frac_barita + frac_lgs)
+	return 100.0 * (frac_barita + frac_lgs + frac_caco3)
 
 
 func lgs_pct() -> float:
@@ -181,7 +203,8 @@ func mf_carbonatos() -> float:
 
 ## Pm = Pf·Fw + cal sin disolver; es la inversa de Formulas.exceso_de_cal.
 func pm() -> float:
-	return pf() * fw() + cal_exceso / 0.26
+	# Los finos de cemento sin disolver también titulan en el lodo entero.
+	return pf() * fw() + (cal_exceso + finos_cemento) / 0.26
 
 
 ## Dureza de calcio (valoración con calcon/EDTA a pH 12–13): solo Ca²⁺, mg/l.
@@ -223,7 +246,7 @@ func ph() -> float:
 ## Capacidad tampón total (meq por litro de filtrado).
 func capacidad_tampon() -> float:
 	var fw_ := maxf(fw(), 0.05)
-	return (MEQ_TAMPON_POR_LB_LIGNOSULFONATO * lignosulfonato
+	return (MEQ_TAMPON_POR_LB_LIGNOSULFONATO * (lignosulfonato + lignito)
 		+ MEQ_TAMPON_POR_LB_BENTONITA * bentonita) / fw_
 
 
@@ -244,16 +267,19 @@ func floculacion() -> float:
 		+ sulfuro / 200.0
 	# MBT bajo → poco efecto de la contaminación química (manual 4C.1).
 	var reactividad := clampf(mbt() / 25.0, 0.2, 1.5)
-	var desfloculante := 0.08 * lignosulfonato * eficacia_lignosulfonato()
+	var desfloculante := (0.08 * lignosulfonato + DESFLOCULANTE_POR_LB_LIGNITO * lignito) \
+		* eficacia_lignosulfonato()
 	return clampf(insultos * reactividad - desfloculante, 0.0, 1.0)
 
 
 func vp() -> float:
-	return 2.0 + 2.5 * lgs_pct() + 0.6 * 100.0 * frac_barita + 3.0 * xc + 1.5 * pac
+	return 2.0 + 2.5 * lgs_pct() + 0.6 * 100.0 * frac_barita + 3.0 * xc + 1.5 * pac \
+		+ 2.5 * 100.0 * frac_caco3 + VP_POR_LB_PHPA * phpa + VP_POR_LB_ALMIDON * almidon
 
 
 func pc() -> float:
-	return 0.8 * bentonita + 4.0 * xc + 25.0 * floculacion() + mg_oh2 / MG_OH2_POR_PUNTO_PC
+	return 0.8 * bentonita + 4.0 * xc + 25.0 * floculacion() + mg_oh2 / MG_OH2_POR_PUNTO_PC \
+		+ PC_POR_LB_PHPA * phpa
 
 
 func lectura_600() -> float:
@@ -269,7 +295,8 @@ func va() -> float:
 
 
 func gel_10s() -> float:
-	return 0.25 * bentonita + 0.3 * lgs_pct() + 12.0 * floculacion() + 1.5 * xc + mg_oh2 / MG_OH2_POR_PUNTO_GEL
+	return 0.25 * bentonita + 0.3 * lgs_pct() + 12.0 * floculacion() + 1.5 * xc + mg_oh2 / MG_OH2_POR_PUNTO_GEL \
+		+ GEL_POR_LB_PHPA * phpa
 
 
 func gel_10min() -> float:
@@ -277,7 +304,9 @@ func gel_10min() -> float:
 
 
 func filtrado_api() -> float:
-	var control := 1.0 + 0.12 * bentonita + 0.6 * pac + 0.15 * lignosulfonato
+	var control := 1.0 + 0.12 * bentonita + 0.6 * pac + 0.15 * lignosulfonato \
+		+ CONTROL_FILTRADO_ALMIDON * almidon + CONTROL_FILTRADO_PHPA * phpa \
+		+ CONTROL_FILTRADO_LIGNITO * lignito + CONTROL_FILTRADO_CACO3_POR_PCT * 100.0 * frac_caco3
 	return 25.0 / control * (1.0 + 2.0 * floculacion())
 
 
@@ -377,14 +406,27 @@ func agregar_quimico(reaccion: Dictionary, peso_molecular: float, lb_bbl: float)
 	_equilibrar()
 
 
-## Aditivo que no cambia los iones: lignosulfonato, PAC, XC (lb/bbl).
-## El lignosulfonato entra ácido (pH 3–4): suma capacidad tampón sin base, así
-## que baja el pH hasta que se le echa soda (1 saco por cada 4, SLB).
+## Aditivo que no cambia los iones (lb/bbl): lignosulfonato, lignito, PAC, XC,
+## PHPA, almidón, amina. El lignosulfonato y el lignito entran ácidos (pH 3–4):
+## suman capacidad tampón sin base, así que bajan el pH hasta que se les echa
+## soda (1 saco por cada 4, SLB).
 func agregar_aditivo(nombre: String, lb_bbl: float) -> void:
-	assert(nombre in ["lignosulfonato", "pac", "xc"], "Aditivo desconocido: %s" % nombre)
+	assert(nombre in ADITIVOS, "Aditivo desconocido: %s" % nombre)
 	set(nombre, get(nombre) + lb_bbl)
-	if nombre == "lignosulfonato":
+	if nombre in ["lignosulfonato", "lignito"]:
 		_equilibrar()
+
+
+const ADITIVOS := ["lignosulfonato", "lignito", "pac", "xc", "phpa", "almidon", "amina"]
+
+
+## Carbonato de calcio dimensionado (lb por bbl de lodo inicial). Sólido inerte
+## para puenteo; suma volumen y peso (SG 2,71). No reacciona: es soluble en
+## ácido, no en el lodo.
+func agregar_carbonato_de_calcio(lb_bbl: float) -> void:
+	var v := lb_bbl / (DENSIDAD_CACO3_PPG * F.GAL_POR_BBL)
+	_diluir_por_volumen_agregado(v, false)
+	frac_caco3 += v / (1.0 + v)
 
 
 ## Barita (lb por bbl de lodo inicial). Sube el volumen: el resultado se
@@ -448,8 +490,9 @@ func fijar_ph(valor: float) -> void:
 
 const _CAMPOS_FILTRADO := ["oh", "co3", "hco3", "ca", "mg", "na", "k", "cl", "so4", "sulfuro",
 	"mg_oh2", "co2", "tampon_base", "alc_org_pf", "alc_org_mf"]
-const _CAMPOS_POR_BBL := ["frac_barita", "frac_lgs", "frac_aceite", "bentonita", "lignosulfonato",
-	"pac", "xc", "arcilla_activa", "cal_exceso"]
+const _CAMPOS_POR_BBL := ["frac_barita", "frac_lgs", "frac_aceite", "frac_caco3", "bentonita",
+	"lignosulfonato", "lignito", "pac", "xc", "phpa", "almidon", "amina", "arcilla_activa",
+	"cal_exceso", "finos_cemento"]
 
 
 ## Todo lo que está "por bbl de lodo" se reparte en (1 + v) bbl. Si lo que entra
@@ -467,11 +510,13 @@ func _diluir_por_volumen_agregado(v: float, es_agua: bool) -> void:
 
 
 ## Aplica los aportes declarados por un contaminante (ver sim/contaminante.gd).
-## Claves: "cal_lb_bbl", "acido_meq", "intercambio_ca", "lgs_frac", "ion_<nombre>".
+## Claves: "cal_lb_bbl", "finos_cemento", "acido_meq", "intercambio_ca", "lgs_frac", "ion_<nombre>".
 func aplicar_aportes(aportes: Dictionary, cantidad: float) -> void:
 	for clave: String in aportes:
 		var valor: float = aportes[clave] * cantidad
-		if clave == "cal_lb_bbl":
+		if clave == "finos_cemento":
+			finos_cemento += valor
+		elif clave == "cal_lb_bbl":
 			agregar_cal(valor)
 		elif clave == "acido_meq":
 			agregar_acido(valor)
