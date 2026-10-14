@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="Formacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/formacion.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Arenas y arcillas superficiales (CAIMÁN-3)"
+descripcion = "Sección superficial de 17½\": arenas, gravas y arcillas no consolidadas, poco reactivas (caolinita meteorizada). Mucho sólido por hora a ROP alta; el control de sólidos manda (simulation-logic.md §6.1, calibración 17 bbl/h)."
+litologia = "arena y arcilla no consolidadas"
+tope_ft = 0.0
+base_ft = 2420.0
+porosidad = 0.3
+cic_meq_100g = 2.0
+tipo_arcilla = "caolinita"

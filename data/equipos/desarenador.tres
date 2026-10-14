@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EquipoSolidos" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/equipo_solidos.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Desarenador"
+tipo = "desarenador"
+descripcion = "Hidrociclones grandes, punto de corte ~40 μm. Con lodo densificado botan barita por el underflow (simulation-logic.md §7)."
+punto_corte_um = 40.0
+actua_en_entrada = true
+eficiencia_gruesos = 0.5
+eficiencia_medios = 0.45
+eficiencia_finos = 0.03
+caudal_gpm = 500.0
+eficiencia_perforados_lodo = 0.02
+eficiencia_barita = 0.25
+eficiencia_finos_cemento = 0.3
+solidos_en_descarte = 0.5
+descarte_max_bbl_h = 8.0

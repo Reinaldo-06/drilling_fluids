@@ -1,0 +1,20 @@
+[gd_resource type="Resource" script_class="EquipoSolidos" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/equipo_solidos.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Deslimador"
+tipo = "deslimador"
+descripcion = "Hidrociclones chicos, punto de corte ~20 μm. Con lodo densificado bota cerca de la mitad de la barita que procesa: hay que apagarlo y usar la centrífuga (simulation-logic.md §7)."
+punto_corte_um = 20.0
+actua_en_entrada = true
+eficiencia_gruesos = 0.3
+eficiencia_medios = 0.35
+eficiencia_finos = 0.08
+caudal_gpm = 400.0
+eficiencia_perforados_lodo = 0.05
+eficiencia_barita = 0.5
+eficiencia_finos_cemento = 0.5
+solidos_en_descarte = 0.5
+descarte_max_bbl_h = 10.0
