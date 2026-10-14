@@ -1,0 +1,34 @@
+[gd_resource type="Resource" script_class="SistemaLodo" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/sistema_lodo.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "amina_phpa"
+nombre = "Polímero-amina (alto desempeño)"
+seccion_tipica = "Intermedia con lutitas muy reactivas"
+aditivos = {
+"amina": [2.0, 6.0],
+"phpa": [0.5, 2.0],
+"kcl": [0.0, 10.0],
+"xc": [0.5, 1.5],
+"pac": [2.0, 4.0]
+}
+rangos_tipicos = {
+"densidad": [9.5, 12.0],
+"vp": [12.0, 22.0],
+"pc": [15.0, 25.0],
+"filtrado": [4.0, 6.0],
+"ph": [9.0, 9.5]
+}
+fuerte_en = "La mejor inhibición de los sistemas base agua del catálogo; recortes firmes; menos cloruro que descartar."
+debil_en = "El inhibidor se consume y hay que reponerlo midiendo; el pH alto hidroliza el PHPA; caro; sensible al calcio."
+nota_de_juego = "El jugador aprende a medir el inhibidor (amina, K⁺, MBT) en vez de confiar en la receta."
+vulnerabilidades = {
+"cemento": "critico",
+"yeso": "alto",
+"sal": "moderado",
+"carbonatos": "alto",
+"solidos_perforados": "moderado",
+"magnesio": "alto"
+}

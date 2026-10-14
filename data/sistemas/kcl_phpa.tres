@@ -1,0 +1,35 @@
+[gd_resource type="Resource" script_class="SistemaLodo" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/sistema_lodo.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "kcl_phpa"
+nombre = "Inhibido KCl / polímero (PHPA)"
+seccion_tipica = "Intermedia con lutitas reactivas"
+aditivos = {
+"kcl": [10.0, 25.0],
+"phpa": [0.5, 2.0],
+"xc": [0.5, 1.5],
+"almidon": [2.0, 6.0],
+"soda_caustica": [0.25, 0.75]
+}
+rangos_tipicos = {
+"densidad": [9.0, 11.5],
+"vp": [10.0, 20.0],
+"pc": [15.0, 25.0],
+"filtrado": [4.0, 6.0],
+"ph": [9.0, 9.5],
+"k": [15000.0, 30000.0]
+}
+fuerte_en = "Excelente estabilidad de pozo, recortes firmes, bajo contenido de sólidos."
+debil_en = "El calcio lo destruye: una contaminación de cemento precipita el sistema. Caro. Con pH sobre ~10 se degrada el almidón y se hidroliza el PHPA."
+nota_de_juego = "El sistema más frágil y el más instructivo: aquí la contaminación de cemento es una catástrofe real."
+vulnerabilidades = {
+"cemento": "critico",
+"yeso": "alto",
+"sal": "alto",
+"carbonatos": "alto",
+"solidos_perforados": "moderado",
+"magnesio": "alto"
+}

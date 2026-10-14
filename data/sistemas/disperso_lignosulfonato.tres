@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="SistemaLodo" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/sistema_lodo.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "disperso_lignosulfonato"
+nombre = "Disperso con lignosulfonato"
+seccion_tipica = "Intermedia en formaciones poco reactivas"
+aditivos = {
+"bentonita": [8.0, 15.0],
+"lignosulfonato": [2.0, 8.0],
+"lignito": [2.0, 6.0],
+"soda_caustica": [0.5, 1.5]
+}
+rangos_tipicos = {
+"densidad": [9.5, 12.5],
+"vp": [12.0, 25.0],
+"pc": [8.0, 16.0],
+"filtrado": [5.0, 8.0],
+"ph": [9.5, 10.5]
+}
+fuerte_en = "Tolera contaminación y carga de sólidos mejor que cualquier otro; barato de mantener."
+debil_en = "Acumula sólidos y la VP sube sin parar; no inhibe lutitas; el pH alto exige vigilancia."
+nota_de_juego = "El sistema donde el jugador pelea con la VP y aprende la regla VP ≈ sólidos."
+vulnerabilidades = {
+"cemento": "moderado",
+"yeso": "moderado",
+"sal": "moderado",
+"carbonatos": "alto",
+"solidos_perforados": "alto",
+"magnesio": "moderado"
+}

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Regla" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/regla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "lodo_fuera_de_programa"
+titulo = "Lodo fuera de programa al cerrar el día"
+tipo = "advertencia"
+momento = "al_cerrar_dia"
+condicion = "fuera_de_programa() > 0"
+explicacion = "Entregas el reporte con propiedades fuera de la especificación del programa de la sección. El company man va a pedir la explicación y el turno de noche hereda el problema. Revisa la lista de desvíos: cada uno dice qué significa y qué se hace."
+referencia = "mud-programs.md, Formato del programa de lodos; game-design-mechanics.md, Ciclo de juego"

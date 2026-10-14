@@ -1,0 +1,32 @@
+[gd_resource type="Resource" script_class="SistemaLodo" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/sistema_lodo.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "bentonitico"
+nombre = "Bentonítico nativo (spud mud)"
+seccion_tipica = "Superficial (26\", 17½\")"
+aditivos = {
+"bentonita": [15.0, 25.0],
+"carbonato_de_sodio": [0.25, 1.0],
+"soda_caustica": [0.25, 0.5]
+}
+rangos_tipicos = {
+"densidad": [8.4, 9.2],
+"embudo": [35.0, 45.0],
+"vp": [5.0, 12.0],
+"pc": [15.0, 30.0],
+"ph": [8.5, 9.5]
+}
+fuerte_en = "Costo bajísimo, tolerancia al abuso, barridos viscosos para limpiar."
+debil_en = "Ninguna inhibición, sin control de filtrado, no soporta densidad alta."
+nota_de_juego = "El sistema del tutorial. Pocas variables, errores perdonables."
+vulnerabilidades = {
+"cemento": "leve",
+"yeso": "leve",
+"sal": "moderado",
+"carbonatos": "leve",
+"solidos_perforados": "tolerado",
+"magnesio": "leve"
+}

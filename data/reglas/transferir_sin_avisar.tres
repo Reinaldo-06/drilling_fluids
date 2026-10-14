@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Regla" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/regla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "transferir_sin_avisar"
+titulo = "Transferir sin avisar al driller"
+tipo = "error"
+momento = "al_transferir"
+condicion = "accion.afecta_activo and not accion.aviso_driller"
+explicacion = "Moviste lodo hacia o desde el sistema activo sin avisar al driller ni al mud logger. El totalizador de volumen de tanques (PVT) no sabe que fuiste tú: lo lee como ganancia (posible kick) o pérdida (posible pérdida de circulación) y dispara la alarma. Se para la perforación y se pierde tiempo. Avisa siempre antes de transferir."
+referencia = "simulation-logic.md §4"

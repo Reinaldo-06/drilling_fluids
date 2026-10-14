@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Pozo" load_steps=5 format=3]
+
+[ext_resource type="Script" path="res://sim/pozo.gd" id="1"]
+[ext_resource type="Resource" path="res://data/programas/caiman_3_superficial.tres" id="2"]
+[ext_resource type="Resource" path="res://data/programas/caiman_3_intermedia.tres" id="3"]
+[ext_resource type="Resource" path="res://data/programas/caiman_3_produccion.tres" id="4"]
+
+[resource]
+script = ExtResource("1")
+nombre = "CAIMÁN-3"
+descripcion = "Pozo ficticio en los llanos, convencional: superficial bentonítica, intermedia KCl/PHPA con lutita reactiva desde 3.200 ft y producción en RDF."
+secciones = [ExtResource("2"), ExtResource("3"), ExtResource("4")]
+evento_guionado = "Contaminación de cemento al iniciar la intermedia, justo después de cementar el revestimiento superficial. Golpea al sistema más vulnerable al calcio."

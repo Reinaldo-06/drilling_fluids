@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Regla" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/regla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "vp_sobre_dos_veces_peso"
+titulo = "VP mayor que 2 × peso del lodo"
+tipo = "advertencia"
+momento = "al_diagnosticar"
+condicion = "corrio(\"reologia\") and despues.vp > 2.0 * despues.densidad"
+explicacion = "La VP pasa el límite práctico del manual: VP ≤ 2 × peso del lodo (ppg). VP alta significa sólidos: cantidad, tamaño y forma de partículas. Revisa la retorta para separar barita de sólidos livianos y ataca con control mecánico de sólidos, asentamiento o dilución, en ese orden."
+referencia = "mud-engineer-reference.md §5.1 (Cap. 5, 5.4)"

@@ -1,0 +1,38 @@
+[gd_resource type="Resource" script_class="ProgramaSeccion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/programa_seccion.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+pozo = "CAIMÁN-3"
+seccion = "Superficial"
+diametro = "17½\""
+profundidad_desde = 0.0
+profundidad_hasta = 2500.0
+sistema = "bentonitico"
+objetivo = "Perforar la formación no consolidada hasta 2.500 ft con un lodo barato y desechable que limpie el hueco, y dejarlo listo para correr y cementar el revestimiento superficial."
+rangos = {
+"densidad": [8.6, 9.0],
+"embudo": [35.0, 45.0],
+"vp": [5.0, 12.0],
+"pc": [15.0, 30.0],
+"gel_10s": [5.0, 15.0],
+"gel_10min": [10.0, 30.0],
+"ph": [8.5, 9.5],
+"ca": [0.0, 200.0],
+"mbt": [15.0, 30.0]
+}
+productos_aprobados = PackedStringArray("bentonita", "carbonato_de_sodio", "soda_caustica", "barita", "agua")
+concentraciones = {
+"bentonita": [15.0, 25.0],
+"carbonato_de_sodio": [0.25, 1.0],
+"soda_caustica": [0.25, 0.5]
+}
+productos_por_crear = PackedStringArray()
+advertencias = PackedStringArray("Formación no consolidada: derrumbes, alta tasa de penetración y enorme volumen de recortes.", "Barridos viscosos cada parada para limpiar el hueco de 17½\".", "Filtrado sin control: el sistema no lo pide en esta sección.", "El agua de mezcla puede venir dura: tratar el calcio con carbonato de sodio antes de agregar la bentonita.", "La densidad sube sola con los recortes: vigilar sólidos y diluir a tiempo.")
+criterios_cambio_fluido = "A 2.500 ft: sacar, correr y cementar el revestimiento superficial. El KCl/PHPA de la intermedia se construye en reserva durante la sección y se desplaza directo, sin bache espaciador (rig-tank-system.md §5). El bentonítico se descarta."
+explicaciones = {
+"pc_bajo": "El spud mud vive de su punto cedente: con PC bajo no levanta los recortes grandes de un hueco de 17½\" a alta ROP. Sube la bentonita (prehidratada).",
+"densidad_alto": "En la superficial la densidad sube sola con los recortes perforados. Pasar de 9,0 ppg aquí es casi siempre sólidos: diluye con agua y usa el equipo de sólidos.",
+"ca_alto": "Calcio alto en el spud mud suele venir del agua de mezcla dura: trátalo con carbonato de sodio (mg/l × Fw × 0,000928), si no hay cemento en el lodo."
+}

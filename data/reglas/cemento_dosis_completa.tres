@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Regla" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/regla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "cemento_dosis_completa"
+titulo = "Cemento tratado con la dosis completa"
+tipo = "advertencia"
+momento = "al_tratar"
+condicion = "accion.producto in [\"bicarbonato_de_sodio\", \"sapp\", \"acido_citrico\"] and antes.cal_exceso > 0.25 and accion.lb_bbl >= dosis_cemento(accion.producto, antes.pm, antes.pf, antes.fw)"
+explicacion = "Echaste de una vez la dosis estequiométrica completa (o más) para el exceso de cal. El manual pide tratar primero con una cantidad insuficiente, observar y recién después añadir más: los finos de cemento se siguen disolviendo y pasarse de bicarbonato crea un problema de carbonatos, que es peor que el cemento."
+referencia = "mud-engineer-reference.md §1.3"

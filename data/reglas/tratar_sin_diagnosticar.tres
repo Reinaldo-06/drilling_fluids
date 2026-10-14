@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Regla" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/regla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "tratar_sin_diagnosticar"
+titulo = "Tratar sin diagnosticar"
+tipo = "advertencia"
+momento = "al_tratar"
+condicion = "accion.producto in [\"soda_caustica\", \"carbonato_de_sodio\", \"bicarbonato_de_sodio\", \"sapp\", \"acido_citrico\", \"cal\", \"yeso\", \"oxido_de_cinc\", \"lignosulfonato\"] and not corrio_alguna([\"pm\", \"pf_mf\", \"dureza\", \"cloruros\"])"
+explicacion = "Echaste un químico sin haber corrido ninguna prueba química en el turno. Los síntomas físicos (embudo, VP, PC, geles, filtrado) son casi iguales para cemento, yeso, sal, carbonatos y H₂S: solo dicen que hay un contaminante, no cuál. Sin Pm, Pf/Mf, dureza o cloruros estás adivinando, y varios tratamientos empeoran el lodo si el contaminante es otro."
+referencia = "mud-engineer-reference.md §1.1 (4C.1); game-design-mechanics.md, Núcleo jugable"

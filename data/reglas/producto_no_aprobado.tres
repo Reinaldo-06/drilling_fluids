@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Regla" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/regla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "producto_no_aprobado"
+titulo = "Producto no aprobado"
+tipo = "error"
+momento = "al_tratar"
+condicion = "accion.producto != \"\" and not aprobado(accion.producto)"
+explicacion = "Ese producto no está en la lista de aprobados del programa de lodos de esta sección. El programa es el inventario legal: lo que no aprueba no está en la locación o no se puede usar (por ejemplo, la barita en la sección de yacimiento daña la formación). Busca el tratamiento con los productos aprobados o justifica el cambio con el company man."
+referencia = "mud-programs.md, Formato del programa de lodos; CLAUDE.md invariante 6"
