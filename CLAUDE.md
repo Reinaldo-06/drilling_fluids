@@ -2,7 +2,7 @@
 
 Juego 2D pixelado en **Godot** donde el jugador es un **ingeniero de fluidos de perforación**. Objetivo: que el autor (que trabaja en la industria) aprenda manejo de tanques, diagnóstico de propiedades y tratamiento de contaminaciones.
 
-**Estado actual: diseño cerrado, sin código.** El siguiente paso es el esqueleto del proyecto Godot.
+**Estado actual: esqueleto creado.** Proyecto Godot 4.7.2 con fórmulas de campo y pruebas pasando. El siguiente paso es el modelo de datos del lodo (`simulation-logic.md` §12). Estructura y cómo correr las pruebas en `README.md`.
 
 ## Mapa de documentos
 
@@ -52,16 +52,23 @@ Leer en este orden antes de proponer nada:
 
 ## Próximos pasos
 
-1. **Esqueleto del proyecto Godot 4.7.2** (no se ha creado).
+1. ~~Esqueleto del proyecto Godot 4.7.2~~ ✅ hecho. Pruebas: `godot --headless --path . --script res://tests/run_tests.gd`.
 2. Modelo de datos puro y testeable según `simulation-logic.md` §12: estado del lodo (composición + floculación + aire atrapado), tanque, conexión, layout del taladro, contaminante, prueba de laboratorio, observación, programa de sección.
    La **Tabla 4 del manual** sirve como batería de pruebas: la firma de cada contaminante derivada por la simulación debe coincidir con sus flechas.
-3. Implementar las fórmulas reales de `mud-engineer-reference.md` con pruebas unitarias.
+3. Fórmulas reales de `mud-engineer-reference.md`: ✅ las de tanque, volumen, presión, reología, dosis y píldoras están en `sim/formulas.gd` con pruebas. Faltan las que dependan del modelo de estado.
 4. Primer vertical slice: sección superficial del pozo CAIMÁN-3 — pruebas básicas, densificar, diluir.
 
 **Pendientes de investigación:**
 - Procedimiento de **desplazamiento / cambio de fluido**: secuencia en `rig-tank-system.md` §5, ya validada en parte por el autor. Quedan abiertos el criterio para desviar retornos y la composición del circuito corto (§7).
 - **Gráficos I y II** de tratamiento de carbonatos: son imágenes del PDF y no sobrevivieron a la extracción de texto. **Solo recuperables en la máquina local** (ver abajo).
 - Estética concreta: paleta, tamaño de tile, sprite del personaje.
+
+## Convenciones de código
+
+- GDScript, nombres en **español sin tildes** (`barita_lb_por_bbl`, no `bariteLbPerBbl`).
+- `sim/` no puede depender de nada de `game/` (invariante 5).
+- Toda fórmula nueva lleva prueba en `tests/` con un ejemplo numérico de `docs/`, citando la sección.
+- Las pruebas cargan scripts con `preload`, no por `class_name`, para que corran en modo `--headless` sin importar el proyecto en el editor.
 
 ## Límites importantes
 

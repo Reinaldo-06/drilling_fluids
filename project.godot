@@ -1,0 +1,25 @@
+; Proyecto Godot 4.7.2 — ver CLAUDE.md para el contexto del juego.
+
+config_version=5
+
+[application]
+
+config/name="Ingeniero de Fluidos"
+config/description="Juego 2D pixelado: el jugador es el ingeniero de fluidos de perforación."
+run/main_scene="res://game/main.tscn"
+config/features=PackedStringArray("4.7", "GL Compatibility")
+
+[display]
+
+window/size/viewport_width=240
+window/size/viewport_height=160
+window/size/window_width_override=960
+window/size/window_height_override=640
+window/stretch/mode="viewport"
+window/stretch/scale_mode="integer"
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/canvas_textures/default_texture_filter=0
