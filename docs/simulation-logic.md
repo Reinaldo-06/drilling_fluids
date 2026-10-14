@@ -24,8 +24,8 @@ Documentos hermanos: `docs/game-design-mechanics.md` (diseño) · `docs/rig-tank
 | 4 | Monitoreo de volumen de tanques y falsas alarmas | ✅ hecho |
 | 5 | Quién hace qué en la cuadrilla (encuellador, mud logger, driller, company man) | ✅ hecho |
 | 6 | Cómo cambian las propiedades al perforar: sólidos, temperatura, degradación | ✅ hecho |
-| 7 | Control de sólidos: eficiencia de cada equipo, tasa de dilución | pendiente |
-| 8 | Mezcla con el embudo: sacos por hora, tiempo de hidratación de bentonita y polímeros | pendiente |
+| 7 | Control de sólidos: eficiencia de cada equipo, tasa de dilución | ✅ hecho (faltan % de eficiencia por equipo) |
+| 8 | Mezcla con el embudo: sacos por hora, tiempo de hidratación de bentonita y polímeros | ✅ hecho |
 | 9 | Reporte diario de lodo: qué contiene, costos, inventario | pendiente |
 | 10 | Eventos: pérdidas, influjo, gas de conexión, maniobras (viajes) desde la vista del ingeniero | pendiente |
 | 11 | Temperatura del lodo: entrada y salida, efecto en reología | pendiente |
@@ -157,3 +157,39 @@ Fuentes: [Roughneck — Wikipedia](https://en.wikipedia.org/wiki/Roughneck) · [
 - Fermentación del almidón: sin biocida o sin salinidad alta, el almidón se degrada con los días y **sube el filtrado**. Otra causa de alarma que no es contaminación. 🧩
 
 Fuentes: [US 8522896 — Consistent drilling fluids engineering and management](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/8522896) · [Solids Control Systems — Oil & Gas Journal](https://www.ogj.com/home/article/17297942/solids-control-systems-scs) · [Drilled-solids removal system performance — IADC Lexicon](https://iadclexicon.org/glossary/global-standards/page/164/) · [AADE — cálculos de remoción y dilución (API RP 13C)](https://www.aade.org/download_file/force/4755/649) · [Jurnal Teknologi (UTM) — LGS y ROP](https://journals.utm.my/jurnalteknologi/article/download/9091/5416/25260) · [Solids control — Drilling Manual](https://www.drillingmanual.com/solids-control/) · [US 9518434 — Managing properties of a circulating wellbore fluid](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/9518434) · [Safi et al., Int. J. Applied Mechanics and Engineering, 2023](https://doaj.org/article/7e8976cba55b48ad8c3370a7009f5250) · [Revisión de polímeros para lodos base agua (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC7178333)
+
+---
+
+## 7. Control de sólidos
+
+**Qué es real.**
+- Cada equipo tiene un **punto de corte**: el tamaño de partícula del que descarta la mitad. Valores típicos: **desarenador ~40 μm** (rango 45–74 μm según la fuente), **deslimador ~20 μm** (rango 15–44 μm). Las zarandas sacan lo grueso (>~100 μm, según la malla) y la **centrífuga** llega a los finos. ✅ (Drilling Manual, Triflo, varias fichas; coincide con `domain-research.md` §1)
+- **La barita mide entre 2 y 80 μm.** Por eso, con lodo densificado, **el desarenador y el deslimador botan barita** por el *underflow* (cerca de la mitad). En lodo densificado se usa la **centrífuga para recuperar barita** y descartar sólidos livianos, a menudo dos centrífugas en serie. ✅ (Drilling Manual, patente US 3964557, OneMine, Trenchless Technology)
+- La centrífuga trabaja sobre una **derivación** del activo: no pasa todo el volumen por ella. ✅
+- No encontré porcentajes de eficiencia confiables por equipo; dependen del modelo y del estado. ⚠️
+
+**Cómo entra al juego.**
+- Cada equipo tiene un interruptor y un estado (mallas buenas o rotas, conos tapados). La eficiencia total del tema 6.1 sale de los equipos encendidos. Los porcentajes se calibran jugando. 🧩
+- **Trampa realista:** con lodo densificado, dejar encendidos desarenador y deslimador **baja la densidad y bota barita** (plata). Lo correcto es apagarlos y usar la centrífuga. El juego explica por qué. 🧩
+- Con lodo sin densificar, los hidrociclones son la herramienta barata contra el PV alto, antes que diluir. 🧩
+
+Fuentes: [Solids Control Equipment in Oil & Gas — Drilling Manual](https://www.drillingmanual.com/solids-control-equipment-in-oil-gas/) · [Solids Control Equipment — Triflo](https://triflo.com/?p=1287) · [US 3964557 — Treatment of weighted drilling mud](https://patents.google.com/patent/US3964557) · [Mechanical Treatment of Weighted Drilling Muds — OneMine](https://onemine.org/documents/drilling-fluids-and-cement-mechanical-treatment-of-weighted-drilling-muds) · [Decanter centrifuges for barite recovery — Trenchless Technology](https://digital.trenchlesstechnology.com/articles/common-challenges-relative-to-the-use-of-decanter-centrifuges-for-barite-recovery) · [US 10233706 — Recovering barite from drilling fluid](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/10233706)
+
+---
+
+## 8. Mezcla con el embudo
+
+**Qué es real.**
+- El embudo es un venturi: una bomba centrífuga pasa lodo a alta velocidad por una boquilla bajo el cono y succiona el producto seco, que se dispersa e hidrata. ✅ (SLB Glossary, Trenchlesspedia, proveedor)
+- **Ritmo de mezcla de barita con embudo convencional: ~200–300 sacos/h.** Una persona cortando sacos sola: **~40–50 sacos/h**. Los sistemas a granel (silos) son mucho más rápidos. ⚠️ (una fuente con cifras; el uso de silos de barita a granel lo confirma también Wikipedia *Derrickhand*)
+- **Prehidratar** bentonita y polímeros (como XC) en agua dulce antes de agregarlos a un lodo salado o muy tratado mejora su rendimiento. La bentonita **no hidrata** en salmuera. ✅ (SLB Glossary, estudio Trisakti, `mud-engineer-reference.md` §1.5)
+- Tiempo de prehidratación: las fuentes solo dan ejemplos (un estudio usa 16 h). No hay un estándar. ⚠️
+- Bentonita sin hidratar se ve como "requesón" en la malla del embudo Marsh. Los polímeros agregados muy rápido forman **ojos de pescado** (grumos sin dispersar). ✅ (The Driller, patente)
+
+**Cómo entra al juego.**
+- **Densificar lleva horas.** El ejemplo del manual (1.548 sacos de barita, `mud-engineer-reference.md` §2.1) a 250 sacos/h son **~6 h** de embudo. Por eso densificar a peso de matada es una carrera contra el tiempo, y por eso conviene tener lodo pesado en reserva. 🧩
+- **El encuellador mezcla** (decisión del autor): el jugador ordena producto, cantidad, embudo y tanque; el encuellador tarda según el ritmo de sacos. Mientras tanto, el jugador hace otra cosa. 🧩
+- **Bentonita prehidratada**: se prepara en un tanque de reserva con agua dulce y queda lista después de varias horas. Agregarla seca a un sistema salado no funciona y el juego lo explica. Tiempo concreto: por definir con el autor. 🧩
+- **Polímeros a la carrera** → ojos de pescado: el producto rinde menos y aparece la observación de grumos en la malla. 🧩
+
+Fuentes: [Mud hopper — SLB Energy Glossary](https://glossary.slb.com/terms/m/mud_hopper) · [Mud hopper — Trenchlesspedia](https://trenchlesspedia.com/definition/4208/mud-hopper-horizontal-directional-drilling) · [Ritmos de mezcla de barita — oilandgasbmps.org](https://oilandgasbmps.org/view.php?id=4540) · [Drilling fluid mixing hopper — PP Drilling Fluids (proveedor)](https://ppdrillingfluids.in/drilling-fluid-mixing-hopper/) · [Prehydration — SLB Energy Glossary](https://glossary.slb.com/terms/p/prehydration) · [Prehidratación de bentonita — Trisakti](https://e-journal.trisakti.ac.id/index.php/petro/article/download/16154/9498) · [Tips for productivity on HDD mixing systems — The Driller](https://thedriller.com/articles/91812-tips-for-productivity-on-hdd-mixing-systems) · [Derrickhand — Wikipedia](https://en.wikipedia.org/wiki/Derrickhand)
