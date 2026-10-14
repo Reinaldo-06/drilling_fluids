@@ -1,0 +1,38 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/turno_tabla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "distancias"
+descripcion = "🧩 Minutos de caminata entre estaciones del overworld (game-design-mechanics.md, Overworld). Clave \"a|b\" con las estaciones en orden alfabético; la tabla es simétrica. Salen de un plano provisional del taladro: piso al centro, zarandas y tanques al lado, embudo y bodega junto a los tanques, caseta de lodos cerca, cabina del mud logger y oficina del company man más lejos. El mapa real las reemplaza."
+valores = {
+"bodega|caseta": 1.0,
+"bodega|embudo": 2.0,
+"bodega|mud_logger": 4.0,
+"bodega|oficina": 6.0,
+"bodega|piso": 5.0,
+"bodega|tanques": 2.0,
+"bodega|zarandas": 4.0,
+"caseta|embudo": 2.0,
+"caseta|mud_logger": 4.0,
+"caseta|oficina": 6.0,
+"caseta|piso": 4.0,
+"caseta|tanques": 2.0,
+"caseta|zarandas": 2.0,
+"embudo|mud_logger": 4.0,
+"embudo|oficina": 7.0,
+"embudo|piso": 4.0,
+"embudo|tanques": 1.0,
+"embudo|zarandas": 2.0,
+"mud_logger|oficina": 3.0,
+"mud_logger|piso": 2.0,
+"mud_logger|tanques": 4.0,
+"mud_logger|zarandas": 3.0,
+"oficina|piso": 6.0,
+"oficina|tanques": 7.0,
+"oficina|zarandas": 6.0,
+"piso|tanques": 2.0,
+"piso|zarandas": 2.0,
+"tanques|zarandas": 1.0
+}
