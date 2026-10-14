@@ -2,7 +2,7 @@
 
 Juego 2D pixelado en **Godot** donde el jugador es un **ingeniero de fluidos de perforación**. Objetivo: que el autor (que trabaja en la industria) aprenda manejo de tanques, diagnóstico de propiedades y tratamiento de contaminaciones.
 
-**Estado actual: esqueleto + modelo del lodo.** Proyecto Godot 4.7.2 con fórmulas de campo, estado del lodo por composición y seis contaminantes que reproducen la Tabla 4 del manual. El siguiente paso son los tratamientos (productos químicos) y el tanque. Estructura y cómo correr las pruebas en `README.md`; estado de la implementación en `simulation-logic.md` §12.6.
+**Estado actual: esqueleto + modelo del lodo + tratamientos.** Proyecto Godot 4.7.2 con fórmulas de campo, estado del lodo por composición, seis contaminantes que reproducen la Tabla 4 y 15 productos que tratan cada contaminación con las dosis del manual. El siguiente paso es el tanque y el paso de simulación en el tiempo. Estructura y cómo correr las pruebas en `README.md`; estado de la implementación en `simulation-logic.md` §12.6.
 
 ## Mapa de documentos
 
@@ -53,12 +53,13 @@ Leer en este orden antes de proponer nada:
 ## Próximos pasos
 
 1. ~~Esqueleto del proyecto Godot 4.7.2~~ ✅ hecho. Pruebas: `godot --headless --path . --script res://tests/run_tests.gd`.
-2. Modelo de datos según `simulation-logic.md` §12: ✅ estado del lodo y contaminantes (la Tabla 4 pasa entera). Faltan: **tratamientos** (productos que corrigen cada contaminación, con las dosis del manual), tanque, conexión, layout del taladro, prueba de laboratorio, observación, programa de sección.
+2. Modelo de datos según `simulation-logic.md` §12: ✅ estado del lodo, contaminantes (la Tabla 4 pasa entera) y productos con sus tratamientos. Faltan: **tanque y paso de simulación en el tiempo** (cinética, homogenización, disolución lenta de finos de cemento), conexión, layout del taladro, prueba de laboratorio, observación, programa de sección, reglas con explicación (invariante 4).
 3. Fórmulas reales de `mud-engineer-reference.md`: ✅ las de tanque, volumen, presión, reología, dosis y píldoras están en `sim/formulas.gd` con pruebas. Faltan las que dependan del modelo de estado.
 4. Primer vertical slice: sección superficial del pozo CAIMÁN-3 — pruebas básicas, densificar, diluir.
 
 **Pendientes de investigación:**
 - Procedimiento de **desplazamiento / cambio de fluido**: secuencia en `rig-tank-system.md` §5, ya validada en parte por el autor. Quedan abiertos el criterio para desviar retornos y la composición del circuito corto (§7).
+- **Dos factores de la Tabla 2** salen 10 veces altos en `mud-engineer-reference.md` §1.2 (bicarbonato con cal y calcio con bicarbonato de sodio). El código usa los estequiométricos. **Confirmar contra el PDF local.**
 - **Gráficos I y II** de tratamiento de carbonatos: son imágenes del PDF y no sobrevivieron a la extracción de texto. **Solo recuperables en la máquina local** (ver abajo).
 - Estética concreta: paleta, tamaño de tile, sprite del personaje.
 

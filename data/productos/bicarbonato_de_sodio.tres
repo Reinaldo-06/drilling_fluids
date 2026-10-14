@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Producto" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/producto.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Bicarbonato de sodio (NaHCO₃)"
+descripcion = "Trata cemento: precipita el calcio y baja pH y Pm. Pasarse crea un problema de carbonatos (§1.3)."
+efecto = "quimico"
+aditivo = ""
+peso_molecular = 84.01
+reaccion = {"ion_hco3": 1.0, "ion_na": 1.0}
+lb_por_saco = 50.0

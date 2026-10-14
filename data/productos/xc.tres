@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Producto" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/producto.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Goma xantan (XC)"
+descripcion = "Viscosificante y suspensión; sube PC, geles y lecturas bajas."
+efecto = "aditivo"
+aditivo = "xc"
+peso_molecular = 0.0
+reaccion = {}
+lb_por_saco = 25.0

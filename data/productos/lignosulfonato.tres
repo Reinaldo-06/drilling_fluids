@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Producto" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/producto.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Lignosulfonato"
+descripcion = "Desfloculante. Baja PC, geles y filtrado causados por floculación; necesita pH > 9,5 para funcionar (§5.2)."
+efecto = "aditivo"
+aditivo = "lignosulfonato"
+peso_molecular = 0.0
+reaccion = {}
+lb_por_saco = 50.0

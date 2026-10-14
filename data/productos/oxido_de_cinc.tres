@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Producto" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/producto.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Óxido de cinc (ZnO)"
+descripcion = "Precipita sulfuros como ZnS. Obligatorio con H₂S: subir el pH solo no basta, porque la reacción se revierte (§1.8)."
+efecto = "quimico"
+aditivo = ""
+peso_molecular = 81.38
+reaccion = {"precipita_sulfuro": 1.0}
+lb_por_saco = 50.0

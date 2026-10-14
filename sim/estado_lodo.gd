@@ -26,6 +26,12 @@ const OH_MAX_CAL_MG_L := 425.0
 ## Aumento de densidad del agua por mg/l de cloruro (agua saturada ≈ 10 ppg).
 const PPG_POR_MG_L_CL := 8.83e-6
 const PKA2_CARBONATO := 10.33
+## mg de producto por litro de lodo en 1 lb/bbl (453,592 g / 158,987 l).
+const MG_L_LODO_POR_LB_BBL := 2853.0
+const MG_POR_MMOL_ION := {
+	"oh": 17.01, "co3": 60.01, "hco3": 61.02, "ca": 40.08, "mg": 24.31,
+	"na": 22.99, "k": 39.10, "cl": 35.45, "so4": 96.06, "sulfuro": 32.06,
+}
 
 # --- Fases (fracción del volumen de lodo) ---
 var frac_barita := 0.0
@@ -103,6 +109,11 @@ func mf() -> float:
 	return oh / 340.0 + co3 / 600.0 + hco3 / 1220.0 + alc_org_mf
 
 
+## La parte del Mf que viene de carbonatos y bicarbonatos (sin OH⁻ ni orgánicos).
+func mf_carbonatos() -> float:
+	return co3 / 600.0 + hco3 / 1220.0
+
+
 ## Pm = Pf·Fw + cal sin disolver; es la inversa de Formulas.exceso_de_cal.
 func pm() -> float:
 	return pf() * fw() + cal_exceso / 0.26
@@ -132,7 +143,7 @@ func floculacion() -> float:
 	var insultos := maxf(0.0, ca - 120.0) / 400.0 \
 		+ mg / 200.0 \
 		+ maxf(0.0, cl - 3000.0) / 15000.0 \
-		+ maxf(0.0, mf() - 3.0) / 4.0 \
+		+ maxf(0.0, mf_carbonatos() - 3.0) / 4.0 \
 		+ sulfuro / 200.0
 	# MBT bajo → poco efecto de la contaminación química (manual 4C.1).
 	var reactividad := clampf(mbt() / 25.0, 0.2, 1.5)
@@ -194,6 +205,9 @@ func agregar_cal(lb_bbl: float) -> void:
 
 ## Agrega acidez (meq por litro de filtrado). Orden de consumo: OH⁻, CO₃²⁻ → HCO₃⁻,
 ## alcalinidad orgánica, cal sin disolver (libera Ca²⁺) y por último HCO₃⁻ → CO₂.
+## Los ácidos atacan primero lo disuelto; en cambio, bicarbonatos y carbonatos
+## consumen primero la cal sólida (ver _equilibrar), que es lo que suponen las
+## fórmulas de tratamiento del manual.
 func agregar_acido(meq: float) -> void:
 	var resto := meq
 	var tomado := minf(resto, oh / MG_POR_MEQ_OH)
@@ -234,6 +248,71 @@ func agregar_solidos(fraccion: float) -> void:
 	frac_lgs += fraccion
 
 
+## Agrega un químico que se disuelve y reacciona (soda, carbonato de sodio, SAPP…).
+## "reaccion" va por mol de producto: "ion_<nombre>" (mol de ion), "acido" (eq),
+## "precipita_ca" (mol de Ca²⁺), "precipita_sulfuro" (mol de S²⁻).
+## La conversión lb/bbl → mmol/l de filtrado usa Fw, igual que las fórmulas
+## de dosis del manual, así la dosis calculada trata exactamente lo medido.
+func agregar_quimico(reaccion: Dictionary, peso_molecular: float, lb_bbl: float) -> void:
+	var mmol := lb_bbl * MG_L_LODO_POR_LB_BBL / peso_molecular / fw()
+	for clave: String in reaccion:
+		var cantidad: float = reaccion[clave] * mmol
+		if clave == "acido":
+			agregar_acido(cantidad)
+		elif clave == "precipita_ca":
+			ca = maxf(0.0, ca - cantidad * MG_POR_MMOL_CA)
+		elif clave == "precipita_sulfuro":
+			sulfuro = maxf(0.0, sulfuro - cantidad * MG_POR_MMOL_ION["sulfuro"])
+		elif clave.begins_with("ion_"):
+			var ion := clave.trim_prefix("ion_")
+			set(ion, get(ion) + cantidad * MG_POR_MMOL_ION[ion])
+		else:
+			assert(false, "Reacción desconocida: %s" % clave)
+	_equilibrar()
+
+
+## Aditivo que no cambia la química: lignosulfonato, PAC, XC (lb/bbl).
+func agregar_aditivo(nombre: String, lb_bbl: float) -> void:
+	assert(nombre in ["lignosulfonato", "pac", "xc"], "Aditivo desconocido: %s" % nombre)
+	set(nombre, get(nombre) + lb_bbl)
+
+
+## Barita (lb por bbl de lodo inicial). Sube el volumen: el resultado se
+## expresa de nuevo por bbl de lodo final. Coincide con Formulas.barita_lb_por_bbl.
+func agregar_barita(lb_bbl: float) -> void:
+	var v := lb_bbl / F.LB_BARITA_POR_BBL
+	_diluir_por_volumen_agregado(v, false)
+	frac_barita += v / (1.0 + v)
+
+
+## Bentonita seca (lb por bbl de lodo inicial). Suma volumen de sólidos livianos.
+func agregar_bentonita(lb_bbl: float) -> void:
+	var v := lb_bbl / (F.DENSIDAD_LGS_PPG * F.GAL_POR_BBL)
+	_diluir_por_volumen_agregado(v, false)
+	frac_lgs += v / (1.0 + v)
+	bentonita += lb_bbl / (1.0 + v)
+
+
+## Agua dulce (bbl por bbl de lodo inicial). Diluye sólidos, productos e iones.
+func agregar_agua(bbl_por_bbl: float) -> void:
+	_diluir_por_volumen_agregado(bbl_por_bbl, true)
+
+
+## Todo lo que está "por bbl de lodo" se reparte en (1 + v) bbl. Si lo que entra
+## es agua, además se diluyen los iones del filtrado.
+func _diluir_por_volumen_agregado(v: float, es_agua: bool) -> void:
+	var factor := 1.0 / (1.0 + v)
+	if es_agua:
+		var fw_antes := fw()
+		var factor_iones := fw_antes / (fw_antes + v)
+		for ion in ["oh", "co3", "hco3", "ca", "mg", "na", "k", "cl", "so4", "sulfuro",
+				"alc_org_pf", "alc_org_mf"]:
+			set(ion, get(ion) * factor_iones)
+	for campo in ["frac_barita", "frac_lgs", "frac_aceite", "bentonita", "lignosulfonato",
+			"pac", "xc", "arcilla_activa", "cal_exceso", "mg_oh2"]:
+		set(campo, get(campo) * factor)
+
+
 ## Aplica los aportes declarados por un contaminante (ver sim/contaminante.gd).
 ## Claves: "cal_lb_bbl", "acido_meq", "intercambio_ca", "lgs_frac", "ion_<nombre>".
 func aplicar_aportes(aportes: Dictionary, cantidad: float) -> void:
@@ -254,31 +333,59 @@ func aplicar_aportes(aportes: Dictionary, cantidad: float) -> void:
 			assert(false, "Aporte desconocido: %s" % clave)
 
 
-## Reacciones que el manual da como completas (mud-engineer-reference.md §1.7).
+## Reacciones que el manual da como completas (mud-engineer-reference.md §1.3–1.7).
+## Se repiten hasta que nada cambia, porque una reacción habilita la siguiente.
 func _equilibrar() -> void:
-	# HCO₃⁻ + OH⁻ → CO₃²⁻ + H₂O
-	var m := minf(hco3 / MG_POR_MMOL_HCO3, oh / MG_POR_MEQ_OH)
-	hco3 -= m * MG_POR_MMOL_HCO3
-	oh -= m * MG_POR_MEQ_OH
-	co3 += m * MG_POR_MMOL_CO3
+	for _vuelta in 20:
+		var movido := 0.0
 
-	# Ca(OH)₂ + 2 HCO₃⁻ → CaCO₃↓ + CO₃²⁻ + 2 H₂O  (la cal sin disolver trata bicarbonatos)
-	var mmol_cal := cal_exceso * MMOL_CAL_POR_LB_BBL / fw()
-	m = minf(hco3 / MG_POR_MMOL_HCO3 / 2.0, mmol_cal)
-	hco3 -= 2.0 * m * MG_POR_MMOL_HCO3
-	cal_exceso -= m * fw() / MMOL_CAL_POR_LB_BBL
-	co3 += m * MG_POR_MMOL_CO3
+		# Ca(OH)₂ + HCO₃⁻ → CaCO₃↓ + OH⁻ + H₂O  (1:1, el factor 1,135 del manual).
+		# Va primero: mientras haya cal sólida, ella amortigua antes que el OH⁻ disuelto.
+		var m := minf(hco3 / MG_POR_MMOL_HCO3, _mmol_cal())
+		hco3 -= m * MG_POR_MMOL_HCO3
+		_restar_cal(m)
+		oh += m * MG_POR_MEQ_OH
+		movido += m
 
-	# Ca²⁺ + CO₃²⁻ → CaCO₃↓  (solo el carbonato precipita calcio, no el bicarbonato)
-	m = minf(ca / MG_POR_MMOL_CA, co3 / MG_POR_MMOL_CO3)
-	ca -= m * MG_POR_MMOL_CA
-	co3 -= m * MG_POR_MMOL_CO3
+		# HCO₃⁻ + OH⁻ → CO₃²⁻ + H₂O
+		m = minf(hco3 / MG_POR_MMOL_HCO3, oh / MG_POR_MEQ_OH)
+		hco3 -= m * MG_POR_MMOL_HCO3
+		oh -= m * MG_POR_MEQ_OH
+		co3 += m * MG_POR_MMOL_CO3
+		movido += m
 
-	# Mg²⁺ + 2 OH⁻ → Mg(OH)₂↓  (gel que espesa; por eso la cáustica empeora la carnalita)
-	m = minf(mg / MG_POR_MMOL_MG, oh / (2.0 * MG_POR_MEQ_OH))
-	mg -= m * MG_POR_MMOL_MG
-	oh -= m * 2.0 * MG_POR_MEQ_OH
-	mg_oh2 += m * 58.32
+		# Ca(OH)₂ + CO₃²⁻ → CaCO₃↓ + 2 OH⁻  (por eso el carbonato de sodio sobre cemento sube el pH).
+		# También antes que el calcio disuelto, por la misma razón que arriba.
+		m = minf(co3 / MG_POR_MMOL_CO3, _mmol_cal())
+		co3 -= m * MG_POR_MMOL_CO3
+		_restar_cal(m)
+		oh += m * 2.0 * MG_POR_MEQ_OH
+		movido += m
+
+		# Ca²⁺ + CO₃²⁻ → CaCO₃↓  (solo el carbonato precipita calcio, no el bicarbonato)
+		m = minf(ca / MG_POR_MMOL_CA, co3 / MG_POR_MMOL_CO3)
+		ca -= m * MG_POR_MMOL_CA
+		co3 -= m * MG_POR_MMOL_CO3
+		movido += m
+
+		# Mg²⁺ + 2 OH⁻ → Mg(OH)₂↓  (gel que espesa; por eso la cáustica empeora la carnalita)
+		m = minf(mg / MG_POR_MMOL_MG, oh / (2.0 * MG_POR_MEQ_OH))
+		mg -= m * MG_POR_MMOL_MG
+		oh -= m * 2.0 * MG_POR_MEQ_OH
+		mg_oh2 += m * 58.32
+		movido += m
+
+		if movido < 1e-6:
+			break
+
+
+## mmol de cal sin disolver por litro de filtrado.
+func _mmol_cal() -> float:
+	return cal_exceso * MMOL_CAL_POR_LB_BBL / fw()
+
+
+func _restar_cal(mmol: float) -> void:
+	cal_exceso = maxf(0.0, cal_exceso - mmol * fw() / MMOL_CAL_POR_LB_BBL)
 
 
 ## Copia independiente, para comparar antes y después o para pruebas piloto.

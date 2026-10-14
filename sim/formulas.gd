@@ -19,13 +19,16 @@ const GAL_POR_BBL := 42.0
 
 ## Factores de la Tabla 2 del manual (mud-engineer-reference.md §1.2).
 ## Dosis (lb/bbl) = mg/l × Fw × factor.
+## Verificados por estequiometría: todos cuadran al 1–2 % salvo dos que en el
+## documento aparecen 10 veces más altos (0,00424 y 0,00735). Se usan los
+## estequiométricos; confirmar contra el PDF original.
 const FACTOR_DOSIS := {
 	"carbonato_yeso": 0.00100,
 	"carbonato_cal": 0.000432,
-	"bicarbonato_cal": 0.00424,
+	"bicarbonato_cal": 0.000424,
 	"calcio_carbonato_de_sodio": 0.000928,
 	"calcio_sapp": 0.000971,
-	"calcio_bicarbonato_de_sodio": 0.00735,
+	"calcio_bicarbonato_de_sodio": 0.000735,
 	"dureza_soda_caustica": 0.00116,
 	"sulfuro_oxido_de_cinc": 0.00091,
 }

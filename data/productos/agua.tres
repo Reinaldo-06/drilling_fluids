@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Producto" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/producto.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Agua dulce"
+descripcion = "Diluye sólidos, iones y productos. La única forma económica de bajar cloruros (§1.5). Cantidad en bbl por bbl de lodo."
+efecto = "agua"
+aditivo = ""
+peso_molecular = 0.0
+reaccion = {}
+lb_por_saco = 1.0

@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Producto" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/producto.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Ácido cítrico"
+descripcion = "Para mucho cemento: precipita el calcio como citrato y baja el pH (§1.3)."
+efecto = "quimico"
+aditivo = ""
+peso_molecular = 210.14
+reaccion = {"precipita_ca": 1.5, "acido": 3.0}
+lb_por_saco = 50.0

@@ -449,5 +449,12 @@ Fuentes: [Barite sag causes, indications & prevention — Drilling Manual](https
   - Un ácido consume, en orden: OH⁻, CO₃²⁻ → HCO₃⁻, alcalinidad orgánica, cal en exceso (libera Ca²⁺) y HCO₃⁻.
 - `sim/contaminante.gd` + `data/contaminantes/*.tres`: cemento, yeso, sal, carbonatos, H₂S y sólidos perforados como datos.
 - `tests/test_tabla4.gd`: **los seis contaminantes reproducen las 12 flechas de la Tabla 4.**
-- **Pendiente de calibrar:** sin alcalinidad el pH cae a 7, demasiado bajo (en el campo quedaría cerca de 8,5–9). Las constantes de VP, PC, geles y filtrado son provisionales.
+- `sim/producto.gd` + `data/productos/*.tres`: 15 productos (soda cáustica, carbonato y bicarbonato de sodio, SAPP, ácido cítrico, cal, yeso, óxido de cinc, lignosulfonato, PAC, XC, bentonita, barita, KCl, agua). Los químicos declaran su **reacción por mol** y su peso molecular; la conversión lb/bbl → mmol/l usa Fw igual que las fórmulas del manual, así **la dosis calculada con la Tabla 2 trata exactamente lo medido**.
+- **Regla de orden de las reacciones:** bicarbonatos y carbonatos consumen primero la **cal sólida** y después lo disuelto (es lo que suponen las fórmulas de tratamiento del manual). Los ácidos atacan primero lo disuelto.
+- `tests/test_tratamientos.gd`: cada contaminación tratada con la dosis del manual. Resultados que salen solos del modelo y conviene conocer:
+  - **Bicarbonato sobre cemento** con la dosis de exceso de cal elimina la cal sólida pero **deja soda en solución**: el Pm baja, el Pf sube y el calcio disuelto sigue. Hace falta un segundo tratamiento (SAPP o ácido cítrico) para bajar pH y calcio.
+  - **Carbonato de sodio sobre cemento** deja todavía más alcalinidad: es la trampa del manual.
+  - **Con cal en exceso**, el carbonato de sodio se gasta primero en ella y la dosis calculada con el calcio no alcanza. Hay que mirar el Pm antes de tratar el calcio.
+  - **Cal sobre bicarbonatos** con la dosis 1:1 elimina los carbonatos pero deja el pH sobre 11,3: por eso el manual pide combinar cal y yeso según el pH.
+- **Pendiente de calibrar:** el pH no tiene amortiguación fuera de OH⁻ y carbonatos. Sin alcalinidad cae a 7 (en el campo quedaría cerca de 8,5–9) y 0,1 lb/bbl de soda lo sube a casi 12. Las constantes de VP, PC, geles y filtrado son provisionales.
 - **Sólidos nuevos** (la fila de la Tabla 4 que mueve todo) queda para cuando exista la perforación en el paso de simulación.

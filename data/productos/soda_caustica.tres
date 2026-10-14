@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Producto" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/producto.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Soda cáustica (NaOH)"
+descripcion = "Sube pH y alcalinidad. Convierte bicarbonato en carbonato. No usarla con carnalita: precipita Mg(OH)₂ y espesa (mud-engineer-reference.md §1.5)."
+efecto = "quimico"
+aditivo = ""
+peso_molecular = 40.0
+reaccion = {"ion_oh": 1.0, "ion_na": 1.0}
+lb_por_saco = 50.0

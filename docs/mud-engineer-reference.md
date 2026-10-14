@@ -46,6 +46,8 @@ Esto se traduce directo a mecánica: el panel de propiedades físicas dispara la
 | Agua dura o salada | Calcio y magnesio | Soda cáustica | mg/l × Fw × 0,00116 |
 | H₂S | Sulfuro | Óxido de cinc + NaOH (pH > 10,5) | mg/l × Fw × 0,00091 |
 
+> ⚠️ **Dos factores de esta tabla no cuadran con la estequiometría.** Verificando cada fila con los pesos moleculares, todas coinciden al 1–2 % salvo dos que aparecen **10 veces más altos**: CO₂/bicarbonato con cal (0,00424 → debería ser **0,000424**) y calcio con bicarbonato de sodio (0,00735 → debería ser **0,000735**). Probablemente es un error al pasar los datos del PDF. El código usa los valores estequiométricos (`sim/formulas.gd`). **Pendiente: confirmar contra el PDF en la máquina local.**
+
 **Exceso de cal (lb/bbl)** = `0,26 × (Pm − (Pf × Fw))`  ·  métrico (kg/m³): `0,074178 × (Pm − (Pf × Fw))`
 
 ### 1.3 Cemento (Cap. 4C, *Contaminación de Cemento*, 4C.4–4C.7)
