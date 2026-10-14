@@ -203,9 +203,9 @@ func test_diluir_ante_pc_alto() -> void:
 func test_tratar_sin_diagnosticar() -> void:
 	var lodo = Base.disperso_lignosulfonato()
 	lodo.cal_exceso = 0.0
-	var ctx := _tratar("sapp", lodo, {"pruebas_corridas": ["embudo", "reologia", "balanza"]})
+	var ctx := _tratar("sapp", lodo, {"pruebas_corridas": ["embudo_marsh", "fann", "balanza"]})
 	verificar(_dispara("tratar_sin_diagnosticar", "al_tratar", ctx), "solo pruebas físicas: dispara")
-	ctx["pruebas_corridas"] = ["reologia", "pm"]
+	ctx["pruebas_corridas"] = ["fann", "pm"]
 	verificar(not _dispara("tratar_sin_diagnosticar", "al_tratar", ctx), "con Pm corrido no dispara")
 	var barita := _tratar("barita", lodo, {"pruebas_corridas": []})
 	verificar(not _dispara("tratar_sin_diagnosticar", "al_tratar", barita), "densificar no es tratar químico")
@@ -326,7 +326,7 @@ func test_producto_no_aprobado() -> void:
 
 # §5.1 — VP ≤ 2 × peso
 func test_vp_sobre_dos_veces_peso() -> void:
-	var ctx := {"antes": {"densidad": 9.0, "vp": 20.0}, "pruebas_corridas": ["reologia"]}
+	var ctx := {"antes": {"densidad": 9.0, "vp": 20.0}, "pruebas_corridas": ["fann"]}
 	verificar(_dispara("vp_sobre_dos_veces_peso", "al_diagnosticar", ctx), "VP 20 con 9 ppg")
 	verificar(F.vp_excede_limite(20.0, 9.0), "coincide con Formulas.vp_excede_limite")
 	ctx["antes"] = {"densidad": 9.0, "vp": 16.0}
@@ -368,3 +368,23 @@ func test_lodo_fuera_de_programa_al_cerrar() -> void:
 	mal["densidad"] = 9.3
 	verificar(_dispara("lodo_fuera_de_programa", "al_cerrar_dia", {"despues": mal, "programa": prog}),
 		"densidad fuera")
+
+
+# Integración con el agente C: los ids que usan las reglas tienen que existir en data/pruebas/.
+func test_ids_de_pruebas_existen_en_el_laboratorio() -> void:
+	var Evaluador = load("res://sim/evaluador_reglas.gd")
+	for id: String in Evaluador.PRUEBAS:
+		verificar(ResourceLoader.exists("res://data/pruebas/%s.tres" % id), "la prueba '%s' no existe en data/pruebas/" % id)
+	var regex := RegEx.new()
+	regex.compile("corrio(?:_alguna)?\\(([^)]*)\\)")
+	for archivo in DirAccess.get_files_at("res://data/reglas"):
+		if not archivo.ends_with(".tres"):
+			continue
+		var regla: Resource = load("res://data/reglas/" + archivo)
+		for m in regex.search_all(regla.condicion):
+			for id in m.get_string(1).replace("[", "").replace("]", "").replace("\"", "").split(","):
+				id = id.strip_edges()
+				if id == "" or id == "p":
+					continue
+				verificar(id in Evaluador.PRUEBAS or id in Evaluador.PRUEBAS_FUTURAS,
+					"%s pide la prueba '%s', que no está en PRUEBAS" % [archivo, id])

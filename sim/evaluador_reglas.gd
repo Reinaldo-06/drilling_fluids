@@ -37,9 +37,12 @@ const ACCION_POR_OMISION := {
 }
 
 ## Ids de prueba que usan las condiciones. Deben coincidir con data/pruebas/.
-const PRUEBAS := ["balanza", "embudo", "reologia", "geles", "filtrado_api", "ph",
-	"pm", "pf_mf", "cloruros", "dureza", "retorta", "mbt", "calcio_magnesio",
-	"ggt", "potasio", "amina"]
+## Ids de data/pruebas/ (tests/test_reglas.gd verifica que existan).
+const PRUEBAS := ["balanza", "balanza_presurizada", "embudo_marsh", "fann", "geles",
+	"filtrado_api", "ph", "pm", "pf_mf", "cloruros", "dureza", "retorta", "mbt",
+	"calcio_magnesio", "ggt_sulfuros", "ggt_carbonatos", "potasio"]
+## Pruebas que las reglas pueden pedir pero todavía no existen como dato.
+const PRUEBAS_FUTURAS := ["amina"]
 
 const ORDEN_TIPO := {"error": 0, "advertencia": 1, "consejo": 2}
 
