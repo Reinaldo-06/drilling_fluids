@@ -2,7 +2,7 @@
 
 Juego 2D pixelado en **Godot** donde el jugador es un **ingeniero de fluidos de perforación**. Objetivo: que el autor (que trabaja en la industria) aprenda manejo de tanques, diagnóstico de propiedades y tratamiento de contaminaciones.
 
-**Estado actual: simulación base completa, sin interfaz.** Proyecto Godot 4.7.2 con: química del lodo con equilibrio ácido-base (Tabla 4 entera), 7 contaminantes, 21 productos con dosis del manual, tanques y paso del tiempo, 17 pruebas de laboratorio y 4 observaciones como datos, 19 reglas con explicación y el programa de CAIMÁN-3. 135 pruebas pasando. Resumen en `simulation-logic.md` §12.7. El siguiente paso es la presentación (overworld) y lo que falta de la simulación: perforación, control de sólidos y eventos. Estructura y cómo correr las pruebas en `README.md`; estado de la implementación en `simulation-logic.md` §12.6.
+**Estado actual: simulación completa del turno y overworld caminable, todavía sin conectar entre sí.** Proyecto Godot 4.7.2 con: química del lodo con equilibrio ácido-base (Tabla 4 entera), 7 contaminantes, 21 productos, tanques y tiempo, 17 pruebas de laboratorio y 4 observaciones, 19 reglas con explicación, programa de CAIMÁN-3; perforación con formaciones y control de sólidos; eventos guionados y PVT; turno de 12 h con acciones, encuellador, inventario, reporte diario y noche simulada (`sim/operacion_pozo.gd` los engancha). Overworld de la locación (`game/overworld/`) con 7 personajes (`docs/personajes.md`). 221 pruebas pasando. Resumen en `simulation-logic.md` §12.7–12.8. Siguiente paso: unir el overworld al turno (señales `interactuado`/`caminado` → acciones y reloj) y las pantallas de laboratorio, tanques y reporte. Estructura y cómo correr las pruebas en `README.md`.
 
 ## Mapa de documentos
 
@@ -55,9 +55,9 @@ Leer en este orden antes de proponer nada:
 ## Próximos pasos
 
 1. ~~Esqueleto del proyecto Godot 4.7.2~~ ✅ hecho. Pruebas: `godot --headless --path . --script res://tests/run_tests.gd`.
-2. Modelo de datos según `simulation-logic.md` §12: ✅ estado del lodo, contaminantes, productos, tanque y tiempo, pruebas de laboratorio, observaciones, reglas, programa de sección (§12.7). Faltan: conexiones y layout del taladro, perforación en el paso de simulación (entrada de sólidos, consumo de volumen), control de sólidos, eventos.
+2. Modelo de datos según `simulation-logic.md` §12: ✅ estado del lodo, contaminantes, productos, tanque y tiempo, pruebas, observaciones, reglas, programa (§12.7); perforación, control de sólidos, eventos, PVT, turno y reporte (§12.8). Falta: layout de compartimientos y conexiones del taladro en la simulación (las válvulas del mapa aún no mueven lodo).
 3. Fórmulas reales de `mud-engineer-reference.md`: ✅ las de tanque, volumen, presión, reología, dosis y píldoras están en `sim/formulas.gd` con pruebas. Faltan las que dependan del modelo de estado.
-4. Primer vertical slice: sección superficial del pozo CAIMÁN-3 — pruebas básicas, densificar, diluir.
+4. Primer vertical slice: sección superficial del pozo CAIMÁN-3 — pruebas básicas, densificar, diluir. Falta la interfaz: unir `game/overworld/overworld.gd` (señales) con `sim/turno.gd`, caja de laboratorio, vista de tanques y reporte.
 
 **Pendientes de investigación:**
 - Procedimiento de **desplazamiento / cambio de fluido**: secuencia en `rig-tank-system.md` §5, ya validada en parte por el autor. Quedan abiertos el criterio para desviar retornos y la composición del circuito corto (§7).
