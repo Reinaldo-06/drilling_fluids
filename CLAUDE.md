@@ -15,6 +15,7 @@ Leer en este orden antes de proponer nada:
 | `docs/mud-programs.md` | 7 sistemas base agua, tabla de vulnerabilidades cruzadas, 3 pozos ficticios, formato del programa de lodos. **Contenido de los niveles.** |
 | `docs/rig-tank-system.md` | Tanques del taladro: qué contiene cada uno, cómo se conectan, reglas de mezcla y volumen, cambio de fluido (validado en parte por el autor). **Base del manejo de tanques.** |
 | `docs/simulation-logic.md` | Reglas de simulación contrastadas con fuentes (≥ 2 por dato), con marca de confianza y lista de temas pendientes. **Antes de implementar una regla, buscarla aquí.** |
+| `docs/reference-wells.md` | Programas y casos **públicos** de otras cuencas (Pérmica, Colombia, Medio Oriente, mar del Norte) usados como referencia de patrones, y tres pozos ficticios derivados (MÉDANO-5, PIEDEMONTE-2, ESTRATO-9). |
 | `docs/domain-research.md` | Entorno del taladro: circulación, válvulas, control de pozo. Hoy es **contexto**, no mecánica — relevante solo para la expansión futura de circulación. |
 
 ## Decisiones cerradas — no re-litigar
@@ -23,7 +24,7 @@ Leer en este orden antes de proponer nada:
 - **Circulación:** fuera de alcance por ahora; expansión posterior.
 - Lodos **base agua** únicamente.
 - **Unidades de campo** (ppg, bbl, psi, lb/bbl, lb/100 ft², cP, mg/l). Las fórmulas traen constantes embebidas (0,052 · 1470 · 35); no convertir a métrico.
-- **Pozos ficticios** con rangos plausibles. Nunca usar datos de pozos reales.
+- **Pozos ficticios** con rangos plausibles. Nunca copiar un pozo real; los programas públicos de pozos reales sirven solo como **referencia de patrones** (`docs/reference-wells.md`).
 - **Overworld caminable** en vista cenital, estética pixel art estilo Pokémon FireRed.
 - **Tiempo por turnos / días de pozo.** El jugador juega el turno de día (12 h); el turno de noche corre simulado según las recomendaciones que dejó en el reporte.
 - **Feedback explícito al fallar**: el juego explica el porqué, no solo marca el error.
