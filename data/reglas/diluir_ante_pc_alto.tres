@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Regla" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/regla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "diluir_ante_pc_alto"
+titulo = "Diluir ante un PC alto"
+tipo = "advertencia"
+momento = "al_tratar"
+condicion = "accion.producto == \"agua\" and sobre_maximo(\"pc\", antes.pc) and not sobre_maximo(\"vp\", antes.vp) and antes.vp <= 2.0 * antes.densidad and not sobre_maximo(\"densidad\", antes.densidad) and not sobre_maximo(\"cl\", antes.cl)"
+explicacion = "El punto cedente está alto pero la VP no: eso es química (floculación), no sólidos. Regla de oro: VP ≈ sólidos, PC ≈ química. Diluir gasta agua, volumen y producto, y el contaminante que flocula sigue ahí. Corre las pruebas químicas (Pm, Pf/Mf, dureza, cloruros), identifica la causa y trátala; la dilución es para VP alta, densidad alta o cloruros."
+referencia = "mud-engineer-reference.md §5; game-design-mechanics.md, Diagnóstico de reología"

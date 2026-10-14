@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Regla" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/regla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "sobre_densificar"
+titulo = "Sobre-densificar"
+tipo = "error"
+momento = "al_tratar"
+condicion = "accion.producto == \"barita\" and sobre_maximo(\"densidad\", despues.densidad)"
+explicacion = "Con esa barita el lodo pasa el techo de densidad del programa. Más peso del necesario empuja contra la formación (riesgo de fracturarla y perder circulación), baja la ROP y además subiste el volumen del sistema, que ahora hay que manejar. Calcula la barita con la fórmula de densificación hasta el peso objetivo, no hasta «un poco más por si acaso»."
+referencia = "mud-engineer-reference.md §2; game-design-mechanics.md, Feedback explícito al fallar"

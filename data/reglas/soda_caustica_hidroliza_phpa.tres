@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Regla" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/regla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "soda_caustica_hidroliza_phpa"
+titulo = "pH alto con PHPA"
+tipo = "advertencia"
+momento = "al_tratar"
+condicion = "accion.producto == \"soda_caustica\" and programa.sistema in [\"kcl_phpa\", \"amina_phpa\"] and despues.ph > 10.0"
+explicacion = "El sistema lleva PHPA y con esa soda cáustica el pH pasa de 10. El pH alto hidroliza el PHPA (libera amoníaco y deja de encapsular) y degrada el almidón. En estos sistemas el pH se mantiene cerca de 9,0–9,5."
+referencia = "simulation-logic.md §13.2–13.3; mud-programs.md, sistema 3"

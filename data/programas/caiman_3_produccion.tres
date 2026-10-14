@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="ProgramaSeccion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/programa_seccion.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+pozo = "CAIMÁN-3"
+seccion = "Producción"
+diametro = "8½\""
+profundidad_desde = 8000.0
+profundidad_hasta = 9600.0
+sistema = "rdf"
+objetivo = "Perforar la arena productora sin dañarla: sólidos de perforación mínimos, puenteo con CaCO₃ dimensionado soluble en ácido y nada de barita."
+rangos = {
+"densidad": [9.0, 9.6],
+"embudo": [40.0, 55.0],
+"vp": [8.0, 15.0],
+"pc": [15.0, 25.0],
+"filtrado": [4.0, 6.0],
+"ph": [9.0, 9.5],
+"lgs_pct": [0.0, 2.0],
+"mbt": [0.0, 5.0]
+}
+productos_aprobados = PackedStringArray("kcl", "xc", "soda_caustica", "agua")
+concentraciones = {
+"xc": [1.0, 2.0],
+"almidon": [4.0, 8.0],
+"carbonato_de_calcio": [15.0, 40.0]
+}
+productos_por_crear = PackedStringArray("almidon", "carbonato_de_calcio")
+advertencias = PackedStringArray("Barita prohibida: es insoluble en ácido y daña la permeabilidad para siempre.", "Cualquier sólido perforado que se quede en el lodo daña el yacimiento: centrífuga y dilución con salmuera limpia.", "La densidad sale de la salmuera y del CaCO₃: el techo es bajo.")
+criterios_cambio_fluido = "Fin del pozo a 9.600 ft."
+explicaciones = {
+"densidad_bajo": "En el RDF no hay barita: la densidad se sube con salmuera más pesada (más KCl) o con CaCO₃ dimensionado.",
+"lgs_pct_alto": "Sólidos perforados en el RDF son daño directo a la formación productora: centrífuga y dilución con salmuera limpia."
+}

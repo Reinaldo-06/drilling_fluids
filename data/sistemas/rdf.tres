@@ -1,0 +1,33 @@
+[gd_resource type="Resource" script_class="SistemaLodo" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/sistema_lodo.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "rdf"
+nombre = "Drill-in de yacimiento (RDF)"
+seccion_tipica = "Formación objetivo / productora"
+aditivos = {
+"kcl": [0.0, 30.0],
+"xc": [1.0, 2.0],
+"almidon": [4.0, 8.0],
+"carbonato_de_calcio": [15.0, 40.0]
+}
+rangos_tipicos = {
+"densidad": [8.6, 10.5],
+"vp": [8.0, 15.0],
+"pc": [15.0, 25.0],
+"filtrado": [4.0, 6.0],
+"ph": [9.0, 9.5]
+}
+fuerte_en = "No daña la formación; el revoque se remueve con ácido y se recupera la permeabilidad."
+debil_en = "Barita prohibida; densidad limitada por la salmuera; carísimo; cualquier sólido de perforación arruina el propósito."
+nota_de_juego = "Invierte las reglas: la barita está prohibida. Hay que densificar con salmuera o aceptar el límite."
+vulnerabilidades = {
+"cemento": "critico",
+"yeso": "alto",
+"sal": "moderado",
+"carbonatos": "alto",
+"solidos_perforados": "critico",
+"magnesio": "alto"
+}

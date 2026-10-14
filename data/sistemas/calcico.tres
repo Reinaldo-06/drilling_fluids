@@ -1,0 +1,36 @@
+[gd_resource type="Resource" script_class="SistemaLodo" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/sistema_lodo.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "calcico"
+nombre = "Cálcico (cal / yeso)"
+seccion_tipica = "Intermedia con anhidrita o yeso, o donde se espera cemento"
+aditivos = {
+"cal": [0.5, 2.0],
+"yeso": [2.0, 6.0],
+"bentonita": [10.0, 15.0],
+"lignosulfonato": [3.0, 6.0],
+"pac": [2.0, 4.0],
+"soda_caustica": [0.5, 1.0]
+}
+rangos_tipicos = {
+"densidad": [9.5, 12.0],
+"vp": [12.0, 22.0],
+"pc": [10.0, 18.0],
+"filtrado": [4.0, 8.0],
+"ph": [9.5, 10.5],
+"ca": [600.0, 1200.0]
+}
+fuerte_en = "Ya está contaminado de calcio a propósito: una contaminación adicional de cemento o anhidrita casi no lo mueve."
+debil_en = "Riesgo de floculación por temperatura, más difícil de controlar el filtrado."
+nota_de_juego = "A veces se agrega el contaminante a propósito para volverse inmune a él."
+vulnerabilidades = {
+"cemento": "inmune",
+"yeso": "inmune",
+"sal": "moderado",
+"carbonatos": "moderado",
+"solidos_perforados": "moderado",
+"magnesio": "alto"
+}

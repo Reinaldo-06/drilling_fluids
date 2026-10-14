@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Regla" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/regla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "estimar_kcl_con_cloruros"
+titulo = "Estimar el KCl con los cloruros"
+tipo = "error"
+momento = "al_diagnosticar"
+condicion = "accion.diagnostico == \"potasio_suficiente\" and not corrio(\"potasio\")"
+explicacion = "Diste la inhibición por buena sin medir el potasio. El K⁺ se consume en las arcillas de la lutita; el Cl⁻ no, se queda en el agua. Los cloruros siguen altos aunque la inhibición ya se haya agotado: esa trampa le dio mala fama a los primeros lodos de potasio. Corre la prueba de K⁺."
+referencia = "simulation-logic.md §13.1"

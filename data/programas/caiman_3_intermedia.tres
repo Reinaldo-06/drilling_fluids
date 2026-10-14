@@ -1,0 +1,41 @@
+[gd_resource type="Resource" script_class="ProgramaSeccion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/programa_seccion.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+pozo = "CAIMÁN-3"
+seccion = "Intermedia"
+diametro = "12¼\""
+profundidad_desde = 2500.0
+profundidad_hasta = 8000.0
+sistema = "kcl_phpa"
+objetivo = "Atravesar la lutita reactiva desde 3.200 ft con inhibición iónica (K⁺) y encapsulamiento (PHPA), manteniendo la densidad dentro de la ventana hasta 8.000 ft."
+rangos = {
+"densidad": [9.5, 10.8],
+"embudo": [40.0, 55.0],
+"vp": [10.0, 20.0],
+"pc": [15.0, 25.0],
+"gel_10s": [4.0, 10.0],
+"gel_10min": [8.0, 20.0],
+"filtrado": [4.0, 6.0],
+"ph": [9.0, 9.5],
+"k": [15000.0, 30000.0],
+"ca": [0.0, 200.0],
+"mbt": [0.0, 15.0]
+}
+productos_aprobados = PackedStringArray("kcl", "xc", "soda_caustica", "barita", "agua", "bicarbonato_de_sodio", "acido_citrico")
+concentraciones = {
+"kcl": [10.0, 25.0],
+"phpa": [0.5, 2.0],
+"xc": [0.5, 1.5],
+"almidon": [2.0, 6.0],
+"soda_caustica": [0.25, 0.75]
+}
+productos_por_crear = PackedStringArray("phpa", "almidon")
+advertencias = PackedStringArray("Lutita reactiva desde 3.200 ft: medir K⁺, no cloruros. El potasio se consume en las arcillas.", "Al rotar el cemento de la zapata entra calcio: en este sistema la contaminación de cemento es crítica.", "pH sobre 10 hidroliza el PHPA y degrada el almidón: nada de soda cáustica de más.", "Con barita en el lodo, apagar desarenador y deslimador y usar la centrífuga.")
+criterios_cambio_fluido = "A 8.000 ft: entubar y cementar el revestimiento intermedio. El RDF se construye limpio en reserva (sin barita ni sólidos) y se desplaza directo antes de entrar a la arena productora."
+explicaciones = {
+"ca_alto": "En KCl/PHPA el calcio precipita el polímero y flocula: si viene de cemento (Pm alto), trátalo ya con bicarbonato de sodio o ácido cítrico, por debajo de la dosis estequiométrica.",
+"ph_alto": "Con PHPA el pH sobre 9,5 empieza a hidrolizarlo y sobre 10 degrada el almidón. Si el pH subió solo, sospecha cemento: mira el Pm."
+}

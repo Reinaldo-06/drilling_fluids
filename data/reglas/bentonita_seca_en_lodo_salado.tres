@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="Regla" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/regla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "bentonita_seca_en_lodo_salado"
+titulo = "Bentonita seca en lodo salado"
+tipo = "error"
+momento = "al_tratar"
+condicion = "accion.producto == \"bentonita\" and not accion.prehidratada and antes.cl > 10000.0"
+explicacion = "La bentonita no hidrata en agua salada: echada seca a este lodo casi no da viscosidad ni revoque, solo suma sólidos. Se prehidrata en agua dulce en el tanque de premezcla, se protege y después se agrega al sistema."
+referencia = "mud-engineer-reference.md §1.5; simulation-logic.md §8"
