@@ -126,18 +126,38 @@ Corolario pedagógico: un fluido excelente en una sección es una mala elección
 **Débil en:** **prohibida la barita** (es insoluble y daña permanentemente); densidad limitada por la salmuera; carísimo; cualquier sólido de perforación que entre arruina el propósito.
 **Nota de juego:** invierte las reglas aprendidas. La herramienta favorita del jugador para subir densidad —la barita— aquí está prohibida. Tiene que densificar con salmuera más pesada o aceptar el límite.
 
+### 7. Polímero-amina (alto desempeño)
+
+**Sección típica:** intermedia con lutitas muy reactivas, donde el KCl solo no alcanza o hay límites al cloruro que se puede descartar
+
+| Aditivo | Dosis | Función |
+|---|---|---|
+| Amina (poliamina o éter-amina) | 2–6 lb/bbl | **Inhibidor principal**: se mete entre las láminas de arcilla e impide que entre agua |
+| PHPA | 0,5–2 lb/bbl | Inhibidor secundario: encapsula recortes |
+| KCl (opcional) | 0–10 lb/bbl | Refuerzo de inhibición |
+| Goma xantan (XC) | 0,5–1,5 lb/bbl | Viscosidad y suspensión |
+| PAC o almidón | 2–4 lb/bbl | Control de filtrado |
+| Soda cáustica | mínima | pH |
+| Barita | según necesidad | Densidad |
+
+**Propiedades objetivo:** densidad 9,5–12,0 ppg · PV 12–22 cP · YP 15–25 lb/100ft² · filtrado 4–6 ml · **pH 9,0–9,5** · amina en especificación del programa · MBT bajo y estable
+
+**Fuerte en:** la mejor inhibición de los sistemas base agua del catálogo; recortes firmes, poca arcilla dispersa en el lodo; menos cloruro que descartar que un KCl alto.
+**Débil en:** el inhibidor **se consume** con cada pie de lutita y hay que reponerlo midiendo; pH alto hidroliza el PHPA; caro; sensible al calcio como el KCl/PHPA.
+**Nota de juego:** el sistema donde el jugador aprende a **medir el inhibidor** (prueba de amina, K⁺, MBT) en vez de confiar en la receta. Fuentes y dosis en `simulation-logic.md` §13.
+
 ## Vulnerabilidades cruzadas
 
 El mismo contaminante hace daño muy distinto según el sistema. Esta tabla es la que hace que cambiar de sección cambie el juego:
 
-| Contaminante | Spud | Lignosulfonato | KCl/PHPA | Salado | Cálcico | RDF |
-|---|---|---|---|---|---|---|
-| **Cemento** | leve | moderado | **crítico** | moderado | **inmune** | crítico |
-| **Anhidrita/yeso** | leve | moderado | alto | moderado | **inmune** | alto |
-| **Sal** | moderado | moderado | alto | **inmune** | moderado | moderado |
-| **Carbonatos** | leve | **alto** | alto | moderado | moderado | alto |
-| **Sólidos de perforación** | tolerado | **alto (PV)** | moderado | alto | moderado | **crítico** |
-| **Magnesio / carnalita** | leve | moderado | alto | **crítico** | alto | alto |
+| Contaminante | Spud | Lignosulfonato | KCl/PHPA | Salado | Cálcico | RDF | Amina/PHPA |
+|---|---|---|---|---|---|---|---|
+| **Cemento** | leve | moderado | **crítico** | moderado | **inmune** | crítico | **crítico** |
+| **Anhidrita/yeso** | leve | moderado | alto | moderado | **inmune** | alto | alto |
+| **Sal** | moderado | moderado | alto | **inmune** | moderado | moderado | moderado |
+| **Carbonatos** | leve | **alto** | alto | moderado | moderado | alto | alto |
+| **Sólidos de perforación** | tolerado | **alto (PV)** | moderado | alto | moderado | **crítico** | moderado |
+| **Magnesio / carnalita** | leve | moderado | alto | **crítico** | alto | alto | alto |
 
 ## Programas de pozo (ficticios)
 

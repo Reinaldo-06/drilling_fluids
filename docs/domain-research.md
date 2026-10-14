@@ -4,7 +4,7 @@ Base técnica para el diseño del juego de entrenamiento. Cubre los 5 bloques de
 
 > **Alcance y supuestos.** Este documento se limita a **lodos base agua (WBM)**, que son los que el juego va a simular. Existen también lodos base aceite (OBM) y sintéticos (SBM), con química y consideraciones ambientales distintas; quedan fuera de alcance.
 >
-> **Procedimiento de control de pozo canónico del juego:** **hard shut-in** (ver bloque 5). Se eligió por ser más rápido, de menor volumen de influjo y de secuencia más simple de enseñar y puntuar. El soft shut-in se documenta como contraste porque también es válido en la industria.
+> **Procedimiento de control de pozo de referencia:** **hard shut-in** (ver bloque 5), con el soft shut-in como contraste. **Es contexto, no mecánica:** por decisión cerrada (`CLAUDE.md`), el jugador no opera el BOP, el choke ni las bombas. Le llega el resultado (presión de cierre → peso de matada) y responde con el lodo. Si algún día se construye la expansión de circulación, esto vuelve a ser relevante.
 
 ## 1. Sistema de circulación de lodo
 
@@ -44,7 +44,7 @@ Elementos adicionales relevantes para el juego: **trip tank** (monitorea volumen
 |---|---|---|---|
 | **Válvulas de succión/descarga de bombas** | on/off | Controlan el flujo de lodo hacia/desde las bombas | Circulación normal, cambio de bomba |
 | **Standpipe manifold** | on/off | Dirige el lodo presurizado hacia la sarta | Circulación normal de perforación |
-| **Hopper de mezcla** | on/off | Permite succionar polvos/químicos hacia el flujo de lodo vía venturi | Tratamiento químico del lodo |
+| **Embudo de mezcla** (*hopper*) | on/off | Permite succionar polvos/químicos hacia el flujo de lodo vía venturi | Tratamiento químico del lodo |
 | **Válvulas de transferencia entre pits** | on/off | Mueven lodo entre tanques (activo, reserva, mezcla) | Ajustes de volumen/propiedades, preparación de lodo nuevo |
 | **BOP (Blowout Preventer)** | on/off | Conjunto de preventores (anular, rams de tubería, rams ciegos) que sellan el pozo | Se cierra ante un kick confirmado |
 | **Válvula de línea de choke (HCR)** | on/off | Abre el paso del anular hacia el choke manifold | En hard shut-in: se abre **después** de cerrar el BOP |
@@ -60,7 +60,7 @@ Elementos adicionales relevantes para el juego: **trip tank** (monitorea volumen
 
 ## 3. Químicos y tratamiento del lodo
 
-El lodo base típico es agua + **bentonita** + **sosa cáustica**. Sobre esa base se ajustan propiedades con aditivos específicos, agregados generalmente vía el **hopper de mezcla** (venturi: succiona el polvo/líquido hacia el flujo) hacia los tanques activos o de mezcla:
+El lodo base típico es agua + **bentonita** + **sosa cáustica**. Sobre esa base se ajustan propiedades con aditivos específicos, agregados generalmente vía el **embudo de mezcla** (*hopper*; venturi: succiona el polvo/líquido hacia el flujo) hacia los tanques activos o de mezcla:
 
 - **Densificantes** — Barita (sulfato de bario, SG ≈ 4.2, sólido inerte) y hematita (óxido de hierro, SG ≈ 5.0): aumentan el peso/densidad del lodo para controlar presión de formación.
 - **Viscosificantes** — Bentonita (arcilla montmorillonita sódica) y polímeros (XC polymer, PHPA): aumentan viscosidad y capacidad de suspender/transportar cuttings.

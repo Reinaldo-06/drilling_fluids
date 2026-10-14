@@ -7,6 +7,7 @@ Documentos hermanos:
 - `docs/mud-engineer-reference.md` — matriz de contaminaciones, cálculos de tanque, píldoras, diagnóstico reológico. **Es la fuente de datos del juego.**
 - `docs/mud-programs.md` — catálogo de sistemas base agua, vulnerabilidades cruzadas y programas de pozo ficticios. **Es el contenido de los niveles.**
 - `docs/rig-tank-system.md` — estructura de tanques del taladro, conexiones, dinámica del lodo en superficie y cambio de fluido.
+- `docs/simulation-logic.md` — reglas de simulación verificadas con fuentes y el **modelo consolidado** (§12). Manda sobre este documento en todo lo que sea cómo se calcula algo.
 
 ## Visión
 
@@ -55,13 +56,14 @@ Mapa cenital caminable. Cada estación es un lugar al que hay que ir físicament
 
 | Estación | Qué se hace |
 |---|---|
-| **Caseta de lodos (laboratorio)** | Correr pruebas: balanza, embudo Marsh, reómetro, filtro prensa API/HTHP, retorta, MBT, titulaciones Pf/Mf/Pm, dureza, cloruros, pH |
-| **Tanques / pits** | Ver volúmenes y niveles, observar el lodo, transferir entre tanques, tomar muestra |
+| **Caseta de lodos (laboratorio)** | Correr pruebas: balanza, embudo Marsh, reómetro, filtro prensa API/HTHP, retorta, MBT, titulaciones Pf/Mf/Pm, dureza, cloruros, pH, K⁺, amina, prueba piloto |
+| **Tanques / pits** | Ver volúmenes y niveles, observar el lodo, mover válvulas, tomar muestra. Aquí está el **encuellador**, que ejecuta las mezclas largas |
 | **Embudo de mezcla** (*hopper*) | Vaciar sacos de producto al sistema activo o al tanque de mezcla |
 | **Bodega de químicos** | Inventario y costo de productos |
 | **Zarandas / control de sólidos** | Estado del equipo, observar retorno y recortes, evaluar si el problema es de sólidos (clave para PV alto) |
-| **Piso de perforación** | Hablar con el driller: profundidad, formación que se está atravesando, avisos |
-| **Oficina / company man** | Programa de lodos, entregar el reporte diario |
+| **Piso de perforación** | Hablar con el driller: profundidad, formación, avisos. **Panel de parámetros** de solo lectura (ROP, WOB, RPM, torque, presión de bomba, caudal, flujo de retorno, volumen de tanques). **Avisar antes de transferir** |
+| **Cabina del mud logger** | Gas de fondo, gas de conexión, cambios en recortes |
+| **Oficina / company man** | Programa de lodos, entregar el reporte diario, explicar desvíos y costos |
 
 Caminar cuesta tiempo del turno. No es relleno: obliga a planear el recorrido, que es parte del oficio.
 
@@ -80,17 +82,19 @@ El tiempo del turno es el recurso escaso. El costo de productos es el segundo.
 
 ### Cómo conviven el chequeo de rutina y el acertijo
 
-El chequeo de rutina incluye las pruebas químicas básicas, así que podría parecer que resuelve el acertijo solo. No lo hace, por tres razones:
+El chequeo completo incluye las pruebas químicas básicas, así que podría parecer que resuelve el acertijo solo. No lo hace, por tres razones:
 
 - **Es una foto del inicio del turno.** Las contaminaciones ocurren *después*, mientras se perfora. A media jornada el jugador solo tiene lo que ve en los tanques.
 - **Re-correr todo cuesta caro.** Cuando una observación dispara la alarma, el jugador decide qué pruebas repetir. Correr el set completo otra vez siempre es posible, pero se come el turno.
-- **Las pruebas ampliadas no están en la rutina.** Separar calcio y magnesio, el Garrett Gas Train, la MBT o el filtrado HTHP solo se corren si el jugador sospecha algo. Ahí se resuelven los casos difíciles (carbonatos, carnalita, H₂S).
+- **Las pruebas ampliadas no están en la rutina.** Separar calcio y magnesio, el Garrett Gas Train, la MBT, el K⁺ o el filtrado HTHP solo se corren si el jugador sospecha algo. Ahí se resuelven los casos difíciles (carbonatos, carnalita, H₂S, inhibición agotada).
 
 ## Chequeo de rutina
 
-Set básico que se corre al inicio de cada turno. Los tiempos son una **propuesta inicial** a calibrar jugando, sobre un turno de 12 h (720 min).
+Tres niveles de chequeo, según las frecuencias de campo de `simulation-logic.md` §3. Los tiempos son una **propuesta inicial** a calibrar jugando, sobre un turno de 12 h (720 min).
 
-**Chequeo rápido** (decisión del autor): densidad, embudo Marsh y pH, hecho por el propio jugador varias veces por turno. **No pasa de 10 min de juego.** Es la alarma numérica entre chequeos completos, junto con la observación visual. Frecuencias de campo en `simulation-logic.md` §3.
+- **Chequeo rápido** (decisión del autor): densidad, embudo Marsh y pH, hecho por el propio jugador varias veces por turno. **No pasa de 10 min de juego.** Es la alarma numérica entre chequeos completos, junto con la observación visual.
+- **Chequeo completo**: la tabla de abajo **sin la retorta**. Al inicio del turno y, si el jugador quiere, una segunda vez a media jornada.
+- **Retorta**: **una vez al día**, con el primer chequeo completo. Fuera de eso se usa el último Fw medido.
 
 | Prueba | Muestra | Tiempo activo | Espera | Revela |
 |---|---|---|---|---|
@@ -109,7 +113,11 @@ Set básico que se corre al inicio de cada turno. Los tiempos son una **propuest
 
 **Dependencia real que es mecánica:** Pf/Mf, cloruros y dureza se corren sobre el **filtrado**, así que no se pueden hacer hasta que el filtro prensa termine. Las pruebas con espera (geles, filtrado) corren en paralelo: el jugador las arranca y mientras tanto hace otra cosa. Planear el orden en el laboratorio es parte del oficio.
 
-**Pruebas ampliadas** (fuera de la rutina, para el acertijo): MBT, calcio y magnesio por separado, Garrett Gas Train, contenido de arena, filtrado HTHP, balanza presurizada.
+**Pruebas ampliadas** (fuera de la rutina, para el acertijo): MBT, calcio y magnesio por separado, Garrett Gas Train, contenido de arena, filtrado HTHP, balanza presurizada, **K⁺** (sistemas con KCl), **amina** (sistemas con amina).
+
+**Prueba piloto**: mezclar una muestra pequeña con el tratamiento que se piensa aplicar y ver el resultado antes de gastar producto en el sistema. Sirve para cualquier tratamiento (`simulation-logic.md` §14).
+
+**Prueba de inhibición a la base**: con recortes de pozos vecinos, para elegir inhibidor y dosis antes de una sección con lutita reactiva. Resultado al día siguiente (`simulation-logic.md` §13).
 
 ### Qué se ve en la retorta
 
@@ -172,7 +180,7 @@ El eje que el jugador más quiere dominar. Operaciones disponibles, todas con su
 
 La estructura de tanques, sus conexiones y las reglas de mezcla están en `rig-tank-system.md`. Los tanques y sus conexiones son un **layout por taladro** (Resource): un taladro con poca reserva es más difícil sin tocar la simulación.
 
-> **Cambio de fluido:** `rig-tank-system.md` §5 propone una secuencia (construir en reserva, desplazar, desviar viejo / interfase / nuevo, reasignar tanques). Es una **síntesis por validar** con el autor: las fuentes públicas cubren poco el procedimiento en superficie entre dos lodos base agua.
+> **Cambio de fluido:** `rig-tank-system.md` §5 tiene la secuencia (circuito corto, construir en reserva, desplazamiento directo, desviar viejo / interfase / nuevo, reasignar tanques), validada en parte por el autor. Queda abierto el criterio para desviar retornos (§7).
 
 ## Diagnóstico de reología
 
@@ -198,6 +206,17 @@ Situaciones donde la respuesta obvia es la equivocada. Son el contenido de mayor
 - **Selección de calcio por pH** — `<10,3` cal · `10,3–11,3` cal + yeso · `>11,3` yeso.
 - **Formación de sal** — no se "corrige": se satura el lodo con sal a propósito. Enseña que no toda desviación es un problema que arreglar; a veces el programa cambia.
 
+Trampas que salieron de la verificación con fuentes (`simulation-logic.md`):
+
+- **Cloruros altos no significan KCl suficiente** — el K⁺ se gasta en las arcillas y el Cl⁻ se queda (§13).
+- **Hidrociclones con lodo densificado** — botan cerca de la mitad de la barita; hay que usar la centrífuga (§7).
+- **Transferir sin avisar al driller** — el totalizador de tanques dispara una falsa alarma y se para la perforación (§4).
+- **Fann en frío** — la reología se reporta a 120 °F; en frío lee más alto (§11).
+- **Adelgazar de más un lodo pesado** — después de un tiempo sin circular aparece asentamiento de barita (§15).
+- **pH alto con PHPA** — lo hidroliza (§13).
+- **KCl en lutita de caolinita** — puede debilitarla en vez de inhibirla (§13).
+- **Bentonita seca en lodo salado** — no hidrata; hay que prehidratarla en agua dulce (§8).
+
 ## Programa de lodos (quest log)
 
 Documento in-game que define, **por sección de pozo**, los rangos objetivo de cada propiedad, los **productos aprobados** (que son el inventario legal de esa sección), las advertencias de formación y los criterios de cambio de fluido. Formato completo y programas de ejemplo en `mud-programs.md`.
@@ -209,7 +228,7 @@ Al cambiar de sección cambian las especificaciones **y el inventario**, de modo
 Los "niveles" son **secciones de pozo**, y luego pozos completos. El fluido cambia entre secciones porque **la amenaza cambia** — esa es la lección estructural (ver `mud-programs.md`):
 
 1. **Superficial** — bentonítico simple. Tutorial real: pruebas básicas, densificar, diluir. Errores perdonables.
-2. **Intermedia** — según el pozo, disperso (pelea con el PV y los sólidos) o KCl/PHPA (frágil ante calcio: la contaminación de cemento es catastrófica).
+2. **Intermedia** — según el pozo, disperso (pelea con el PV y los sólidos), KCl/PHPA (frágil ante calcio: la contaminación de cemento es catastrófica) o amina/PHPA (inhibición fuerte; hay que vigilar el consumo de inhibidor).
 3. **Sal** — saturación deliberada. **El jugador pierde la prueba de cloruros** como instrumento, porque ya está en el techo: la deducción se vuelve genuinamente más difícil por una razón real.
 4. **Producción (RDF)** — invierte las reglas aprendidas: **la barita está prohibida**, y cualquier sólido de perforación arruina el objetivo.
 5. **Pozos completos** con cambios de fluido y eventos encadenados.
@@ -228,22 +247,25 @@ Ejemplos del catálogo (se amplía con la matriz del reference):
 | Sobre-densificar | Pasaste el techo de la ventana y además subiste el volumen del sistema |
 | Carbonato de sodio sobre cemento | Prohibido por el manual: empeora el sistema |
 | Tratar la sal como contaminación | En formación salina el programa pide saturar, no corregir |
+| Estimar el KCl con los cloruros | El potasio se consume en las arcillas y el cloruro no; los cloruros siguen altos aunque la inhibición se haya agotado. Corre la prueba de K⁺ |
+| Dejar hidrociclones encendidos con lodo densificado | La barita mide entre 2 y 80 μm; desarenador y deslimador botan cerca de la mitad. Usa la centrífuga |
 
 ## Modelo de simulación
 
-Se usan **las fórmulas reales** del manual donde existen (están en `mud-engineer-reference.md`): densificación con barita y su aumento de volumen, mezcla por volumen, dosis de tratamiento (ej. `carbonato de sodio = mg/l × Fw × 0,000928`, `exceso de cal = 0,26(Pm − Pf·Fw)`), altura de columna de píldora.
+**El modelo completo está en `simulation-logic.md` §12.** Resumen:
 
-Se **simplifican** con modelos lineales con techos/pisos: evolución de PV/YP/geles por adición, degradación pasiva por avance de perforación (ingreso de sólidos), cinética de los tratamientos (un tratamiento no actúa instantáneo: tarda ciclos de circulación).
-
-El estado químico del lodo debe incluir las variables que el diagnóstico necesita — Pm, Pf, Mf, dureza de calcio, cloruros — no solo las físicas. **Sin eso, el acertijo central no existe.**
-
-El estado también necesita **aire atrapado** (fracción de volumen). No es una propiedad que se reporte, pero genera la observación de espuma y hace que la balanza atmosférica lea bajo.
+- Se usan **las fórmulas reales** del manual donde existen (`mud-engineer-reference.md`): densificación con barita y su aumento de volumen, mezcla por volumen, dosis de tratamiento (ej. `carbonato de sodio = mg/l × Fw × 0,000928`, `exceso de cal = 0,26(Pm − Pf·Fw)`), altura de columna de píldora.
+- El estado de cada tanque guarda la **composición** (fases, química del agua, productos con su edad, aire atrapado) y un índice interno de **floculación**. PV, YP, geles y filtrado **se derivan** de eso al correr una prueba.
+- Todo contaminante químico sube la floculación, así que los síntomas físicos se parecen por construcción; solo la química del agua los distingue. **Sin las variables químicas el acertijo central no existe.**
+- Se **simplifican** con modelos con techos y pisos: efecto de cada producto, entrada de sólidos por perforación, cinética de los tratamientos (tardan ciclos de circulación), hidratación y degradación.
+- Paso de simulación de **10 min de juego**.
 
 ## Arquitectura en Godot (conceptual)
 
 - **Separación simulación / presentación**: el estado del lodo, los tanques y la química viven en nodos de datos independientes de sprites y mapa. Testeable sin árbol visual (GUT); las fórmulas del manual son casos de prueba con entrada y salida conocidas.
-- **Estado del lodo por tanque**: recurso con propiedades físicas *y químicas*.
-- **Contaminante como dato**: cada uno declara su firma de efectos sobre cada prueba (la Tabla 4 convertida en Resource) y sus tratamientos válidos e inválidos. Agregar un contaminante nuevo = agregar un Resource, sin tocar lógica.
+- **Estado del lodo por tanque**: composición (física + química + aire atrapado + floculación), con las propiedades derivadas por funciones puras (`simulation-logic.md` §12.1).
+- **Contaminante como dato**: cada uno declara qué agrega a la química del agua, cuánto sube la floculación y sus tratamientos válidos e inválidos (`simulation-logic.md` §12.4). Agregar un contaminante nuevo = agregar un Resource, sin tocar lógica.
+- **La Tabla 4 del manual es una batería de pruebas**: para cada contaminante, la firma derivada por la simulación (↑/↓ en FV, PV, YP, geles, filtrado, pH, Pm, Pf, Mf, Cl⁻, Ca²⁺) tiene que coincidir con las flechas de la tabla. Si no coincide, el modelo está mal.
 - **Prueba de laboratorio como dato**: qué variables revela, cuánto tiempo activo y de espera cuesta, sobre qué muestra se corre (lodo o filtrado).
 - **Observación como dato**: qué variable la genera, umbrales, texto, estación donde se ve.
 - **Tanque, conexión y layout del taladro como datos**: ver `rig-tank-system.md` §6.
@@ -253,7 +275,14 @@ El estado también necesita **aire atrapado** (fracción de volumen). No es una 
 
 ## Pendientes
 
-1. **Validar con el autor** la secuencia de cambio de fluido y las preguntas de `rig-tank-system.md` §7.
+1. **Con el autor**: criterio para desviar retornos en el desplazamiento y composición del circuito corto (`rig-tank-system.md` §7); cuántos turnos juega el jugador por día de pozo (ver abajo).
 2. Recuperar los **Gráficos I y II** de tratamiento de carbonatos leyendo esas páginas del PDF como imagen (no sobrevivieron a la extracción de texto).
 3. Calibrar constantes de los modelos simplificados y los tiempos de las pruebas — se ajustan jugando.
 4. Estética concreta: paleta, tamaño de tile, sprite del personaje.
+
+### Pregunta abierta: turnos por día de pozo
+
+El diseño usa un turno de 12 h pero el ciclo se llama "día de pozo" (24 h). Propuesta para decidir:
+- El jugador **juega el turno de día** (12 h).
+- El **turno de noche corre simulado**: el pozo sigue perforando, entra sólido y se consume volumen. Lo que pase depende de las **recomendaciones** que el jugador dejó en el reporte (por ejemplo, "mantener 1 lb/bbl de PHPA cada 100 bbl construidos").
+- Al día siguiente el jugador encuentra las consecuencias. Así el reporte y las recomendaciones tienen peso real.

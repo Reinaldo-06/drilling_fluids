@@ -30,7 +30,7 @@ Documentos hermanos: `docs/game-design-mechanics.md` (diseño) · `docs/rig-tank
 | 10 | Eventos: pérdidas, influjo, gas de conexión, maniobras (viajes) desde la vista del ingeniero | ✅ hecho |
 | 11 | Temperatura del lodo: entrada y salida, efecto en reología | ✅ hecho |
 | 12 | **Modelo consolidado**: variables de estado y qué cambia en cada hora de juego (une los temas 1–11) | ✅ hecho (propuesta) |
-| 13 | Lutitas reactivas: MBT, consumo de KCl y PHPA, recortes blandos | ✅ hecho |
+| 13 | Lutitas reactivas e inhibición: sales, aminas, PHPA, prueba de K⁺ | ✅ hecho |
 | 14 | Lodo de matada: cómo prepara el ingeniero el peso de matada y el lodo pesado de reserva | ✅ hecho |
 | 15 | Asentamiento de barita (*sag*) en tanques y en el pozo | ✅ hecho |
 
@@ -293,8 +293,8 @@ El estado de cada tanque **no guarda PV, YP ni filtrado**. Guarda **de qué est�
 |---|---|
 | Volumen | bbl, temperatura |
 | Fases | % agua, % aceite, **% barita**, **% sólidos livianos** (bentonita + perforados), **aire atrapado** |
-| Química del agua | pH, OH⁻ libre, Ca²⁺, Mg²⁺, Cl⁻, K⁺, CO₃²⁻, HCO₃⁻, sulfuros |
-| Productos | lb/bbl activos de cada producto (bentonita hidratada, lignosulfonato, lignito, PAC/almidón, XC, PHPA, cal en exceso…) y su **edad** (para hidratación y degradación) |
+| Química del agua | pH, OH⁻ libre, Ca²⁺, Mg²⁺, Na⁺, Cl⁻, K⁺, CO₃²⁻, HCO₃⁻, SO₄²⁻, sulfuros |
+| Productos | lb/bbl activos de cada producto (bentonita hidratada, lignosulfonato, lignito, PAC/almidón, XC, PHPA, amina, cal en exceso…) y su **edad** (para hidratación y degradación) |
 | Estado interno | **floculación** (0–1) |
 
 **La floculación es la pieza clave.** Todo contaminante químico (cemento, yeso, sal, carbonatos, H₂S) **sube la floculación**; los desfloculantes la bajan. De la floculación salen YP, geles y filtrado. Así, **por construcción, los síntomas físicos de todos los contaminantes químicos se parecen**, y lo único que los distingue es la química del agua. El invariante 1 queda garantizado por el modelo, no por cuidado al escribir cada contaminante. (`mud-engineer-reference.md` §1.1)
@@ -347,20 +347,62 @@ Cada contaminante (un Resource) declara, por unidad que entra:
 
 ---
 
-## 13. Lutitas reactivas
+## 13. Lutitas reactivas e inhibición
+
+Las arcillas de la lutita absorben agua, se hinchan y se dispersan. Eso desestabiliza el pozo, ensucia el lodo con arcilla fina (sube MBT, PV y YP) y hace recortes blandos que se pegan a la broca. Se combate con **tres familias de inhibidores** que actúan de forma distinta y se combinan.
+
+### 13.1 Sales
 
 **Qué es real.**
-- El **K⁺ del KCl** se intercambia con el sodio o el calcio de las arcillas y las mantiene unidas, lo que limita el hinchamiento. Es un inhibidor que **se consume**. ✅ (patente US 6818596 + SLB; coincide con `mud-programs.md`, sistema KCl/PHPA)
-- El **PHPA recubre** la pared del pozo y **encapsula los recortes**: no se hidratan, no se pegan entre sí ni a la broca. También se consume, porque se va pegado a los recortes. ✅ (patentes US 7351680 y US 6818596)
-- Un **MBT que sube** indica que entra arcilla reactiva y que la inhibición se está quedando corta. ⚠️ (guía de proveedor; coherente con `mud-engineer-reference.md` §7)
-- El **embolamiento de la broca** (*bit balling*) es más común en lutitas blandas y con brocas PDC. Agregar más inhibidor **no siempre** lo resuelve. ⚠️ (un estudio)
+- **KCl**: el K⁺ reemplaza a los cationes hidratados de la arcilla y mantiene unidas sus láminas. Es muy eficaz en lutitas con **alta capacidad de intercambio** (montmorillonita, illita). En lutitas ricas en **caolinita** puede debilitarlas. ✅ (Drilling Manual, patente US 6818596, estudio ACS 2025)
+- **Otras sales (NaCl, CaCl₂, formiato de potasio)**: bajan la **actividad del agua** del lodo y así frenan el paso de agua hacia la lutita por ósmosis. ✅ (Drilling Manual, patentes)
+- **CaCl₂** es la sal divalente más barata y el calcio inhibe, pero puede dejar la arcilla **blanda y pegajosa**. ⚠️
+- Concentraciones de estudios: KCl eficaz desde **1–2 % en peso** en algunas formaciones; **7 %** con glicol en otra. No hay un valor universal: depende de la lutita. ✅ (dos estudios coinciden en que depende de la formación)
+- **El K⁺ se consume** en las arcillas; **el Cl⁻ se queda** en el agua. ✅ (SLB Glossary, Drilling Manual)
+- Hay límites ambientales al cloruro que se puede descartar (en EE. UU., 3.000 ppm en la locación). ⚠️
 
-**Cómo entra al juego.** 🧩
-- En lutita reactiva, cada hora de perforación **consume K⁺ y PHPA** en proporción a los sólidos perforados (tema 6.1), y lo que no se inhibe entra como arcilla activa: **sube el MBT, la PV y el YP**.
-- Señales: recortes **blandos y pegajosos** en las zarandas (observación visual), MBT en aumento, K⁺ en baja.
-- Hace falta una prueba de **K⁺** en el sistema KCl/PHPA. Queda como prueba ampliada; su procedimiento está pendiente de verificar.
+**Trampa realista:** medir **cloruros** para estimar cuánto KCl queda **engaña**. Los cloruros siguen altos mientras el potasio ya se gastó, así que la inhibición parece buena cuando no lo es. La SLB cuenta que esto le dio mala fama a los primeros lodos de potasio. El jugador tiene que correr la **prueba de K⁺**, no fiarse de los cloruros. ✅
 
-Fuentes: [US 7351680 — High performance water-based mud system](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/7351680) · [US 6818596 — Dry mix for water based drilling fluid](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/6818596) · [KLA-CURE hydration suppressant — SLB](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/well-construction/drilling-fluids/drilling-fluid-additives/shale-inhibitors/kla-cure-hydration-suppressant) · [Bit balling — Journal of Petroleum Research (RIPI)](https://pr.ripi.ir/article_1493_en.html)
+### 13.2 Aminas
+
+**Qué es real.**
+- Las aminas (poliaminas, éter-aminas) se **protonan** en el agua, reemplazan a los cationes de la arcilla y se pegan a las láminas por atracción electrostática y puentes de hidrógeno. Actúan **como el potasio pero más fuerte**: se meten entre las láminas e impiden que entre agua. ✅ (patente CN 104592955, estudio PMC, varias patentes)
+- Dosis en patentes: **1–18 lb/bbl**, preferida **2–12 lb/bbl**; otra patente da **0,5–10 lb/bbl**. La dosis exacta se ajusta **probando con la lutita del pozo**. ✅ (varias patentes coinciden)
+- Se usan como **inhibidor principal**, con el **PHPA como secundario**: la amina trabaja entre las láminas y el PHPA, que es una molécula grande, por fuera. ✅ (Drilling Manual + estudio de lodos de alto desempeño con aminas)
+- En lodos con PHPA el **pH se mantiene cerca de 9,0**: un pH alto dispersa las arcillas e **hidroliza el PHPA**, liberando amoníaco. ✅ (Drilling Manual + estudio Trisakti, pH 9 estable)
+- Existen pruebas colorimétricas para medir la amina en el lodo. ⚠️ (patente US 11401805)
+
+### 13.3 PHPA
+
+**Qué es real.** ✅ (temas anteriores + patentes)
+- **Encapsula** recortes y recubre la pared: los recortes no se hidratan ni se pegan entre sí ni a la broca.
+- Se gasta pegado a los recortes que salen por las zarandas.
+- Es sensible al **pH alto** (hidrólisis, sobre todo en caliente), al **calcio** y a la **sal**. Por eso una contaminación de cemento es catastrófica en el sistema KCl/PHPA (`mud-programs.md`).
+
+### 13.4 Cómo se mide en el campo
+
+- **Prueba de K⁺** (API): al filtrado se le agrega perclorato de sodio, que precipita perclorato de potasio. Se centrifuga y el volumen del precipitado se convierte a K⁺ con una **curva de calibración** hecha en el taladro. Sirve para K⁺ alto (> 5.000 mg/l). Para K⁺ bajo hay una titulación con tetrafenilborato. ✅ (SLB Glossary, Drilling Manual, API RP 13B de 1980)
+- **MBT** en aumento: entra arcilla activa que no se está inhibiendo. ⚠️ (tema 13 original)
+- **Pruebas de inhibición de laboratorio**: dispersión por rolado en caliente (10 g de recortes, 16 h a 150 °F, se tamiza y se pesa lo recuperado), hinchamiento lineal y tiempo de succión capilar. Se usan para **elegir el inhibidor y la dosis** antes de perforar, no durante el turno. ✅ (revisión KFUPM, patentes, AADE)
+
+### 13.5 Cómo entra al juego
+
+🧩 Todo lo de esta sección es diseño sobre lo anterior.
+
+- **Lutita como dato del nivel**: cada formación declara su **reactividad** (capacidad de intercambio) y su **tipo de arcilla** (montmorillonita, illita, caolinita). Eso decide qué inhibidor funciona: el KCl ayuda en montmorillonita e illita y **puede empeorar la caolinita**.
+- **Inhibición del sistema** = combinación de K⁺, amina activa, PHPA activo y actividad del agua (sal). Cada hora en lutita reactiva:
+  - se consumen K⁺, amina y PHPA en proporción a los sólidos perforados (tema 6.1);
+  - la arcilla que no queda inhibida entra como **arcilla activa** y sube MBT, PV y YP;
+  - los recortes se ven **blandos y pegajosos** en las zarandas (observación visual) y aumenta el riesgo de embolamiento.
+- **Pruebas**: se agregan a las ampliadas la **prueba de K⁺** (propuesta: 20 min, necesita filtrado) y la **prueba de amina** (propuesta: 15 min).
+- **Trampas**:
+  - cloruros altos ≠ potasio suficiente (13.1);
+  - subir el pH con soda cáustica en un sistema con PHPA lo hidroliza (13.2);
+  - KCl en lutita de caolinita (13.1);
+  - echar más inhibidor no siempre arregla el embolamiento (tema 13 original).
+- **Planificación**: antes de una sección con lutita reactiva, el jugador puede pedir una **prueba de inhibición a la base** con recortes de pozos vecinos (resultado al día siguiente) para elegir el inhibidor y la dosis. Es la versión de juego de "probar con la lutita del pozo".
+
+Fuentes: [Shale inhibitor mechanisms & products — Drilling Manual](https://www.drillingmanual.com/shale-inhibitor-mechanisms/) · [Assessment of KCl inhibition efficiency — Ind. Eng. Chem. Res. (ACS)](https://pubs.acs.org/iecred/article/64/45/21523/3735166/Assessment-of-KCl-Inhibition-Efficiency-in-Water) · [Laboratory evaluation of shale inhibitors (Kurdistan)](https://d-nb.info/1202239749/34) · [US 6355600 — CaCl₂ con poliacrilamida catiónica](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/6355600) · [Water-based glycol drilling muds — OSTI](https://www.osti.gov/biblio/372394) · [Potassium ion — SLB Energy Glossary](https://glossary.slb.com/en/terms/p/potassium_ion) · [Potassium ion & KCl test — Drilling Manual](https://www.drillingmanual.com/potassium-ion-kcl-in-drilling-fluid-test/) · [US 9574126 — Glycol ether amines como inhibidores](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/9574126) · [US 7572756 — Shale hydration inhibition agent](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/7572756) · [CN 104592955 — Polyamine shale inhibitor](https://patents.google.com/patent/CN104592955A/en) · [Melamine cross-linked polyammonium inhibitor (PMC)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC5915987/) · [Polyamine inhibitor effects on hydrated shale — ScienceDirect](https://www.sciencedirect.com/science/article/pii/S2405656122000177) · [High-performance WBM based on amine derivatives — ResearchGate](https://www.researchgate.net/publication/241788564_Development_of_High-Performance_Water-Based_Mud_Formulation_Based_on_Amine_Derivatives) · [Water based drilling fluid systems — Drilling Manual](https://www.drillingmanual.com/water-based-drilling-fluid-systems/) · [Polyamine vs KCl polymer mud — Trisakti](https://e-journal.trisakti.ac.id/index.php/jeeset/article/view/22150) · [US 11401805 — Colorimetric detection of amine inhibitors](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/11401805) · [US 7351680 — High performance water-based mud system](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/7351680) · [US 4526693 — Shale and salt stabilizing drilling fluid](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/4526693) · [Experimental methods for testing inhibitors — KFUPM](https://pure.kfupm.edu.sa/en/publications/experimental-and-analytical-methods-for-testing-inhibitors-and-fl/) · [Bit balling — Journal of Petroleum Research (RIPI)](https://pr.ripi.ir/article_1493_en.html)
 
 ---
 

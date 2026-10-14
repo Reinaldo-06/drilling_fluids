@@ -12,8 +12,8 @@ Leer en este orden antes de proponer nada:
 |---|---|
 | `docs/game-design-mechanics.md` | **Empezar aquí.** Diseño del juego: núcleo jugable, overworld, ciclo de turno, progresión, arquitectura Godot. |
 | `docs/mud-engineer-reference.md` | Datos del dominio: matriz de contaminaciones, cálculos de tanque, píldoras, diagnóstico reológico, pruebas de laboratorio. **Fuente de datos de la simulación.** |
-| `docs/mud-programs.md` | 6 sistemas base agua, tabla de vulnerabilidades cruzadas, 3 pozos ficticios, formato del programa de lodos. **Contenido de los niveles.** |
-| `docs/rig-tank-system.md` | Tanques del taladro: qué contiene cada uno, cómo se conectan, reglas de mezcla y volumen, cambio de fluido (síntesis por validar). **Base del manejo de tanques.** |
+| `docs/mud-programs.md` | 7 sistemas base agua, tabla de vulnerabilidades cruzadas, 3 pozos ficticios, formato del programa de lodos. **Contenido de los niveles.** |
+| `docs/rig-tank-system.md` | Tanques del taladro: qué contiene cada uno, cómo se conectan, reglas de mezcla y volumen, cambio de fluido (validado en parte por el autor). **Base del manejo de tanques.** |
 | `docs/simulation-logic.md` | Reglas de simulación contrastadas con fuentes (≥ 2 por dato), con marca de confianza y lista de temas pendientes. **Antes de implementar una regla, buscarla aquí.** |
 | `docs/domain-research.md` | Entorno del taladro: circulación, válvulas, control de pozo. Hoy es **contexto**, no mecánica — relevante solo para la expansión futura de circulación. |
 
@@ -29,9 +29,10 @@ Leer en este orden antes de proponer nada:
 - **Feedback explícito al fallar**: el juego explica el porqué, no solo marca el error.
 - Documentación y UI **en español**.
 - **Motor: Godot 4.7.2 (stable)**, la última estable de mantenimiento al momento de decidir. No usar betas ni versiones de desarrollo.
-- **Chequeo de rutina** al inicio del turno: balanza, Fann (PV, YP, VA), geles, filtrado API, pH, Pm, Pf/Mf, cloruros, dureza, retorta (da Fw). Detalle en `game-design-mechanics.md`.
+- **Chequeos:** rápido (densidad, embudo, pH; lo hace el jugador, ≤ 10 min) varias veces por turno; **completo** (balanza, Fann con PV/YP/VA, geles, filtrado API, pH, Pm, Pf/Mf, cloruros, dureza) al inicio del turno y opcional a media jornada; **retorta** (da Fw) una vez al día. Detalle en `game-design-mechanics.md`.
 - **El jugador opera las válvulas de tanques** caminando hasta ellas. El "hopper" se llama **embudo de mezcla** en el juego; hay dos (arriba en el tanque de píldoras y abajo junto a la bomba centrífuga).
-- **Chequeo rápido** (densidad, embudo, pH) lo hace el jugador, máximo 10 min de juego. **Las mezclas largas en el embudo las ejecuta el encuellador** por orden del jugador (`simulation-logic.md` §5).
+- **Las mezclas largas en el embudo las ejecuta el encuellador** por orden del jugador, a 50 sacos/h (250 con cuadrilla prestada en emergencias). `simulation-logic.md` §5 y §8.
+- **Modelo de simulación:** cada tanque guarda composición + floculación; las propiedades se derivan. Paso de 10 min de juego. `simulation-logic.md` §12.
 - **Cambio de fluido entre lodos base agua: desplazamiento directo**, sin bache espaciador. Layout base: dos reservas + fractanques; circuito corto en el activo durante los preparativos (`rig-tank-system.md` §5).
 - **Observación visual** (espuma, viscosidad a ojo, recortes, nivel, color/olor, sedimento) es la alarma entre chequeos. Nunca identifica el contaminante químico.
 
@@ -52,12 +53,14 @@ Leer en este orden antes de proponer nada:
 ## Próximos pasos
 
 1. **Esqueleto del proyecto Godot 4.7.2** (no se ha creado).
-2. Modelo de datos puro y testeable: estado del lodo (físico + químico + aire atrapado), tanque, conexión, layout del taladro, contaminante, prueba de laboratorio, observación, programa de sección.
+2. Modelo de datos puro y testeable según `simulation-logic.md` §12: estado del lodo (composición + floculación + aire atrapado), tanque, conexión, layout del taladro, contaminante, prueba de laboratorio, observación, programa de sección.
+   La **Tabla 4 del manual** sirve como batería de pruebas: la firma de cada contaminante derivada por la simulación debe coincidir con sus flechas.
 3. Implementar las fórmulas reales de `mud-engineer-reference.md` con pruebas unitarias.
 4. Primer vertical slice: sección superficial del pozo CAIMÁN-3 — pruebas básicas, densificar, diluir.
 
 **Pendientes de investigación:**
 - Procedimiento de **desplazamiento / cambio de fluido**: secuencia en `rig-tank-system.md` §5, ya validada en parte por el autor. Quedan abiertos el criterio para desviar retornos y la composición del circuito corto (§7).
+- **Turnos por día de pozo**: propuesta en `game-design-mechanics.md` (turno de día jugado, turno de noche simulado según las recomendaciones del reporte). Falta confirmación del autor.
 - **Gráficos I y II** de tratamiento de carbonatos: son imágenes del PDF y no sobrevivieron a la extracción de texto. **Solo recuperables en la máquina local** (ver abajo).
 - Estética concreta: paleta, tamaño de tile, sprite del personaje.
 
