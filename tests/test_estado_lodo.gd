@@ -60,9 +60,9 @@ func test_soda_caustica_en_bicarbonatos_solo_los_convierte() -> void:
 	lodo.cal_exceso = 0.0
 	lodo.ca = 0.0
 	lodo.agregar_ion("hco3", 3000.0)
-	var carbono_antes: float = lodo.co3 / 60.0 + lodo.hco3 / 61.0
-	lodo.agregar_ion("oh", 300.0)
-	var carbono_despues: float = lodo.co3 / 60.0 + lodo.hco3 / 61.0
+	var carbono_antes: float = lodo.co3 / 60.0 + lodo.hco3 / 61.0 + lodo.co2 / 44.01
+	lodo.agregar_ion("oh", 400.0)
+	var carbono_despues: float = lodo.co3 / 60.0 + lodo.hco3 / 61.0 + lodo.co2 / 44.01
 	verificar_cerca(carbono_despues, carbono_antes, 0.001, "el carbono total no cambia")
 	verificar(lodo.ph() > 10.0, "el pH sube y el lodo parece arreglado")
 
