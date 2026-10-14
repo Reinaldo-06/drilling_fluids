@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/evento.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "c3i_sag"
+titulo = "Densidad que oscila después del viaje"
+tipo = "sag"
+disparador = "condicion"
+profundidad_ft = 5500.0
+condicion = "contexto.disparados.has('c3i_viaje_broca') and not contexto.activos.has('c3i_viaje_broca') and props.frac_barita > 0.02 and props.gel_10min < 6.0"
+profundidad_hasta_ft = 8000.0
+variacion_densidad_ppg = 0.6
+quien_avisa = "encuellador"
+aviso = "Ingeniero, la balanza en la caja de llegada me da raro: primero más liviano y ahora más pesado, como {variacion} ppg de diferencia."
+explicacion = "Asentamiento de barita (sag): el lodo densificado quedó sin geles suficientes y estuvo horas quieto durante el viaje. La barita bajó en el pozo; al circular sale primero el lodo liviano de arriba y después el pesado. Viene de haber adelgazado de más un lodo densificado: bajar la viscosidad para controlar la PV puede causar sag. Mantén los geles y la lectura de 6 RPM antes de un viaje."
+referencia = "simulation-logic.md §15"

@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/evento.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "c3s_filtracion_gravas"
+titulo = "Filtración en las gravas superficiales"
+tipo = "perdida_circulacion"
+disparador = "profundidad"
+profundidad_ft = 900.0
+duracion_h = 3.0
+tasa_perdida_bbl_h = 12.0
+quien_avisa = "nadie"
+aviso = "El nivel del tanque de succión baja despacio, aunque nadie movió lodo y no se está mezclando nada."
+explicacion = "Las gravas y arenas sueltas de la parte superficial dejan entrar lodo a la formación: unos {tasa} bbl/h ({clasificacion}). Nadie te lo avisa; se ve en el nivel de tanques. A esa tasa basta con reponer volumen y, si sigue, agregar material de pérdida fino al sistema. Antes de declarar una pérdida, descuenta el lodo que se va pegado a los recortes."
+referencia = "simulation-logic.md §10.1"

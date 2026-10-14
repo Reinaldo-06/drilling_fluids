@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/evento.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "c3p_falla_centrifuga"
+titulo = "La centrífuga fuera de servicio"
+tipo = "falla_equipo"
+disparador = "tiempo"
+tiempo_h = 20.0
+duracion_h = 8.0
+equipo = "centrifuga"
+quien_avisa = "encuellador"
+aviso = "La centrífuga se paró con vibración; el mecánico dice que son unas ocho horas."
+aviso_es_observacion = false
+explicacion = "Sin centrífuga los sólidos finos se acumulan y el RDF pide menos del 2 % de sólidos de baja gravedad. Mientras se repara, la herramienta es diluir con lodo nuevo limpio, que cuesta volumen y producto. Vigila la retorta y el MBT."
+referencia = "simulation-logic.md §7"

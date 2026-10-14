@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="GuionSeccion" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://sim/guion_seccion.gd" id="1"]
+[ext_resource type="Resource" path="res://data/eventos/m5_perdida_en_la_sal.tres" id="2"]
+[ext_resource type="Resource" path="res://data/eventos/m5_perdida_severa.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = "medano_5_sal"
+pozo = "MÉDANO-5"
+seccion = "Sal"
+profundidad_desde = 1000.0
+profundidad_hasta = 4600.0
+descripcion = "Sal con intercalaciones fracturadas: pérdidas probables en cualquier momento y una severa en la base de la sal."
+eventos = [ExtResource("2"), ExtResource("3")]

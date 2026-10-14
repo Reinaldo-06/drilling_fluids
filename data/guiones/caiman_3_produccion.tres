@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="GuionSeccion" load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://sim/guion_seccion.gd" id="1"]
+[ext_resource type="Resource" path="res://data/eventos/c3p_perdida_parcial.tres" id="2"]
+[ext_resource type="Resource" path="res://data/eventos/c3p_falla_centrifuga.tres" id="3"]
+
+[resource]
+script = ExtResource("1")
+id = "caiman_3_produccion"
+pozo = "CAIMÁN-3"
+seccion = "Producción"
+profundidad_desde = 8000.0
+profundidad_hasta = 9600.0
+descripcion = "Arena productora en RDF: pérdida parcial en la arena y una falla de la centrífuga que obliga a controlar sólidos diluyendo."
+eventos = [ExtResource("2"), ExtResource("3")]

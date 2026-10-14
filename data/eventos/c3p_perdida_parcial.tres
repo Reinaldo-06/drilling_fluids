@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/evento.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "c3p_perdida_parcial"
+titulo = "Pérdida parcial en la arena"
+tipo = "perdida_circulacion"
+disparador = "profundidad"
+profundidad_ft = 8900.0
+duracion_h = 4.0
+tasa_perdida_bbl_h = 60.0
+quien_avisa = "driller"
+aviso = "Ingeniero, el flujo de retorno bajó y el nivel de tanques cae. Está tomando lodo."
+explicacion = "La arena productora es permeable y la presión de poro está más baja: el pozo toma {tasa} bbl/h, una pérdida {clasificacion}. La respuesta de fluidos es una píldora de material de pérdida (en RDF, carbonato de calcio dimensionado: soluble en ácido, no daña la arena), reponer volumen sin parar y, si la ventana lo permite, no subir la densidad. Cuatro horas a esa tasa son 240 bbl: hay que tener lodo en reserva."
+referencia = "simulation-logic.md §10.1; mud-engineer-reference.md §3"

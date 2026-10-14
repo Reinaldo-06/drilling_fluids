@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/evento.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "c3i_subir_peso"
+titulo = "El company man pide subir la densidad"
+tipo = "gas_conexion"
+disparador = "condicion"
+profundidad_ft = 7000.0
+condicion = "props.densidad < 10.4"
+profundidad_hasta_ft = 8000.0
+gas_unidades = 180.0
+subir_densidad_ppg = 0.3
+quien_avisa = "company_man"
+aviso = "Con {gas} unidades en cada conexión no seguimos así. Súbeme la densidad {subir} ppg, a {peso_pedido} ppg, antes de la próxima parada."
+explicacion = "El gas de conexión creciente dice que el lodo está en balance justo frente a la formación. Subir la densidad unas décimas devuelve el margen. Densificar con barita también aumenta el volumen del sistema y la PV: revisa los sólidos y el espacio en tanques antes de agregar, y no te pases del máximo del programa (10,8 ppg) para no fracturar."
+referencia = "simulation-logic.md §10.2; domain-research.md §4.1"

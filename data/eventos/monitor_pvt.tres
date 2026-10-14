@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="MonitorTanques" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/monitor_tanques.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+umbral_bbl = 10.0
+minutos_perdidos_falsa_alarma = 20.0
+quien_avisa = "driller"
+aviso_ganancia = "¡Alarma del PVT! El activo ganó {bbl} bbl. Paramos para revisar flujo. ¿Alguien movió lodo?"
+aviso_perdida = "¡Alarma del PVT! El activo perdió {bbl} bbl. Paramos para revisar. ¿Alguien movió lodo?"
+explicacion_falsa_ganancia = "Falsa alarma: la ganancia la pusiste tú, al pasar lodo de la reserva al activo sin avisar al driller ni al mud logger. El totalizador de volumen (PVT) no sabe quién movió el lodo: una ganancia sin explicar puede ser un influjo, así que la cuadrilla para, revisa flujo y pierde tiempo. Avisa siempre antes de transferir."
+explicacion_falsa_perdida = "Falsa alarma: la pérdida la causaste tú, al sacar lodo del activo sin avisar al driller ni al mud logger. El PVT lo lee como una posible pérdida de circulación y la cuadrilla para a revisar. Avisa siempre antes de transferir."
+explicacion_ganancia = "Ganancia real: nadie movió lodo en superficie y el activo creció. Es la señal de un influjo; el driller cierra el pozo y te toca preparar el peso de matada."
+explicacion_perdida = "Pérdida real: nadie movió lodo en superficie y el activo bajó. El pozo está tomando lodo. Mide la tasa con el balance de volumen, clasifícala y responde con volumen y material de pérdida."
+explicacion_mixta = "La alarma mezcla dos cosas: una transferencia que no avisaste y un cambio de volumen real del pozo. Lo que no avisaste confunde la lectura justo cuando más importa: descontada tu transferencia, sigue faltando o sobrando lodo, y eso es del pozo."
+referencia = "simulation-logic.md §4"

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/evento.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "c3i_gas_conexion_1"
+titulo = "Primeros picos de gas de conexión"
+tipo = "gas_conexion"
+disparador = "profundidad"
+profundidad_ft = 6200.0
+gas_unidades = 40.0
+quien_avisa = "mud_logger"
+aviso = "Aquí mud logging: en la última conexión vimos un pico de {gas} unidades de gas sobre el fondo. Lo vamos a seguir."
+explicacion = "El gas de conexión entra cuando se paran las bombas: sin la presión de fricción del anular, el lodo queda justo en balance o por debajo frente a alguna zona. Un pico aislado no exige nada, pero conviene tener barita y volumen para subir la densidad si los picos crecen."
+referencia = "simulation-logic.md §10.2"

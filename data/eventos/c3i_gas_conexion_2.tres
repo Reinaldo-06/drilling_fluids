@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/evento.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "c3i_gas_conexion_2"
+titulo = "El gas de conexión crece"
+tipo = "gas_conexion"
+disparador = "profundidad"
+profundidad_ft = 6800.0
+gas_unidades = 120.0
+quien_avisa = "mud_logger"
+aviso = "Mud logging otra vez: los picos de conexión van en {gas} unidades y el gas de fondo también subió. Le avisamos al company man."
+explicacion = "Picos de conexión que crecen con la profundidad anuncian una zona con más presión de poro: el margen de densidad se está acabando. Es la señal para preparar barita antes de que lo pidan."
+referencia = "simulation-logic.md §10.2"

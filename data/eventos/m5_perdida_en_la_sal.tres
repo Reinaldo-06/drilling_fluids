@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/evento.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "m5_perdida_en_la_sal"
+titulo = "Pérdida en la sal"
+tipo = "perdida_circulacion"
+disparador = "probabilidad"
+profundidad_ft = 1500.0
+probabilidad_por_hora = 0.04
+profundidad_hasta_ft = 4400.0
+duracion_h = 3.0
+tasa_perdida_bbl_h = 40.0
+quien_avisa = "nadie"
+aviso = "El nivel de tanques está bajando más rápido de lo que se perfora."
+explicacion = "En la sal de MÉDANO-5 hay intercalaciones fracturadas que toman lodo sin aviso: {tasa} bbl/h ({clasificacion}). Por eso el programa pide material de pérdida en sitio desde el principio. Repón con lodo saturado: si repones con agua dulce, disuelve la sal del hueco y lo agranda."
+referencia = "reference-wells.md §6 (MÉDANO-5); simulation-logic.md §10.1"

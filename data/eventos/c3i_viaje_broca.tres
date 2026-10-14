@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/evento.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "c3i_viaje_broca"
+titulo = "Viaje para cambiar la broca"
+tipo = "viaje"
+disparador = "profundidad"
+profundidad_ft = 5500.0
+duracion_h = 10.0
+detiene_perforacion = true
+quien_avisa = "driller"
+aviso = "La broca ya no avanza. Sacamos a superficie para cambiarla; son unas diez horas sin perforar."
+aviso_es_observacion = false
+explicacion = "Un viaje es tiempo sin sólidos nuevos: sirve para tratar, construir volumen y preparar píldoras. Al volver a fondo el lodo estuvo quieto horas: espera gas de viaje al circular el fondo arriba y, si el lodo pesado quedó sin geles, barita asentada."
+referencia = "simulation-logic.md §10.3"
