@@ -80,7 +80,7 @@ static func disolver_cal(lodo: EstadoLodoScript, dt_h: float) -> void:
 	lodo.ca += disuelto * EstadoLodoScript.MG_POR_MMOL_CA
 	lodo.cal_exceso = maxf(0.0, lodo.cal_exceso - disuelto * fw / EstadoLodoScript.MMOL_CAL_POR_LB_BBL)
 	# El OH⁻ nuevo puede reaccionar (Mg²⁺ → Mg(OH)₂, HCO₃⁻ → CO₃²⁻, Ca²⁺ + CO₃²⁻).
-	lodo._equilibrar()
+	lodo.equilibrar()
 
 
 ## 1 en agua dulce y blanda; baja con cloruros y calcio altos (§8).

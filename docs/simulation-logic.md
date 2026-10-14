@@ -458,3 +458,40 @@ Fuentes: [Barite sag causes, indications & prevention — Drilling Manual](https
   - **Cal sobre bicarbonatos** con la dosis 1:1 elimina los carbonatos pero deja el pH sobre 11,3: por eso el manual pide combinar cal y yeso según el pH.
 - **Pendiente de calibrar:** el pH no tiene amortiguación fuera de OH⁻ y carbonatos. Sin alcalinidad cae a 7 (en el campo quedaría cerca de 8,5–9) y 0,1 lb/bbl de soda lo sube a casi 12. Las constantes de VP, PC, geles y filtrado son provisionales.
 - **Sólidos nuevos** (la fila de la Tabla 4 que mueve todo) queda para cuando exista la perforación en el paso de simulación.
+
+### 12.7 Primera ronda de agentes (integrada)
+
+Cuatro agentes trabajaron en paralelo, cada uno con archivos propios. Resumen de lo integrado:
+
+**Química (agente B)** — `sim/estado_lodo.gd`
+- **Equilibrio ácido-base:** cada cambio conserva la alcalinidad total y el carbono inorgánico; el pH sale de repartirlos entre OH⁻, CO₂/HCO₃⁻/CO₃²⁻ (pKa 6,35 y 10,33) y un **tampón** de lignosulfonato y bentonita (pKa 8,5/9,5/10,5 🧩). Pf y Mf suman la base del tampón.
+- Capacidad del lignosulfonato anclada a la regla de SLB "1 saco de soda por 4 de lignosulfonato" ✅ ([Caustic soda](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/well-construction/drilling-fluids/drilling-fluid-additives/alkalinity-control/caustic-soda), [SPERSENE](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/well-construction/drilling-fluids/drilling-fluid-additives/thinners-and-dispersants/spersene-chrome-lignosulfonate)).
+- Resultado: yeso, sal y H₂S bajan el pH a 8,9–9,4 (antes 7); desde pH 8,5, 0,25 lb/bbl de soda → 9,5 y 0,5 → 10,5.
+- El lignosulfonato entra ácido y rinde menos bajo pH 9,5. CaCO₃ precipita hasta un Ksp efectivo (1e-8 🧩); Mg(OH)₂ precipita y **se redisuelve si baja el pH** (§1.6). ZnO + HS⁻ → ZnS + OH⁻.
+- **Carnalita** como contaminante; dureza total y de calcio por separado.
+- `mezclar()` y `equilibrar()` públicos.
+
+**Tanques y tiempo (agente A)** — `sim/tanque.gd`, `sim/cinetica.gd`
+- `transferir` respeta capacidad; la mezcla **delega en `EstadoLodo.mezclar`** (lo disuelto por volumen de agua, lo demás por volumen de lodo). `tratar` hace crecer el volumen con barita, bentonita y agua, con rebalse.
+- Pasos de 10 min: homogenización del activo en 1−e^(−Δt/ciclo) 🧩, reserva aislada; cal en exceso se disuelve con τ = 4 h 🧩; bentonita hidrata en rampa hasta el 100 % a las 6 h, más lento con Cl⁻ o Ca²⁺ altos 🧩; indicador de asentamiento en tanques sin agitar.
+
+**Laboratorio y observación (agente C)** — `sim/prueba_laboratorio.gd`, `sim/laboratorio.gd`, `sim/observacion.gd`
+- 17 pruebas como datos, con la **resolución del instrumento** (balanza 0,1 ppg, dial del Fann entero, Pf a 0,05 ml…). Balanza atmosférica lee bajo con aire; Fann sin copa térmica ×1,15 🧩; Θ6/Θ3 derivados 🧩. Las pruebas sobre filtrado lo exigen.
+- Planificador del laboratorio: chequeo completo 67 min con esperas en paralelo, contra 107 en serie.
+- 4 observaciones (espuma, viscosidad a ojo, rebose de zarandas, lodo ennegrecido). Ningún texto nombra un contaminante (lo verifica una prueba).
+
+**Reglas y programa (agente D)** — `sim/regla.gd`, `sim/evaluador_reglas.gd`, `sim/programa_seccion.gd`
+- 19 reglas con condición (expresión de Godot) y explicación como dato; momentos: al tratar, al transferir, al diagnosticar, al cerrar el día.
+- Programas de CAIMÁN-3 (tres secciones), los 7 sistemas y el pozo como datos. `puede_usar` y `sin_producto` son la palanca de dificultad.
+- Umbrales provisionales 🧩: cemento = cal en exceso > 0,25 lb/bbl; carnalita = Mg > 2.000 mg/l; carbonatos = Mf > 5 y Mf de carbonatos > 2,5; lodo densificado = 2 % de barita.
+
+**Correcciones al integrar**
+- Los ids de pruebas de las reglas no coincidían con los del laboratorio (`reologia` → `fann`, etc.). Alineados, con una prueba que lo verifica.
+- El tanque mezclaba `tampon_base`, `co2` y `mg_oh2` por volumen de lodo; ahora usa la mezcla del estado (por volumen de agua).
+- El ejecutor de pruebas cuenta como falla un archivo que no compila.
+
+**Decisiones abiertas**
+- **Deriva del lodo base:** la cal en exceso del lodo base (0,2 lb/bbl) se disuelve con el tiempo y sube el pH de 10,0 a 11,0 y el calcio de 120 a 442 mg/l en un día, sin que el jugador haga nada. Quitarla rompe la fila de carbonatos de la Tabla 4 (el Pf baja en vez de subir). Opciones: separar "finos de cemento" (se disuelven) de "cal de tratamiento" (inerte), alargar τ, o aceptar la deriva como mecánica (el jugador la corrige con su tratamiento de mantenimiento).
+- Productos que piden los programas y no existen: PHPA, almidón, CaCO₃ dimensionado (y lignito, NaCl, amina para otros sistemas).
+- Variables que piden las observaciones y no existen: sedimento visible al transferir, mallas tapadas, temperatura de la muestra, nivel de tanques, recortes.
+- Solubilidad de Ca(OH)₂ con Ksp (hoy tope fijo de OH⁻); mecanismo real de la caída de pH por yeso y sal (hoy ácidos calibrados).

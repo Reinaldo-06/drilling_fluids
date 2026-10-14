@@ -21,8 +21,6 @@ const ROLES := ["llegada", "trampa", "proceso", "succion", "reserva", "fractanqu
 ## mezclar se ponderan por volumen de agua (volumen × Fw), no por volumen de lodo.
 ## Todo lo demás (fracciones de fase, lb/bbl de productos, cal en exceso,
 ## Mg(OH)₂ precipitado) está "por bbl de lodo" y se pondera por volumen de lodo.
-const CAMPOS_POR_AGUA := ["oh", "co3", "hco3", "ca", "mg", "na", "k", "cl", "so4", "sulfuro",
-	"alc_org_pf", "alc_org_mf"]
 
 @export var nombre := ""
 @export var capacidad_bbl := 0.0
@@ -101,34 +99,13 @@ func mezclar_con(otro: EstadoLodoScript, otro_sin_hidratar: float, otra_edad: fl
 
 
 ## Lodo resultante de mezclar va bbl de "a" con vb bbl de "b" (§2.3 del manual).
-## Lo que está por bbl de lodo se pondera por volumen; los iones del filtrado,
-## por volumen de agua (ver CAMPOS_POR_AGUA). Así la masa de cada ion se
-## conserva y la densidad de la mezcla sale lineal, como en el manual.
-## Recorre todas las variables del estado, así un campo nuevo de EstadoLodo
-## se mezcla por volumen sin tocar este código.
+## Delega en EstadoLodo.mezclar, que es la única fuente de la regla: lo que está
+## por bbl de lodo se pondera por volumen y lo disuelto en el filtrado por volumen
+## de agua (así la masa de cada ion se conserva), y después re-equilibra la química
+## (el Ca²⁺ de uno puede precipitar con el CO₃²⁻ del otro).
 static func mezclar(a: EstadoLodoScript, va: float, b: EstadoLodoScript, vb: float) -> EstadoLodoScript:
 	var r := a.copiar() as EstadoLodoScript
-	var total := va + vb
-	if total <= 0.0:
-		return r
-	var agua_a := va * a.fw()
-	var agua_b := vb * b.fw()
-	for propiedad in a.get_property_list():
-		if not (propiedad["usage"] & PROPERTY_USAGE_SCRIPT_VARIABLE):
-			continue
-		if propiedad["type"] != TYPE_FLOAT:
-			continue
-		var campo: String = propiedad["name"]
-		var xa: float = a.get(campo)
-		var xb: float = b.get(campo)
-		if campo in CAMPOS_POR_AGUA:
-			if agua_a + agua_b > 0.0:
-				r.set(campo, (agua_a * xa + agua_b * xb) / (agua_a + agua_b))
-		else:
-			r.set(campo, (va * xa + vb * xb) / total)
-	# Al juntar dos aguas pueden reaccionar (Ca²⁺ de uno con CO₃²⁻ del otro).
-	# TODO: pedir a EstadoLodo un método público equilibrar().
-	r._equilibrar()
+	r.mezclar(b, va, vb)
 	return r
 
 

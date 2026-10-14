@@ -2,7 +2,7 @@
 
 Juego 2D pixelado en **Godot** donde el jugador es un **ingeniero de fluidos de perforación**. Objetivo: que el autor (que trabaja en la industria) aprenda manejo de tanques, diagnóstico de propiedades y tratamiento de contaminaciones.
 
-**Estado actual: esqueleto + modelo del lodo + tratamientos.** Proyecto Godot 4.7.2 con fórmulas de campo, estado del lodo por composición, seis contaminantes que reproducen la Tabla 4 y 15 productos que tratan cada contaminación con las dosis del manual. El siguiente paso es el tanque y el paso de simulación en el tiempo. Estructura y cómo correr las pruebas en `README.md`; estado de la implementación en `simulation-logic.md` §12.6.
+**Estado actual: simulación base completa, sin interfaz.** Proyecto Godot 4.7.2 con: química del lodo con equilibrio ácido-base (Tabla 4 entera), 7 contaminantes, 15 productos con dosis del manual, tanques y paso del tiempo, 17 pruebas de laboratorio y 4 observaciones como datos, 19 reglas con explicación y el programa de CAIMÁN-3. 126 pruebas pasando. Resumen en `simulation-logic.md` §12.7. El siguiente paso es decidir los pendientes de §12.7 y empezar la presentación (overworld). Estructura y cómo correr las pruebas en `README.md`; estado de la implementación en `simulation-logic.md` §12.6.
 
 ## Mapa de documentos
 
@@ -54,7 +54,7 @@ Leer en este orden antes de proponer nada:
 ## Próximos pasos
 
 1. ~~Esqueleto del proyecto Godot 4.7.2~~ ✅ hecho. Pruebas: `godot --headless --path . --script res://tests/run_tests.gd`.
-2. Modelo de datos según `simulation-logic.md` §12: ✅ estado del lodo, contaminantes (la Tabla 4 pasa entera) y productos con sus tratamientos. Faltan: **tanque y paso de simulación en el tiempo** (cinética, homogenización, disolución lenta de finos de cemento), conexión, layout del taladro, prueba de laboratorio, observación, programa de sección, reglas con explicación (invariante 4).
+2. Modelo de datos según `simulation-logic.md` §12: ✅ estado del lodo, contaminantes, productos, tanque y tiempo, pruebas de laboratorio, observaciones, reglas, programa de sección (§12.7). Faltan: conexiones y layout del taladro, perforación en el paso de simulación (entrada de sólidos, consumo de volumen), control de sólidos, eventos.
 3. Fórmulas reales de `mud-engineer-reference.md`: ✅ las de tanque, volumen, presión, reología, dosis y píldoras están en `sim/formulas.gd` con pruebas. Faltan las que dependan del modelo de estado.
 4. Primer vertical slice: sección superficial del pozo CAIMÁN-3 — pruebas básicas, densificar, diluir.
 

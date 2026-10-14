@@ -56,9 +56,10 @@ func test_mezclar_reacciona() -> void:
 	var b := EstadoLodoScript.new()
 	b.co3 = 600.0
 	var r = Tanque.mezclar(a, 1.0, b, 1.0)
-	# 200 mg/l de Ca (5 mmol) contra 300 mg/l de CO₃ (5 mmol): se van los dos.
-	verificar_cerca(r.ca, 0.0, 0.5, "el calcio precipita")
-	verificar_cerca(r.co3, 0.0, 1.0, "el carbonato precipita")
+	# 200 mg/l de Ca (5 mmol) contra 300 mg/l de CO₃ (5 mmol): precipitan casi todo,
+	# hasta el producto de solubilidad efectivo del CaCO₃ (ver EstadoLodo).
+	verificar(r.ca < 10.0, "el calcio precipita (%.1f mg/l)" % r.ca)
+	verificar(r.co3 < 10.0, "el carbonato precipita (%.1f mg/l)" % r.co3)
 
 
 # §2.1 — 1.000 bbl de 14 → 16 ppg con la barita de Formulas: 1.105,3 bbl
@@ -121,3 +122,18 @@ func test_transferir_a_vacio_copia() -> void:
 	verificar_cerca(destino.lodo.densidad(), 10.0, 1e-9, "misma densidad")
 	destino.lodo.cl = 5000.0
 	verificar_cerca(origen.lodo.cl, 0.0, 1e-9, "el origen no cambia al tocar el destino")
+
+
+# Integración A + B: lo disuelto en el filtrado (incluido el CO₂) se mezcla por
+# volumen de agua: el carbono total disuelto se conserva al mezclar.
+func test_carbono_disuelto_se_conserva_por_agua() -> void:
+	var a := EstadoLodoScript.new()
+	a.hco3 = 1220.0
+	a.co2 = 440.0
+	a.equilibrar()
+	var b := EstadoLodoScript.new()
+	b.frac_barita = 0.2          # menos agua por bbl
+	var carbono := func(e) -> float: return e.co3 / 60.01 + e.hco3 / 61.02 + e.co2 / 44.01
+	var r = Tanque.mezclar(a, 1.0, b, 1.0)
+	var esperado: float = carbono.call(a) * a.fw() / (a.fw() + b.fw())
+	verificar_cerca(carbono.call(r), esperado, 0.01, "mmol de carbono por litro de agua")
