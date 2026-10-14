@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "potasio"
+nombre = "Potasio (K⁺)"
+descripcion = "Sobre 5.000 mg/l: precipitado con perclorato de sodio, centrífuga y curva de calibración; por debajo, titulación con tetrafenilborato (simulation-logic.md §13.4). 🧩 Paso de 100 mg/l en la titulación y de 500 mg/l con la centrífuga; 20 min (§13.5)."
+muestra = "filtrado"
+minutos_activos = 20
+minutos_espera = 0
+requiere = PackedStringArray("filtrado_api")
+nivel = "ampliada"
+chequeos = PackedStringArray()
+equipo = "centrifuga"
+produce = ""
+lecturas = [{"nombre": "k", "fuente": "k", "unidad": "mg/l", "resolucion": 100.0, "limite_fino": 5000.0, "resolucion_gruesa": 500.0}]

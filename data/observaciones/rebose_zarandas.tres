@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Observacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/observacion.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "rebose_zarandas"
+nombre = "Lodo rebosando las zarandas"
+estaciones = PackedStringArray("zarandas")
+variable = "va"
+umbrales = PackedFloat64Array(60.0)
+niveles = PackedStringArray("normal", "rebosando")
+textos = PackedStringArray("El lodo pasa por las mallas sin problema.", "El lodo rebosa las mallas de las zarandas y se va al descarte junto con los recortes.")
+nivel_normal = 0
+alerta_seguridad = false
+notas = "Viscosidad muy alta (o mallas tapadas, cuando exista esa variable). Se está perdiendo lodo en superficie; no dice la causa de la viscosidad. 🧩 Umbral de VA: 60 cP."

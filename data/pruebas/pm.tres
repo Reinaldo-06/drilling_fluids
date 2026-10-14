@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "pm"
+nombre = "Pm (alcalinidad del lodo)"
+descripcion = "ml de ácido 0,02 N por ml de lodo hasta el punto de la fenolftaleína, a 0,05 ml. Con Pf y Fw da el exceso de cal."
+muestra = "lodo"
+minutos_activos = 10
+minutos_espera = 0
+requiere = PackedStringArray()
+nivel = "completo"
+chequeos = PackedStringArray("completo")
+equipo = ""
+produce = ""
+lecturas = [{"nombre": "pm", "fuente": "pm", "unidad": "ml", "resolucion": 0.05}]

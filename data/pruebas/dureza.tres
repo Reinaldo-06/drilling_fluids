@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "dureza"
+nombre = "Dureza total (como Ca²⁺)"
+descripcion = "Titulación con EDTA 0,01 M en gotas de 0,05 ml sobre 1 ml de filtrado: paso de 20 mg/l. Suma calcio y magnesio expresados como calcio; para separarlos está la prueba ampliada."
+muestra = "filtrado"
+minutos_activos = 10
+minutos_espera = 0
+requiere = PackedStringArray("filtrado_api")
+nivel = "completo"
+chequeos = PackedStringArray("completo")
+equipo = ""
+produce = ""
+lecturas = [{"nombre": "dureza_total", "fuente": "dureza_total", "unidad": "mg/l como Ca²⁺", "resolucion": 20.0}]

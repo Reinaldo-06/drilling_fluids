@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "mbt"
+nombre = "Azul de metileno (MBT)"
+descripcion = "Capacidad de intercambio en lb/bbl de bentonita equivalente. 🧩 1 ml de lodo y gotas de 0,5 ml de azul de metileno: paso de 2,5 lb/bbl; 20 min. MBT < 15 lb/bbl → poca sensibilidad a la contaminación (mud-engineer-reference.md §7)."
+muestra = "lodo"
+minutos_activos = 20
+minutos_espera = 0
+requiere = PackedStringArray()
+nivel = "ampliada"
+chequeos = PackedStringArray()
+equipo = ""
+produce = ""
+lecturas = [{"nombre": "mbt", "fuente": "mbt", "unidad": "lb/bbl", "resolucion": 2.5}]

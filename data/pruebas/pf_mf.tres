@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "pf_mf"
+nombre = "Pf / Mf (alcalinidad del filtrado)"
+descripcion = "ml de ácido 0,02 N por ml de filtrado hasta fenolftaleína (Pf) y hasta pH 4,3 (Mf), a 0,05 ml. La relación Mf/Pf señala carbonatos."
+muestra = "filtrado"
+minutos_activos = 10
+minutos_espera = 0
+requiere = PackedStringArray("filtrado_api")
+nivel = "completo"
+chequeos = PackedStringArray("completo")
+equipo = ""
+produce = ""
+lecturas = [{"nombre": "pf", "fuente": "pf", "unidad": "ml", "resolucion": 0.05}, {"nombre": "mf", "fuente": "mf", "unidad": "ml", "resolucion": 0.05}]

@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="Observacion" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/observacion.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "espuma"
+nombre = "Espuma y burbujas"
+estaciones = PackedStringArray("tanques", "caja_de_llegada", "zarandas")
+variable = "aire"
+umbrales = PackedFloat64Array(0.005, 0.03)
+niveles = PackedStringArray("sin_espuma", "burbujas", "espuma_abundante")
+textos = PackedStringArray("La superficie del lodo se ve lisa, sin burbujas.", "Se ven burbujas finas reventando en la superficie.", "Hay una capa de espuma sobre el lodo y la superficie no deja de burbujear.")
+nivel_normal = 0
+alerta_seguridad = false
+notas = "Aire o gas atrapado (embudo de mezcla, pistolas, agitación, tensoactivos, gas de formación). Sugiere aire o gas; no dice cuál. Trampa: la balanza atmosférica lee bajo; confirmar con la balanza presurizada. 🧩 Umbrales en fracción de aire: 0,5 % y 3 %. Fuentes en game-design-mechanics.md."

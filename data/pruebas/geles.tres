@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "geles"
+nombre = "Geles 10 s / 10 min"
+descripcion = "Esfuerzos de gel en lb/100 ft², lectura entera del dial a 3 RPM. Ocupa el Fann durante los 10 min de reposo."
+muestra = "lodo"
+minutos_activos = 5
+minutos_espera = 10
+requiere = PackedStringArray()
+nivel = "completo"
+chequeos = PackedStringArray("completo")
+equipo = "fann"
+produce = ""
+lecturas = [{"nombre": "gel_10s", "fuente": "gel_10s", "unidad": "lb/100 ft²", "resolucion": 1.0, "frio": true}, {"nombre": "gel_10min", "fuente": "gel_10min", "unidad": "lb/100 ft²", "resolucion": 1.0, "frio": true}]

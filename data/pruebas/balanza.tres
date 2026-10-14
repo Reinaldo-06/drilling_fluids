@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="PruebaLaboratorio" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/prueba_laboratorio.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "balanza"
+nombre = "Balanza de lodo (atmosférica)"
+descripcion = "Densidad. Lee bajo si hay aire o gas atrapado: la copa no está presurizada (game-design-mechanics.md, Observación visual). Resolución 0,1 ppg."
+muestra = "lodo"
+minutos_activos = 5
+minutos_espera = 0
+requiere = PackedStringArray()
+nivel = "rapido"
+chequeos = PackedStringArray("rapido", "completo")
+equipo = "balanza"
+produce = ""
+lecturas = [{"nombre": "densidad", "fuente": "densidad_balanza_atmosferica", "unidad": "ppg", "resolucion": 0.1}]
