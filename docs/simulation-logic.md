@@ -22,8 +22,8 @@ Documentos hermanos: `docs/game-design-mechanics.md` (diseño) · `docs/rig-tank
 | 2 | Tiempos de circulación: emboladas, retorno de fondo, ciclo completo | ✅ hecho |
 | 3 | Frecuencia de pruebas y puntos de muestreo | ✅ hecho |
 | 4 | Monitoreo de volumen de tanques y falsas alarmas | ✅ hecho |
-| 5 | Quién hace qué en la cuadrilla (encuellador, mud logger, driller, company man) | pendiente |
-| 6 | Cómo cambian las propiedades al perforar: sólidos, temperatura, degradación | pendiente |
+| 5 | Quién hace qué en la cuadrilla (encuellador, mud logger, driller, company man) | ✅ hecho |
+| 6 | Cómo cambian las propiedades al perforar: sólidos, temperatura, degradación | ✅ hecho |
 | 7 | Control de sólidos: eficiencia de cada equipo, tasa de dilución | pendiente |
 | 8 | Mezcla con el embudo: sacos por hora, tiempo de hidratación de bentonita y polímeros | pendiente |
 | 9 | Reporte diario de lodo: qué contiene, costos, inventario | pendiente |
@@ -107,3 +107,53 @@ Fuentes: [Mud report — SLB Energy Glossary](https://glossary.slb.com/en/terms/
 - **Pérdida o ganancia real** llega como evento: el jugador la ve en el nivel de tanques o se la informan. Su trabajo es la respuesta de fluidos (material de pérdida, densificar), no el control del pozo. 🧩
 
 Fuentes: [Pit Volume Totalizer — Pason](https://pason.com/products/pit-volume-totalizer-pvt) · [US 6234250 — Real time wellbore pit volume monitoring](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/6234250) · [WO 2021087509 — Automated kick and loss detection](https://patents.google.com/patent/WO2021087509A1) · [Insights into automatic gain/loss detection (SPE)](https://file.streaming.spe.org/wp-content/uploads/2024/02/22130907/Insights-Into-the-Physical-Phenomena-That-Influence-Automatic-GainLoss-Detection-During-Drilling-Operations.pdf) · [Offshore Engineer, sep/oct 2014](https://magazines.marinelink.com/Magazines/OffshoreEngineer/201409/page/66)
+
+---
+
+## 5. Quién hace qué en la cuadrilla
+
+**Qué es real.**
+- **Toolpusher**: jefe del taladro en sitio, responsable de todas las cuadrillas. ✅ (Wikipedia *Roughneck*, Motive)
+- **Driller** (perforador): dirige su cuadrilla y opera el taladro desde la consola; mantiene los parámetros de perforación. ✅
+- **Encuellador** (*derrickman*): además de trabajar en la torre durante los viajes, se ocupa del sistema de lodo: **mide densidad y viscosidad de embudo, mezcla químicos, vigila el nivel de los tanques y reporta pérdidas o ganancias al driller**. Depende del driller, pero en lo químico **sigue las instrucciones del ingeniero de lodos**. ✅ (Drilling Manual, Wikipedia, varias ofertas de empleo)
+- **Company man**: representante de la operadora en sitio. Hace cumplir el programa de perforación aprobado y supervisa la calidad de los servicios de terceros, incluido el de lodos. Reporta al superintendente de perforación. ✅ (Penn State PNG 301, Rigzone, ofertas de empleo)
+- **Mud logger**: monitorea gas, recortes y parámetros para evaluación geológica; es un rol distinto al de ingeniero de lodos. ⚠️ (una fuente los confunde; se toma como distintos por el resto del material)
+- A quién reporta el ingeniero de lodos **depende del contrato**. Las fuentes no lo fijan. ⚠️
+
+**Cómo entra al juego.** Personajes no jugables, cada uno con un papel claro:
+- **Driller**: informa profundidad, formación y eventos al inicio del turno; **hay que avisarle antes de transferir** (tema 4). 🧩
+- **Encuellador**: en el campo hace parte del trabajo de tanques. En el juego **el jugador hace sus propias mediciones** (decisión del autor), pero el encuellador puede **ejecutar mezclas largas** en el embudo cuando el jugador se las ordena, liberando tiempo del turno a cambio de supervisar el resultado. 🧩 (propuesta, por confirmar)
+- **Company man**: recibe el reporte diario y evalúa contra el programa de lodos. Es quien **pide explicaciones** cuando algo sale de especificación o el costo sube. 🧩
+- **Mud logger**: avisa de gas y cambios en recortes; otra fuente de alarma. 🧩
+
+Fuentes: [Roughneck — Wikipedia](https://en.wikipedia.org/wiki/Roughneck) · [Derrickhand — Wikipedia](https://en.wikipedia.org/wiki/Derrickhand) · [Derrickman Job Description — Drilling Manual](https://www.drillingmanual.com/derrickman-job-description-requirements-role/) · [Drilling crew — Motive](https://gomotive.com/glossary/oil-and-gas/drilling-crew/) · [Derrickhand — oferta de empleo (Seventy Seven Energy)](https://app.energyhire.com/job-board/derrickhand-oklahoma-el-reno-ok-48f08ca7-2847-4b7d-bdaf-2d60ff14c836) · [Derrickman — Lewis Energy](https://uscareers-lewisenergy.icims.com/jobs/11143/derrickman/job) · [Company man — Penn State PNG 301](https://www.e-education.psu.edu/png301/node/900) · [Well site supervisor — Rigzone](https://www.rigzone.com/insights/job-descriptions-2/responsibilities-of-a-well-site-supervisor-in-oil-operations-249) · [Mud Man — oferta de empleo](https://jobnow.ng/mud-man-at-an-oil-and-gas-drilling-services-company-myrtle-management-consultants-limited/)
+
+---
+
+## 6. Cómo cambian las propiedades al perforar
+
+### 6.1 Entrada de sólidos
+
+**Qué es real.**
+- El volumen de sólidos que genera la broca sale del diámetro, la ROP y la porosidad de la formación: `sólidos (bbl/h) = capacidad del hueco (bbl/ft) × ROP (ft/h) × (1 − porosidad)`. Ejemplo publicado: hueco de 26", ROP 62 ft/h, porosidad 0,25 → **~30 bbl/h** de sólidos que el equipo tiene que remover. ✅ (el ejemplo cuadra con la fórmula de capacidad de §2: 26²/1.029,4 × 62 × 0,75 = 30,5)
+- **Eficiencia de remoción** = sólidos removidos / sólidos generados por la broca. Lo que no se remueve se queda en el lodo. ✅ (dos fuentes; definición de API RP 13C)
+- Para mantener los sólidos perforados por debajo de un máximo hay que **diluir**. API RP 13C compara la dilución necesaria con remoción contra la que haría falta sin remoción. ✅
+- Con **sólidos de baja gravedad por encima de 3–5 %** la tasa de penetración cae de forma importante. ⚠️ (una fuente)
+
+**Cómo entra al juego.**
+- Cada hora de perforación entra al lodo `generados × (1 − eficiencia)` de sólidos perforados. Sube el % LGS, la PV y el MBT si la formación es arcillosa. 🧩
+- La **eficiencia** depende del estado del equipo de sólidos (zarandas con mallas buenas, desarenador, deslimador y centrífuga encendidos). Un equipo apagado o una malla rota sube la entrada de sólidos. Valores concretos: tema 7. 🧩
+- Ejemplo de calibración, CAIMÁN-3 superficial (cálculo propio): 17½", ROP 80 ft/h, porosidad 0,30 → 0,2975 × 80 × 0,70 ≈ **17 bbl/h generados**. Con 80 % de eficiencia quedan ≈ **3,3 bbl/h** en el sistema. 🧩
+
+### 6.2 Temperatura
+
+**Qué es real.**
+- Al subir la temperatura, los lodos base agua con polímeros **se adelgazan**: en un estudio con CMC/PAC de 20 a 80 °C la PV cayó 78,5 % y el esfuerzo de corte 58,8 %. ✅ (estudio de laboratorio + patente)
+- Excepción: en lodos con mucha arcilla, la temperatura puede **dispersar y flocular** las arcillas y **espesar** el lodo. ✅ (patente; coincide con el manual sobre floculación térmica del lodo cálcico, `mud-programs.md`)
+- Los polímeros naturales y modificados (almidón, CMC) **se degradan** a alta temperatura (sobre ~115 °C según una revisión) y son atacados por bacterias. ✅ (revisión + `mud-engineer-reference.md` §1.5 sobre fermentación del almidón y biocidas + `domain-research.md` §3)
+
+**Cómo entra al juego.**
+- Las pruebas de superficie se corren a temperatura de superficie. El juego puede mostrar que **el lodo en fondo es más delgado** que lo que mide el Fann en la caseta, y que en pozos calientes los polímeros se gastan más rápido (hay que reponer más). 🧩
+- Fermentación del almidón: sin biocida o sin salinidad alta, el almidón se degrada con los días y **sube el filtrado**. Otra causa de alarma que no es contaminación. 🧩
+
+Fuentes: [US 8522896 — Consistent drilling fluids engineering and management](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/8522896) · [Solids Control Systems — Oil & Gas Journal](https://www.ogj.com/home/article/17297942/solids-control-systems-scs) · [Drilled-solids removal system performance — IADC Lexicon](https://iadclexicon.org/glossary/global-standards/page/164/) · [AADE — cálculos de remoción y dilución (API RP 13C)](https://www.aade.org/download_file/force/4755/649) · [Jurnal Teknologi (UTM) — LGS y ROP](https://journals.utm.my/jurnalteknologi/article/download/9091/5416/25260) · [Solids control — Drilling Manual](https://www.drillingmanual.com/solids-control/) · [US 9518434 — Managing properties of a circulating wellbore fluid](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/9518434) · [Safi et al., Int. J. Applied Mechanics and Engineering, 2023](https://doaj.org/article/7e8976cba55b48ad8c3370a7009f5250) · [Revisión de polímeros para lodos base agua (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC7178333)
