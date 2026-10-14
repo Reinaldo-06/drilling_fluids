@@ -122,7 +122,7 @@ Fuentes: [Pit Volume Totalizer — Pason](https://pason.com/products/pit-volume-
 
 **Cómo entra al juego.** Personajes no jugables, cada uno con un papel claro:
 - **Driller**: informa profundidad, formación y eventos al inicio del turno; **hay que avisarle antes de transferir** (tema 4). 🧩
-- **Encuellador**: en el campo hace parte del trabajo de tanques. En el juego **el jugador hace sus propias mediciones** (decisión del autor), pero el encuellador puede **ejecutar mezclas largas** en el embudo cuando el jugador se las ordena, liberando tiempo del turno a cambio de supervisar el resultado. 🧩 (propuesta, por confirmar)
+- **Encuellador**: en el campo hace parte del trabajo de tanques. En el juego **el jugador hace sus propias mediciones** (decisión del autor), pero el encuellador puede **ejecutar mezclas largas** en el embudo cuando el jugador se las ordena, liberando tiempo del turno a cambio de supervisar el resultado. 👷
 - **Company man**: recibe el reporte diario y evalúa contra el programa de lodos. Es quien **pide explicaciones** cuando algo sale de especificación o el costo sube. 🧩
 - **Mud logger**: avisa de gas y cambios en recortes; otra fuente de alarma. 🧩
 

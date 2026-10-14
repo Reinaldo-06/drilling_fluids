@@ -31,6 +31,7 @@ Leer en este orden antes de proponer nada:
 - **Motor: Godot 4.7.2 (stable)**, la última estable de mantenimiento al momento de decidir. No usar betas ni versiones de desarrollo.
 - **Chequeo de rutina** al inicio del turno: balanza, Fann (PV, YP, VA), geles, filtrado API, pH, Pm, Pf/Mf, cloruros, dureza, retorta (da Fw). Detalle en `game-design-mechanics.md`.
 - **El jugador opera las válvulas de tanques** caminando hasta ellas. El "hopper" se llama **embudo de mezcla** en el juego; hay dos (arriba en el tanque de píldoras y abajo junto a la bomba centrífuga).
+- **Chequeo rápido** (densidad, embudo, pH) lo hace el jugador, máximo 10 min de juego. **Las mezclas largas en el embudo las ejecuta el encuellador** por orden del jugador (`simulation-logic.md` §5).
 - **Cambio de fluido entre lodos base agua: desplazamiento directo**, sin bache espaciador. Layout base: dos reservas + fractanques; circuito corto en el activo durante los preparativos (`rig-tank-system.md` §5).
 - **Observación visual** (espuma, viscosidad a ojo, recortes, nivel, color/olor, sedimento) es la alarma entre chequeos. Nunca identifica el contaminante químico.
 
