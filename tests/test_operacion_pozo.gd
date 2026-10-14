@@ -81,3 +81,12 @@ func test_falla_de_centrifuga_la_apaga_y_vuelve() -> void:
 	o.guion.terminar(falla.id)
 	t.esperar(10.0)
 	verificar(o.control.equipo("centrifuga").encendido, "vuelve al terminar la falla")
+
+
+func test_transferir_dentro_del_activo_no_alarma() -> void:
+	var par := _turno(null, 500.0)
+	var t = par[0]
+	var r: Dictionary = t.transferir("Proceso", "Succión", 50.0)
+	verificar(t.alarmas_pvt == 0, "el total del activo no cambia")
+	verificar(not "transferir_sin_avisar" in r["hallazgos"].map(func(h): return h["id"]),
+		"la regla no se dispara")

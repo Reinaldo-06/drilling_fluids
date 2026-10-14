@@ -498,3 +498,41 @@ Cuatro agentes trabajaron en paralelo, cada uno con archivos propios. Resumen de
 - ~~Productos faltantes~~ **Creados:** PHPA, almidón, lignito, amina, carbonato de calcio dimensionado (un solo grado por ahora) y NaCl. Aprobados en los programas de CAIMÁN-3 intermedia y producción. Efectos sobre VP, PC, geles y filtrado son calibración 🧩.
 - Variables que piden las observaciones y no existen: sedimento visible al transferir, mallas tapadas, temperatura de la muestra, nivel de tanques, recortes.
 - Solubilidad de Ca(OH)₂ con Ksp (hoy tope fijo de OH⁻); mecanismo real de la caída de pH por yeso y sal (hoy ácidos calibrados).
+
+### 12.8 Segunda ronda de agentes (integrada)
+
+Cinco agentes en paralelo; aquí lo integrado de la simulación. Los personajes están en `docs/personajes.md` y el mapa en el overworld (`game/`).
+
+**Perforación y control de sólidos (agente E)** — `sim/perforacion.gd`, `sim/control_solidos.gd`, `sim/formacion.gd`, `sim/equipo_solidos.gd`
+- Formaciones como datos (`data/formaciones/`): porosidad, CIC, tipo de arcilla, reparto de tamaños, contaminante por bbl de roca, lutita frágil con densidad mínima. CAIMÁN-3 completo y la lutita frágil de PIEDEMONTE-2.
+- Cada paso: el hueco nuevo sale de la succión; entran `capacidad × ROP × (1 − φ)` de sólidos (§6.1). La parte dispersa de una lutita reactiva pasa todos los equipos y entra como **arcilla activa** (sube MBT, PC y geles); el resto pasa zaranda → desarenador → deslimador. El lodo pegado a los recortes se descarta (§10.1).
+- Inhibición = combinación de K⁺, amina, PHPA y sal 🧩; reduce la dispersión. El KCl empeora la caolinita (§13.1). Los recortes consumen K⁺ (entra Na⁺, el Cl⁻ se queda), amina y PHPA (§13.5).
+- Equipos como datos (`data/equipos/`), con encendido y estado (malla rota, conos tapados). Remoción combinada ≈ 80 % 🧩. Por pasada, hidrociclones y centrífuga sacan sólidos dispersos y finos de cemento; con lodo densificado los hidrociclones **botan barita** (12 → 11,65 ppg en 1 h) y la centrífuga casi no.
+- Calibración CAIMÁN-3 superficial: ~17 bbl/h generados, ~3,5 retenidos; lutita reactiva 4 h sin inhibir: MBT 12 → 17, VP 13,5 → 20; cemento de zapata 90 ft: pH 12,2, Pm 4,1, Ca 840.
+- Pendiente: temperatura, hidrólisis del PHPA con pH alto, retraso de un retorno de fondo, compartimientos.
+
+**Eventos, guiones y PVT (agente F)** — `sim/evento.gd`, `sim/guion_seccion.gd`, `sim/guion_ejecucion.gd`, `sim/monitor_tanques.gd`
+- Cada evento es un dato (`data/eventos/`) con disparador (profundidad, tiempo, condición sobre las propiedades del lodo o probabilidad por hora 🧩), parámetros, quién avisa, aviso y explicación para el debrief (invariante 4).
+- Al jugador le ocurren: pérdidas (restan tasa·Δt del activo; cortes 🧩 ≤ 25 bbl/h filtración, ≤ 100 parcial, más severa), influjo (suma la ganancia y **exige el peso de matada**, §14, redondeado hacia arriba a 0,1 ppg; la perforación no sigue hasta alcanzarlo), contaminación, gas y pedido de subir peso, viajes que paran la perforación, fallas de equipo, sag.
+- Los avisos de observación nunca nombran el contaminante (lo verifica una prueba).
+- PVT (§4): umbral 10 bbl 🧩; una transferencia sin avisar da falsa alarma con su explicación; una diferencia que no explica nadie en superficie es del pozo.
+- Guiones: CAIMÁN-3 superficial (filtración que no avisa nadie, viaje), intermedia (cemento de zapata; gas que crece, pedido de +0,3 ppg e influjo si no se sube; viaje, gas de viaje, sag), producción (pérdida parcial, centrífuga fuera) y MÉDANO-5 sal.
+
+**Turno y reporte (agente G)** — `sim/turno.gd`, `sim/reloj.gd`, `sim/accion.gd`, `sim/encuellador.gd`, `sim/turno_inventario.gd`, `sim/reporte_diario.gd`, `sim/turno_noche.gd`, `data/turno/`
+- Reloj de 720 min (06:00–18:00) que nunca se pasa. Cada acción cuesta minutos (tablas 🧩 en `data/turno/`) e incluye la caminata hasta su estación. El reloj corre el paso de §12.2 cada 10 min y entrega las pruebas con espera.
+- Chequeo rápido 10 min; completo 67 min (planificador del laboratorio). Encuellador con cola a 50 sacos/h o 250 con cuadrilla; saca de la bodega y avisa al terminar o si falta producto.
+- Las acciones llaman a las reglas en su momento y guardan los hallazgos (aviso inmediato y debrief).
+- Reporte diario: solo lo medido (las casillas vacías se ven), desvíos contra el programa, **balance de volumen** que delata pérdidas no registradas, productos, costo del día y acumulado, recomendaciones estructuradas (mantener producto por bbl construido, agua, reponer volumen, rango de pH, densidad objetivo).
+- Turno de noche: 12 h simuladas que cumplen esas recomendaciones a través del encuellador; deja un resumen para el día siguiente.
+
+**Integración** — `sim/operacion_pozo.gd`
+- Engancha al turno la perforación y los equipos (pasos 1–2) y el guion y el PVT (pasos 6–7). Los equipos que saca una falla se apagan y vuelven solos al terminar.
+- El hueco (neto de lo que retiene el lodo), el lodo en recortes y el descarte entran al balance del turno; **las pérdidas de los eventos no**: el jugador las tiene que ver en el PVT, en los tanques o en el reporte que no cuadra.
+- Pruebas en `tests/test_operacion_pozo.gd`: perforar cuadra el balance; la filtración de 900 ft dispara el PVT y descuadra el reporte; una transferencia avisada no alarma; la falla de la centrífuga la apaga y la devuelve.
+
+**Preguntas abiertas de esta ronda**
+- Pedido de subir peso: ¿valor fijo del programa o densidad actual + 0,3 ppg (hoy)?
+- ¿Eventos por probabilidad repetibles? Hoy cada uno ocurre una vez por sección.
+- ¿Reporte de 24 h (día + noche) o solo el turno de día (hoy, con la noche en un resumen aparte)?
+- ~~La regla `transferir_sin_avisar` se disparaba entre dos tanques del activo~~ corregido: solo cuenta si un lado es activo y el otro no.
+- Posible doble conteo de los hidrociclones (en la entrada y por pasada); el LGS se estabiliza cerca del 4 %, razonable.

@@ -289,7 +289,8 @@ func transferir(origen_nombre: String, destino_nombre: String, bbl: float) -> Di
 	_ir_a("tanques")
 	var antes: RefCounted = d.lodo.copiar()
 	var movido: float = o.transferir(d, movible)
-	var afecta: bool = o.en_sistema_activo or d.en_sistema_activo
+	# Entre dos tanques del activo el total no cambia: el PVT no ve nada.
+	var afecta: bool = o.en_sistema_activo != d.en_sistema_activo
 	var aviso := _aviso_driller
 	_aviso_driller = false
 	var accion := {"tipo": "transferir", "origen": o.nombre, "destino": d.nombre,
