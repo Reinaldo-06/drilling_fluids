@@ -143,3 +143,20 @@ func test_noche_mantiene_el_ph() -> void:
 	t.simular_noche()
 	verificar(t.inventario.disponible("soda_caustica") < 20.0, "la cuadrilla echó soda")
 	verificar(t.tanque("Succión").lodo.ph() >= ph0 + 0.3, "el pH subió al rango (%.2f)" % t.tanque("Succión").lodo.ph())
+
+
+func test_reporte_cubre_24_horas() -> void:
+	# Decisión del autor: el reporte diario cubre la noche anterior y el turno de día.
+	var t := _turno()
+	var r1 = t.entregar_reporte([{"tipo": "agua", "bbl_h": 10.0, "tanque": "Succión"}])
+	verificar_cerca(r1.horas, 12.0, 1e-6, "el primer día solo tiene turno de día")
+	var noche: Dictionary = t.simular_noche()
+	t.iniciar_dia()
+	t.tratar("soda_caustica", 0.1, "Succión")
+	var r2 = t.entregar_reporte()
+	verificar_cerca(r2.horas, 24.0, 1e-6, "día 2: 24 h")
+	verificar(r2.volumen["construido"] >= 120.0 - 1e-6, "el agua de la noche entra al balance: %.1f" % r2.volumen["construido"])
+	verificar(r2.volumen["cuadra"], "el balance de 24 h cuadra")
+	verificar(r2.costo_dia > noche["costo"], "costo de la noche más el del día")
+	var nombres: Array = r2.productos.map(func(p): return p["producto"])
+	verificar(nombres.size() >= 2, "productos de la noche y del día: %s" % str(nombres))

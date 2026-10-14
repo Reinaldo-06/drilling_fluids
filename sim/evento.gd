@@ -81,6 +81,9 @@ const VARIABLES_CONDICION := ["profundidad", "horas", "props", "contexto"]
 @export var gas_unidades := 0.0
 ## Gas o pedido del company man: cuánto pide subir la densidad (ppg).
 @export var subir_densidad_ppg := 0.0
+## Pedido del company man: true si pide la densidad del programa a esa
+## profundidad (ProgramaSeccion.densidad_programada) en vez de subir_densidad_ppg.
+@export var densidad_del_programa := false
 ## Sag: oscilación de la densidad en la caja de llegada al volver a circular.
 @export var variacion_densidad_ppg := 0.0
 ## Falla de equipo: id del equipo de control de sólidos que sale de servicio.

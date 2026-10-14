@@ -23,6 +23,8 @@ const EventoScript := preload("res://sim/evento.gd")
 const CARPETA_EVENTOS := "res://data/eventos"
 
 var guion: Resource
+## ProgramaSeccion de la sección (opcional): da la densidad que pide el programa.
+var programa: Resource = null
 var rng := RandomNumberGenerator.new()
 ## Horas de juego desde que empezó la sección.
 var horas := 0.0
@@ -93,9 +95,14 @@ func disparar(e: Resource, tanques: Array, profundidad_ft := 0.0) -> Dictionary:
 			exigencias[e.id] = {"peso_minimo_ppg": datos["peso_matada"], "detiene": true,
 				"texto": "Peso de matada %.1f ppg" % datos["peso_matada"]}
 		"gas_fondo", "gas_conexion", "gas_viaje":
-			if e.subir_densidad_ppg > 0.0:
-				var objetivo := snappedf(densidad + e.subir_densidad_ppg, 0.1)
+			var objetivo := 0.0
+			if e.densidad_del_programa and programa != null:
+				objetivo = programa.densidad_en(profundidad_ft)
+			if objetivo <= 0.0 and e.subir_densidad_ppg > 0.0:
+				objetivo = snappedf(densidad + e.subir_densidad_ppg, 0.1)
+			if objetivo > 0.0:
 				datos["peso_pedido"] = objetivo
+				datos["subir"] = snappedf(objetivo - densidad, 0.1)
 				exigencias[e.id] = {"peso_minimo_ppg": objetivo, "detiene": false,
 					"texto": "Subir la densidad a %.1f ppg" % objetivo}
 		"contaminacion":

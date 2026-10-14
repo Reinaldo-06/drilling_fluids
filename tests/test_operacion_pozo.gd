@@ -13,17 +13,17 @@ const GUION_SUP := preload("res://data/guiones/caiman_3_superficial.tres")
 const GUION_PROD := preload("res://data/guiones/caiman_3_produccion.tres")
 
 
-func _turno(guion: Resource, profundidad: float) -> Array:
+func _turno(guion: Resource, profundidad: float, formacion: Resource = SUPERFICIAL) -> Array:
 	var tanques := [
 		Tanque.crear("Proceso", 500.0, "proceso", 300.0, Base.disperso_lignosulfonato()),
 		Tanque.crear("Succión", 500.0, "succion", 300.0, Base.disperso_lignosulfonato()),
 		Tanque.crear("Reserva", 500.0, "reserva", 200.0, Base.disperso_lignosulfonato(), false),
 	]
-	var t = Turno.crear(tanques, PROGRAMA, {"barita": 500.0})
+	var t = Turno.crear(tanques, PROGRAMA, {"barita": 500.0, "pac": 20.0})
 	t.caudal_gpm = 700.0
 	t.profundidad_ft = profundidad
 	t.volumen_pozo_bbl = 0.15 * profundidad
-	var o = Operacion.crear([SUPERFICIAL], guion, 60.0, 17.5)
+	var o = Operacion.crear([formacion], guion, 60.0, 17.5)
 	o.conectar(t)
 	return [t, o]
 
@@ -33,7 +33,9 @@ func _tipos(avisos: Array) -> Array:
 
 
 func test_perforar_cuadra_el_balance_sin_eventos() -> void:
-	var par := _turno(null, 500.0)
+	var impermeable: Resource = SUPERFICIAL.duplicate()
+	impermeable.perdida_filtracion_bbl_h = 0.0
+	var par := _turno(null, 500.0, impermeable)
 	var t = par[0]
 	var vol0: float = t.volumen_superficie()
 	t.esperar(120.0)
@@ -45,7 +47,7 @@ func test_perforar_cuadra_el_balance_sin_eventos() -> void:
 
 
 func test_filtracion_sin_avisar_la_detecta_el_pvt_y_el_balance() -> void:
-	# c3s_filtracion_gravas: 12 bbl/h a 900 ft, nadie la avisa (guion superficial).
+	# Filtración de las gravas superficiales (~8 bbl/h, sale de la formación): nadie la avisa.
 	var par := _turno(GUION_SUP, 880.0)
 	var t = par[0]
 	t.esperar(180.0)
@@ -90,3 +92,46 @@ func test_transferir_dentro_del_activo_no_alarma() -> void:
 	verificar(t.alarmas_pvt == 0, "el total del activo no cambia")
 	verificar(not "transferir_sin_avisar" in r["hallazgos"].map(func(h): return h["id"]),
 		"la regla no se dispara")
+
+
+# --- Pérdidas por filtración según la formación (decisión del autor) ---
+
+const PRODUCTORA := preload("res://data/formaciones/caiman_3_arena_productora.tres")
+const LUTITA := preload("res://data/formaciones/caiman_3_lutita_reactiva.tres")
+const Perforacion := preload("res://sim/perforacion.gd")
+const PAC := preload("res://data/productos/pac.tres")
+const CACO3 := preload("res://data/productos/carbonato_de_calcio.tres")
+
+
+func test_arenas_pierden_y_lutitas_no() -> void:
+	var lodo = Base.disperso_lignosulfonato()
+	var arena: float = Perforacion.tasa_filtracion(lodo, SUPERFICIAL)
+	verificar(arena >= 1.0 and arena <= 10.0, "filtración en las gravas, 1–10 bbl/h: %.1f" % arena)
+	verificar(Perforacion.tasa_filtracion(lodo, PRODUCTORA) > 0.0, "la arena productora también")
+	verificar_cerca(Perforacion.tasa_filtracion(lodo, LUTITA), 0.0, 1e-9, "la lutita no pierde")
+
+
+func test_subir_el_controlador_de_filtrado_baja_la_perdida() -> void:
+	var lodo = Base.disperso_lignosulfonato()
+	var antes: float = Perforacion.tasa_filtracion(lodo, SUPERFICIAL)
+	PAC.aplicar(lodo, 1.0)
+	var con_pac: float = Perforacion.tasa_filtracion(lodo, SUPERFICIAL)
+	verificar(con_pac < 0.85 * antes, "1 lb/bbl de PAC: %.1f → %.1f bbl/h" % [antes, con_pac])
+	CACO3.aplicar(lodo, 10.0)
+	var con_caco3: float = Perforacion.tasa_filtracion(lodo, SUPERFICIAL)
+	verificar(con_caco3 < 0.6 * con_pac, "10 lb/bbl de CaCO₃ puentea: %.1f → %.1f bbl/h" % [con_pac, con_caco3])
+
+
+func test_la_orden_de_sacos_de_pac_reduce_lo_perdido_en_el_turno() -> void:
+	var par_sin := _turno(null, 500.0)   # el par guarda viva la operación
+	var par_con := _turno(null, 500.0)
+	var sin = par_sin[0]
+	var con = par_con[0]
+	# 12 sacos de PAC (600 lb, ~1 lb/bbl en el activo) por el obrero de patio.
+	con.ordenar_mezcla("pac", 12.0, "Succión", false, "obrero_patio")
+	sin.esperar(240.0)
+	con.esperar(240.0)
+	var perdido_sin: float = -sin.entregar_reporte().volumen["no_explicado"]
+	var perdido_con: float = -con.entregar_reporte().volumen["no_explicado"]
+	verificar(perdido_sin > 20.0, "sin tratar se pierden ~8 bbl/h: %.1f bbl en 4 h" % perdido_sin)
+	verificar(perdido_con < perdido_sin - 3.0, "con PAC se pierde menos: %.1f contra %.1f" % [perdido_con, perdido_sin])

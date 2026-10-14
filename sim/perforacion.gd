@@ -60,6 +60,15 @@ const CIC_ACCESIBLE := 0.3
 const AMINA_LB_POR_BBL_RECORTE := 2.0
 const PHPA_LB_POR_BBL_RECORTE := 1.5
 
+## Pérdidas por filtración en formaciones permeables (simulation-logic.md §10.1):
+## la tasa base de la formación escala con (filtrado API / referencia)² 🧩 —un
+## revoque más delgado y menos permeable deja pasar menos— y baja con el
+## carbonato de calcio que puentea las gargantas porales 🧩.
+const FILTRADO_REFERENCIA_ML := 8.0
+const EXPONENTE_FILTRADO := 2.0
+const CACO3_REFERENCIA_LB := 10.0
+const PUENTEO_MAXIMO := 0.8
+
 ## Derrumbes: bbl de roca extra por bbl generado, por cada ppg bajo el mínimo (tope 2 ppg). 🧩
 const DERRUMBES_POR_PPG := 0.3
 
@@ -252,6 +261,16 @@ static func _consumir_inhibidores(lodo: EstadoLodoScript, formacion: FormacionSc
 
 
 ## La formación del nivel a una profundidad (la primera que la contiene).
+## bbl/h que el lodo pierde hacia la formación mientras se la perfora.
+static func tasa_filtracion(lodo: EstadoLodoScript, formacion: FormacionScript) -> float:
+	if formacion == null or formacion.perdida_filtracion_bbl_h <= 0.0:
+		return 0.0
+	var relativo := clampf(lodo.filtrado_api() / FILTRADO_REFERENCIA_ML, 0.2, 3.0)
+	var caco3_lb := lodo.frac_caco3 * EstadoLodoScript.DENSIDAD_CACO3_PPG * F.GAL_POR_BBL
+	var puenteo := PUENTEO_MAXIMO * (1.0 - exp(-caco3_lb / CACO3_REFERENCIA_LB))
+	return formacion.perdida_filtracion_bbl_h * pow(relativo, EXPONENTE_FILTRADO) * (1.0 - puenteo)
+
+
 static func formacion_en(formaciones: Array, profundidad_ft: float) -> FormacionScript:
 	for f in formaciones:
 		if f.contiene(profundidad_ft):

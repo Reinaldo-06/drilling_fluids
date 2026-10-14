@@ -2,7 +2,7 @@
 
 Juego 2D pixelado en **Godot** donde el jugador es un **ingeniero de fluidos de perforación**. Objetivo: que el autor (que trabaja en la industria) aprenda manejo de tanques, diagnóstico de propiedades y tratamiento de contaminaciones.
 
-**Estado actual: simulación completa del turno y overworld caminable, todavía sin conectar entre sí.** Proyecto Godot 4.7.2 con: química del lodo con equilibrio ácido-base (Tabla 4 entera), 7 contaminantes, 21 productos, tanques y tiempo, 17 pruebas de laboratorio y 4 observaciones, 19 reglas con explicación, programa de CAIMÁN-3; perforación con formaciones y control de sólidos; eventos guionados y PVT; turno de 12 h con acciones, encuellador, inventario, reporte diario y noche simulada (`sim/operacion_pozo.gd` los engancha). Overworld de la locación (`game/overworld/`) con 7 personajes (`docs/personajes.md`). 221 pruebas pasando. Resumen en `simulation-logic.md` §12.7–12.8. Siguiente paso: unir el overworld al turno (señales `interactuado`/`caminado` → acciones y reloj) y las pantallas de laboratorio, tanques y reporte. Estructura y cómo correr las pruebas en `README.md`.
+**Estado actual: simulación completa del turno y overworld caminable, todavía sin conectar entre sí.** Proyecto Godot 4.7.2 con: química del lodo con equilibrio ácido-base (Tabla 4 entera), 7 contaminantes, 21 productos, tanques y tiempo, 17 pruebas de laboratorio y 4 observaciones, 19 reglas con explicación, programa de CAIMÁN-3; perforación con formaciones y control de sólidos; eventos guionados y PVT; turno de 12 h con acciones, encuellador, inventario, reporte diario y noche simulada (`sim/operacion_pozo.gd` los engancha). Overworld de la locación (`game/overworld/`) con 7 personajes (`docs/personajes.md`). 228 pruebas pasando. Resumen en `simulation-logic.md` §12.7–12.8. Siguiente paso: unir el overworld al turno (señales `interactuado`/`caminado` → acciones y reloj) y las pantallas de laboratorio, tanques y reporte. Estructura y cómo correr las pruebas en `README.md`.
 
 ## Mapa de documentos
 
@@ -36,6 +36,9 @@ Leer en este orden antes de proponer nada:
 - **Modelo de simulación:** cada tanque guarda la composición; la floculación y todas las propiedades se derivan. Paso de 10 min de juego. `simulation-logic.md` §12.
 - **El efecto de un cambio se ve en una vuelta del lodo** (depende de profundidad, caudal y volumen en superficie), no en horas fijas. Sin tratamientos, el lodo no deriva solo: la cal en exceso es reserva; solo los finos de cemento se disuelven, en pocas vueltas.
 - **Cambio de fluido entre lodos base agua: desplazamiento directo**, sin bache espaciador. Layout base: dos reservas + fractanques; circuito corto en el activo durante los preparativos (`rig-tank-system.md` §5).
+- **La densidad se sube por programa** (tabla por profundidad en cada sección); el company man pide el valor del programa.
+- **Pérdidas por filtración según la formación**: las arenas permeables pierden; se responde subiendo el controlador de filtrado (y puenteo). Las órdenes de sacos van al **encuellador o al obrero de patio**.
+- **El reporte diario cubre 24 h** (noche anterior + turno de día).
 - **Observación visual** (espuma, viscosidad a ojo, recortes, nivel, color/olor, sedimento) es la alarma entre chequeos. Nunca identifica el contaminante químico.
 
 ## Invariantes de diseño — romper esto rompe el juego

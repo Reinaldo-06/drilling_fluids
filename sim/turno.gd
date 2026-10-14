@@ -5,7 +5,7 @@ extends RefCounted
 ## avanzar el reloj corre, en pasos de 10 min y en el orden de
 ## simulation-logic.md §12.2:
 ##   1–2. enganches_antes   (perforación, control de sólidos: otros sistemas)
-##   3.   encuellador       (mezclas en curso)
+##   3.   encuellador y obrero de patio (mezclas en curso)
 ##   4–5. Cinetica.paso     (química, hidratación, asentamiento, homogenización)
 ##   6–7. enganches_despues (eventos, detección)
 ##   y se entregan los resultados de laboratorio cuya espera terminó.
@@ -44,6 +44,10 @@ var tanques: Array = []
 var programa: Resource = null
 var inventario: Inventario = Inventario.new()
 var encuellador: Encuellador = Encuellador.new()
+## Segundo mezclador: el jugador le puede dar la orden al encuellador o al
+## obrero de patio (decisión del autor). Cada uno con su cola y su ritmo.
+var obrero_patio: Encuellador = _mezclador("Obrero de patio")
+const MEZCLADORES := ["encuellador", "obrero_patio"]
 var evaluador: Evaluador = Evaluador.new()
 var reglas: Array = []
 
@@ -95,6 +99,9 @@ var reporte: RefCounted = null
 var resumen_noche_anterior: Dictionary = {}
 
 var _aviso_driller := false
+## Horas que cubre el próximo reporte: 24 si la noche anterior se simuló.
+var horas_periodo := 12.0
+var _noche_simulada := false
 var _muestra_filtrado: RefCounted = null
 var _previo = null
 
@@ -127,8 +134,16 @@ func iniciar_dia() -> void:
 	reporte = null
 	_aviso_driller = false
 	_muestra_filtrado = null
-	inventario.cerrar_turno()
-	abrir_contabilidad_volumen()
+	# El reporte diario cubre 24 h (decisión del autor): la noche simulada
+	# después del reporte anterior y este turno de día. Si hubo noche, su
+	# contabilidad sigue abierta; si no (primer día), se abre ahora.
+	if _noche_simulada:
+		horas_periodo = 24.0
+	else:
+		horas_periodo = 12.0
+		inventario.cerrar_turno()
+		abrir_contabilidad_volumen()
+	_noche_simulada = false
 
 
 # ======================= Consultas =======================
@@ -350,7 +365,11 @@ func tratar(producto_id: String, lb_bbl: float, tanque_nombre := "", prehidratad
 ## Orden al encuellador: mezcla en segundo plano a 50 sacos/h (250 con la
 ## cuadrilla prestada). Las reglas se evalúan al ordenar, con el lodo que
 ## resultaría de la mezcla completa.
-func ordenar_mezcla(producto_id: String, sacos: float, tanque_nombre := "", cuadrilla := false) -> Dictionary:
+func ordenar_mezcla(producto_id: String, sacos: float, tanque_nombre := "", cuadrilla := false,
+		quien := "encuellador") -> Dictionary:
+	if not quien in MEZCLADORES:
+		return {"error": "Nadie llamado %s puede mezclar." % quien}
+	var mezclador: Encuellador = get(quien)
 	var p := inventario.producto(producto_id)
 	var t := tanque(tanque_nombre)
 	if p == null or t == null or t.volumen_bbl <= 0.0 or sacos <= 0.0 or p.efecto == "agua":
@@ -370,10 +389,10 @@ func ordenar_mezcla(producto_id: String, sacos: float, tanque_nombre := "", cuad
 		"volumen_bbl": t.volumen_bbl, "mezcla": true, "sacos": sacos, "cuadrilla": cuadrilla}
 	var h := _evaluar("al_tratar", accion, t.lodo, previsto.lodo)
 	tratamientos_previos.append(producto_id)
-	var mezcla: Dictionary = encuellador.ordenar(producto_id, p, sacos, t, cuadrilla, reloj.minuto)
+	var mezcla: Dictionary = mezclador.ordenar(producto_id, p, sacos, t, cuadrilla, reloj.minuto)
 	var aviso := ""
 	if inventario.disponible(producto_id) < sacos:
-		aviso = "En la bodega solo hay %d sacos de %s: el encuellador va a parar antes." % [
+		aviso = "En la bodega solo hay %d sacos de %s: la mezcla va a parar antes." % [
 			floori(inventario.disponible(producto_id)), p.nombre]
 	avanzar_tiempo(Accion.minutos("orden_encuellador"))
 	acciones.append(Accion.registro("orden_encuellador", inicio, reloj.minuto - inicio, accion))
@@ -430,7 +449,9 @@ func entregar_reporte(recomendaciones: Array = []) -> RefCounted:
 func simular_noche(recomendaciones = null) -> Dictionary:
 	var recs: Array = recomendaciones if recomendaciones != null else \
 		(reporte.recomendaciones if reporte != null else [])
-	return Noche.simular(self, recs)
+	var resumen := Noche.simular(self, recs)
+	_noche_simulada = true
+	return resumen
 
 
 # ======================= Lo que usa la noche =======================
@@ -454,11 +475,12 @@ func ordenar_mezcla_noche(producto_id: String, sacos: float, t: Resource) -> voi
 func _paso(minuto_inicio: float, dt: float) -> void:
 	for f in enganches_antes:
 		f.call(self, dt)
-	var r: Dictionary = encuellador.avanzar(dt, inventario)
-	for ap in r["aplicado"]:
-		_contabilizar(ap)
-	for a in r["avisos"]:
-		avisos.append({"minuto": minuto_inicio + dt, "tipo": "encuellador_" + a["tipo"], "texto": a["texto"]})
+	for quien in MEZCLADORES:
+		var r: Dictionary = (get(quien) as Encuellador).avanzar(dt, inventario)
+		for ap in r["aplicado"]:
+			_contabilizar(ap)
+		for a in r["avisos"]:
+			avisos.append({"minuto": minuto_inicio + dt, "tipo": quien + "_" + a["tipo"], "texto": a["texto"]})
 	Cinetica.paso(tanques, dt, caudal_gpm, volumen_pozo_bbl)
 	for f in enganches_despues:
 		f.call(self, dt)
@@ -557,6 +579,12 @@ func _ir_a(estacion: String) -> void:
 		avanzar_tiempo(m)
 		acciones.append(Accion.registro("caminar", inicio, reloj.minuto - inicio, {"desde": ubicacion, "hasta": estacion}))
 	ubicacion = estacion
+
+
+static func _mezclador(nombre: String) -> Encuellador:
+	var m := Encuellador.new()
+	m.nombre = nombre
+	return m
 
 
 func _sin_tiempo(costo: float) -> Dictionary:

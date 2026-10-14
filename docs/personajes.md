@@ -20,7 +20,7 @@ Tampoco le resuelven las cuentas: el driller entrega la presión de cierre y el 
 | `company_man` | Patricia Salcedo | Company man (operadora) | `oficina` |
 | `mud_logger` | Lucía Ferreyra | Mud logger | `cabina_mud_logger` |
 | `toolpusher` | Aurelio Mamani | Toolpusher (jefe de taladro) | `bodega` |
-| `cuadrillero` | Kevin Ortiz | Cuadrillero de zarandas | `zarandas` |
+| `cuadrillero` | Kevin Ortiz | Obrero de patio (ayudante de zarandas) | `zarandas` |
 
 ### Jugador — Alex Rivas
 
@@ -78,7 +78,9 @@ Jefe del taladro en sitio, responsable de todas las cuadrillas y de la logístic
 
 **Sprite:** casco blanco, overol rojo oscuro, piel morena, pelo y bigote canosos.
 
-### Cuadrillero — Kevin Ortiz
+### Obrero de patio — Kevin Ortiz
+
+También mezcla: el jugador le puede dar la orden de sacos a él o al encuellador (cada uno a 50 sacos/h, en paralelo).
 
 Ayudante nuevo, con **casco verde**: en muchos taladros el casco verde marca al novato. Entusiasta y preguntón. Cuida las zarandas y cuenta con detalle lo que sale por ellas: lajas, astillas, rebose, olor. Nunca saca conclusiones.
 

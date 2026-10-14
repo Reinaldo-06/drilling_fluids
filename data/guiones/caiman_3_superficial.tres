@@ -1,7 +1,6 @@
-[gd_resource type="Resource" script_class="GuionSeccion" load_steps=4 format=3]
+[gd_resource type="Resource" script_class="GuionSeccion" load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://sim/guion_seccion.gd" id="1"]
-[ext_resource type="Resource" path="res://data/eventos/c3s_filtracion_gravas.tres" id="2"]
 [ext_resource type="Resource" path="res://data/eventos/c3s_viaje_revestimiento.tres" id="3"]
 
 [resource]
@@ -11,5 +10,5 @@ pozo = "CAIMÁN-3"
 seccion = "Superficial"
 profundidad_desde = 0.0
 profundidad_hasta = 2500.0
-descripcion = "Sección tranquila de aprendizaje: lodo bentonítico, una filtración leve en las gravas que solo se ve en los tanques y el viaje para bajar el revestimiento."
-eventos = [ExtResource("2"), ExtResource("3")]
+descripcion = "Sección tranquila de aprendizaje: lodo bentonítico, pérdidas por filtración en las arenas y gravas (vienen de la formación, data/formaciones/caiman_3_superficial.tres, y bajan con el controlador de filtrado) y el viaje para bajar el revestimiento."
+eventos = [ExtResource("3")]

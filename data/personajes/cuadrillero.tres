@@ -6,7 +6,7 @@
 script = ExtResource("1")
 id = "cuadrillero"
 nombre = "Kevin Ortiz"
-rol = "Cuadrillero (ayudante de zarandas)"
+rol = "Obrero de patio (ayudante de zarandas)"
 estacion = "zarandas"
 hoja = "res://assets/personajes/cuadrillero.png"
 retrato = ""
@@ -15,6 +15,8 @@ dialogos = {
 "recortes_raros": ["Inge, mire: están saliendo lajas grandes.", "Unas como astillas con filo, otras en bloque.", "No es el recorte de siempre. Yo le cuento lo que veo."],
 "rebose_zarandas": ["Inge, la zaranda está botando lodo por encima.", "Ya revisé las mallas y no están rotas."],
 "olor_raro": ["¡Inge! Hay un olor feo en la zaranda.", "Como a huevo podrido. Me retiré y avisé al piso."],
-"perdida": ["Inge, casi no está llegando lodo a la zaranda.", "Antes venía más. Ya le avisé al perforador."]
+"perdida": ["Inge, casi no está llegando lodo a la zaranda.", "Antes venía más. Ya le avisé al perforador."],
+"orden_mezcla": ["¡Listo, inge! ¿Cuántos sacos dijo?", "Los echo por el embudo, a unos 50 por hora."],
+"mezcla_terminada": ["Inge, ya eché todos los sacos.", "¿Me vuelvo a las zarandas?"]
 }
-notas = "Ayudante nuevo, casco verde (en el taladro el casco verde marca al novato). Entusiasta y preguntón. Cuida las zarandas y cuenta con detalle lo que sale por ellas, sin sacar conclusiones."
+notas = "Ayudante nuevo, casco verde (en el taladro el casco verde marca al novato). Entusiasta y preguntón. Obrero de patio: cuida las zarandas, ayuda con las mezclas cuando el ingeniero se lo pide (segundo mezclador, simulation-logic.md §12.8) y cuenta con detalle lo que sale por ellas, sin sacar conclusiones."

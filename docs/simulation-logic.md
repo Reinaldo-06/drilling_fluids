@@ -240,7 +240,8 @@ Fuentes: [Mud report — SLB Energy Glossary](https://glossary.slb.com/en/terms/
 
 **Cómo entra al juego.** 🧩
 - El evento llega por el **nivel de tanques** (tema 4) o por el driller. El jugador mide la tasa con el balance de volumen.
-- Respuesta de fluidos según la severidad: filtración → material de pérdida fino en el sistema; parcial → **píldora de material de pérdida** (`mud-engineer-reference.md` §3); severa o total → píldora más grande, bajar densidad si la ventana lo permite y avisar al company man.
+- **Filtración según la formación** (decisión del autor): las arenas y gravas permeables tienden a perder; ahí el ingeniero sube un poco el controlador de filtrado y le pide al encuellador o al obrero de patio que meta X sacos. En el juego no es un evento: cada formación trae `perdida_filtracion_bbl_h` (superficial de CAIMÁN-3 8 bbl/h, arena productora 4; lutitas 0) y mientras se la perfora el activo pierde `base × (filtrado API / 8 ml)² × (1 − puenteo con CaCO₃)` 🧩 (`Perforacion.tasa_filtracion`). Con el lodo base son ~8,5 bbl/h; 1 lb/bbl de PAC la baja ~25 %; 10 lb/bbl de CaCO₃ dimensionado, otro ~45 %. Nadie la avisa: se ve en el PVT y en el balance del reporte. Fuentes: la filtración es la pérdida más leve, típica en formaciones porosas y permeables donde no se forma un revoque firme de baja permeabilidad, y el puenteo con carbonato de calcio es el remedio habitual ✅ ([US5147852, reducción de pérdidas por filtración](https://patents.google.com/patent/US5147852); [Baker Hughes, puenteo con CaCO₃](https://dam.bakerhughes.com/m/b1cc020f7b741b9d/original/fluid-bridging-wellbore-stability-minimized-formation-damage-Brazil-cs-PDF.PDF)); la permeabilidad del revoque baja con más partículas coloidales ([US5076944](https://patents.google.com/patent/US5076944)). El exponente 2 y el 80 % de puenteo máximo son calibración 🧩.
+- Respuesta de fluidos según la severidad: filtración → controlador de filtrado y material de pérdida fino en el sistema; parcial → **píldora de material de pérdida** (`mud-engineer-reference.md` §3); severa o total → píldora más grande, bajar densidad si la ventana lo permite y avisar al company man.
 - Mientras tanto hay que **reponer volumen** rápido, lo que se cruza con los ritmos de mezcla (tema 8).
 
 ### 10.2 Gas
@@ -530,9 +531,10 @@ Cinco agentes en paralelo; aquí lo integrado de la simulación. Los personajes 
 - El hueco (neto de lo que retiene el lodo), el lodo en recortes y el descarte entran al balance del turno; **las pérdidas de los eventos no**: el jugador las tiene que ver en el PVT, en los tanques o en el reporte que no cuadra.
 - Pruebas en `tests/test_operacion_pozo.gd`: perforar cuadra el balance; la filtración de 900 ft dispara el PVT y descuadra el reporte; una transferencia avisada no alarma; la falla de la centrífuga la apaga y la devuelve.
 
-**Preguntas abiertas de esta ronda**
-- Pedido de subir peso: ¿valor fijo del programa o densidad actual + 0,3 ppg (hoy)?
-- ¿Eventos por probabilidad repetibles? Hoy cada uno ocurre una vez por sección.
-- ¿Reporte de 24 h (día + noche) o solo el turno de día (hoy, con la noche en un resumen aparte)?
+**Decisiones del autor sobre esta ronda**
+- **La densidad se sube por programa.** `ProgramaSeccion.densidad_programada` = tramos `[desde_ft, ppg]` (CAIMÁN-3 intermedia: 9,6 desde 2.500, 10,0 desde 6.000, 10,5 desde 7.000). El pedido del company man (`densidad_del_programa` en el evento) pide el valor del programa a esa profundidad; sin programa vuelve a "actual + subir_densidad_ppg".
+- **Pérdidas según la formación**, no por probabilidad: ver §10.1. La filtración de las gravas dejó de ser un evento guionado.
+- **Las órdenes de sacos van al encuellador o al obrero de patio** (`Turno.ordenar_mezcla(..., quien)`), cada uno con su cola a 50 sacos/h: dos mezclas en paralelo. Kevin Ortiz pasa a ser el obrero de patio.
+- **El reporte cubre 24 h**: la noche simulada después del reporte anterior y el turno de día. Volumen, productos y costo son de las 24 h (`ReporteDiario.horas`); el primer día cubre 12.
 - ~~La regla `transferir_sin_avisar` se disparaba entre dos tanques del activo~~ corregido: solo cuenta si un lado es activo y el otro no.
 - Posible doble conteo de los hidrociclones (en la entrada y por pasada); el LGS se estabiliza cerca del 4 %, razonable.

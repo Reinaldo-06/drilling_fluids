@@ -15,6 +15,9 @@ const RITMO_SACOS_H := 50.0
 ## Con cuadrilla de piso prestada por el driller (emergencias). 🧩
 const RITMO_CUADRILLA_SACOS_H := 250.0
 
+## Quién mezcla, para los avisos: el encuellador o el obrero de patio (que
+## trabaja igual, con su propia cola; decisión del autor).
+var nombre := "Encuellador"
 ## Mezclas pendientes; la primera es la que está haciendo. Cada una:
 ## {producto_id, producto, sacos, hechos, tanque, cuadrilla, minuto_orden}
 var cola: Array = []
@@ -75,12 +78,12 @@ func avanzar(dt_min: float, inventario: RefCounted) -> Dictionary:
 			m["hechos"] = m["sacos"]
 			_cerrar(m, "terminada")
 			avisos.append({"tipo": "termine", "mezcla": m,
-				"texto": "Encuellador: terminé de mezclar %d sacos de %s en %s." % [
+				"texto": "%s: terminé de mezclar %d sacos de %s en %s." % [nombre,
 					roundi(m["sacos"]), m["producto"].nombre, m["tanque"].nombre]})
 		elif sacados < posibles - 1e-9:
 			_cerrar(m, "sin_producto")
 			avisos.append({"tipo": "sin_producto", "mezcla": m,
-				"texto": "Encuellador: se acabó el %s en la bodega. Mezclé %d de %d sacos en %s." % [
+				"texto": "%s: se acabó el %s en la bodega. Mezclé %d de %d sacos en %s." % [nombre,
 					m["producto"].nombre, floori(m["hechos"] + 1e-6), roundi(m["sacos"]), m["tanque"].nombre]})
 	return {"aplicado": aplicado, "avisos": avisos}
 

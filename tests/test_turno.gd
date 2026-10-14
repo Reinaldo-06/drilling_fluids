@@ -141,6 +141,22 @@ func test_encuellador_para_si_se_acaba_el_producto() -> void:
 	verificar_cerca(t.tanque("Succión").lodo.pac - d0, 10.0 * 50.0 / 300.0, 0.01, "entraron 10 sacos de PAC")
 
 
+func test_obrero_de_patio_mezcla_en_paralelo() -> void:
+	# Decisión del autor: la orden de sacos puede ir al encuellador o al obrero de patio.
+	var t := _turno()
+	t.ordenar_mezcla("barita", 25.0, "Succión")
+	var r: Dictionary = t.ordenar_mezcla("barita", 25.0, "Proceso", false, "obrero_patio")
+	verificar(not r.has("error"), "el obrero de patio acepta la orden")
+	t.esperar(31.0)
+	verificar(not t.encuellador.ocupado() and not t.obrero_patio.ocupado(),
+		"25 sacos cada uno a 50 sacos/h: terminan los dos en media hora")
+	verificar_cerca(t.inventario.disponible("barita"), 450.0, 1e-6, "salieron 50 sacos")
+	var textos: Array = t.tomar_avisos().map(func(a): return a["texto"])
+	verificar(textos.any(func(x): return x.begins_with("Obrero de patio:")), "avisa con su nombre")
+	verificar(t.ordenar_mezcla("barita", 5.0, "Succión", false, "driller").has("error"),
+		"el driller no mezcla")
+
+
 # --- Transferencias y reglas ---
 
 func test_transferir_sin_avisar_dispara_la_regla() -> void:

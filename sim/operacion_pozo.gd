@@ -34,6 +34,9 @@ var perforando := true
 ## Equipos que apagó una falla; se vuelven a encender cuando termina.
 var _apagados_por_falla: Array = []
 var _volumen_referencia := -1.0
+## bbl que salieron del activo desde la última lectura del PVT sin que nadie lo
+## supiera (filtración durante la perforación).
+var _sin_avisar_bbl := 0.0
 
 
 ## "guion" es un GuionSeccion (data/guiones/) o null; "formaciones", Formacion
@@ -51,6 +54,10 @@ static func crear(formaciones_: Array, guion_seccion: Resource, rop: float, diam
 
 
 func conectar(turno: RefCounted) -> void:
+	if guion.programa == null:
+		guion.programa = turno.programa
+	monitor.referenciar(turno.tanques)
+	_volumen_referencia = MonitorTanques.volumen_activo(turno.tanques)
 	turno.enganches_antes.append(_perforar)
 	turno.enganches_despues.append(_eventos)
 
@@ -81,6 +88,10 @@ func _perforar(turno: RefCounted, dt: float) -> void:
 		# Neto en superficie: sale el hueco, entra lo que el lodo retiene de los recortes.
 		turno.registrar_volumen("hueco", r["hueco_bbl"] - r["retenidos_bbl"])
 		turno.registrar_volumen("descarte", r["lodo_en_recortes_bbl"])
+		# Filtración hacia una formación permeable: nadie la avisa ni se registra.
+		var filtrado: float = Perforacion.tasa_filtracion(succion.lodo, formacion) * dt / 60.0
+		if filtrado > 0.0:
+			_sin_avisar_bbl += GuionEjecucion.restar_del_activo(turno.tanques, filtrado)
 	var p: Dictionary = control.procesar(succion, dt)
 	turno.registrar_volumen("descarte", p["descarte_bbl"])
 	for e in control.equipos:
@@ -94,7 +105,8 @@ func _eventos(turno: RefCounted, dt: float) -> void:
 	if _volumen_referencia < 0.0:
 		monitor.referenciar(tanques)
 	else:
-		monitor.cambio_avisado(antes - _volumen_referencia)
+		monitor.cambio_avisado(antes - _volumen_referencia + _sin_avisar_bbl)
+	_sin_avisar_bbl = 0.0
 	var minuto: float = turno.reloj.minuto + dt
 	var contexto := {"perforando": not perforacion_detenida(turno)}
 	for a in guion.paso(tanques, turno.profundidad_ft, dt, contexto):

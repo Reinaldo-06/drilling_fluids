@@ -56,6 +56,9 @@ var dia := 1
 var pozo := ""
 var seccion := ""
 var profundidad_ft := 0.0
+## Horas que cubre: 24 (noche anterior + turno de día) o 12 el primer día.
+## Volumen, productos y costo son de todo ese período (decisión del autor).
+var horas := 12.0
 ## Minuto del turno en que se entregó.
 var minuto_entrega := 0.0
 ## true si se entregó con el turno ya terminado.
@@ -136,6 +139,7 @@ static func desde_turno(turno: RefCounted, recomendaciones: Array) -> RefCounted
 	r.dia = turno.dia
 	r.profundidad_ft = turno.profundidad_ft
 	r.minuto_entrega = turno.reloj.minuto
+	r.horas = turno.horas_periodo
 	var programa: Resource = turno.programa
 	if programa != null:
 		r.pozo = programa.pozo
@@ -189,7 +193,7 @@ func vacia(clave: String) -> bool:
 ## Texto plano para depurar o para un primer prototipo de interfaz.
 func texto() -> String:
 	var lineas := PackedStringArray()
-	lineas.append("REPORTE DIARIO DE LODO — %s %s — día %d — %.0f ft" % [pozo, seccion, dia, profundidad_ft])
+	lineas.append("REPORTE DIARIO DE LODO — %s %s — día %d (%.0f h) — %.0f ft" % [pozo, seccion, dia, horas, profundidad_ft])
 	for fila in FILAS:
 		var v = propiedades.get(fila[0])
 		lineas.append("  %-24s %s %s" % [fila[1], "—" if v == null else str(v), fila[2]])
@@ -202,7 +206,7 @@ func texto() -> String:
 		lineas.append("  ¡No cuadra por %.1f bbl!" % volumen["no_explicado"])
 	for p in productos:
 		lineas.append("  %s: %.1f %s, USD %.0f" % [p["producto"], p["sacos"], p["unidad"], p["costo"]])
-	lineas.append("Costo del día USD %.0f, acumulado USD %.0f" % [costo_dia, costo_acumulado])
+	lineas.append("Costo del período USD %.0f, acumulado USD %.0f" % [costo_dia, costo_acumulado])
 	for rec in recomendaciones:
 		lineas.append("  Recomendación: " + Noche.describir(rec))
 	return "\n".join(lineas)

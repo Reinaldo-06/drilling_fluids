@@ -26,6 +26,11 @@ const Props := preload("res://sim/propiedades_lodo.gd")
 ## Propiedad → [mín, máx]. Las claves son las de sim/propiedades_lodo.gd.
 @export var rangos: Dictionary = {}
 
+## Programa de densidad: [[desde_ft, ppg], ...] en orden de profundidad. La
+## densidad se sube por programa a medida que se profundiza (decisión del
+## autor); el company man la pide según esta tabla. Vacío = sin tabla.
+@export var densidad_programada: Array = []
+
 # --- Inventario ---
 ## Ids de data/productos/ que se pueden usar en la sección.
 @export var productos_aprobados: PackedStringArray = []
@@ -189,3 +194,12 @@ static func _num(x: float, decimales: int) -> String:
 	con_miles = entero + con_miles
 	var r := con_miles + ("," + partes[1] if partes.size() > 1 else "")
 	return ("-" if x < 0.0 else "") + r
+
+
+## Densidad que pide el programa a "profundidad_ft" (0 si no hay tabla).
+func densidad_en(profundidad_ft: float) -> float:
+	var ppg := 0.0
+	for tramo in densidad_programada:
+		if profundidad_ft >= float(tramo[0]):
+			ppg = float(tramo[1])
+	return ppg

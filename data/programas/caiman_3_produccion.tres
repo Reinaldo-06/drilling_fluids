@@ -11,6 +11,7 @@ profundidad_desde = 8000.0
 profundidad_hasta = 9600.0
 sistema = "rdf"
 objetivo = "Perforar la arena productora sin dañarla: sólidos de perforación mínimos, puenteo con CaCO₃ dimensionado soluble en ácido y nada de barita."
+densidad_programada = [[8000.0, 9.3]]
 rangos = {
 "densidad": [9.0, 9.6],
 "embudo": [40.0, 55.0],

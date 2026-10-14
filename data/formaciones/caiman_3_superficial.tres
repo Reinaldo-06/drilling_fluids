@@ -12,3 +12,4 @@ base_ft = 2420.0
 porosidad = 0.3
 cic_meq_100g = 2.0
 tipo_arcilla = "caolinita"
+perdida_filtracion_bbl_h = 8.0

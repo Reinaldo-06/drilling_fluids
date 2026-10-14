@@ -129,20 +129,14 @@ func test_viaje_trae_gas_de_viaje_al_volver() -> void:
 	verificar(not ej.disparados.has("c3i_sag"), "sin barita no hay sag")
 
 
-func test_superficial_tranquila_y_el_pvt_ve_la_filtracion() -> void:
+func test_superficial_tranquila_solo_el_viaje() -> void:
+	# La filtración de las gravas ya no es un evento: sale de la formación
+	# (Perforacion.tasa_filtracion; tests/test_operacion_pozo.gd).
 	var tanques := _tanques()
 	var ej := Ejecucion.new(_guion("caiman_3_superficial"))
-	var m: Resource = PVT.duplicate()
-	m.referenciar(tanques)
-	var ids := _perforar(ej, tanques, 0.0, 1100.0)
-	verificar(ids == ["c3s_filtracion_gravas"], "solo la filtración: %s" % [ids])
-	var r: Dictionary = m.leer(tanques)
-	verificar(r["alarma"] and not r["falsa"] and r["tipo"] == "perdida",
-		"el PVT da alarma verdadera de pérdida (%.1f bbl)" % r["diferencia_bbl"])
-	verificar_cerca(ej.perdido_bbl("c3s_filtracion_gravas"), 36.0, 1e-6, "12 bbl/h × 3 h")
-	ids = _perforar(ej, tanques, 1100.0, 2500.0)
+	var ids := _perforar(ej, tanques, 0.0, 2500.0)
 	verificar(ids == ["c3s_viaje_revestimiento"], "al final, el viaje: %s" % [ids])
-	verificar(ej.debrief().size() == 2, "dos renglones de debrief")
+	verificar(ej.debrief().size() == 1, "un renglón de debrief")
 	for d in ej.debrief():
 		verificar(not d["explicacion"].contains("{"), "%s: sin marcadores sin reemplazar" % d["id"])
 
@@ -180,3 +174,15 @@ func test_avisos_y_explicaciones_sin_marcadores() -> void:
 			var a: Dictionary = ej.disparar(e, _tanques(), e.profundidad_ft)
 			verificar(not a["texto"].contains("{"), "%s: aviso con marcador: %s" % [e.id, a["texto"]])
 			verificar(not a["explicacion"].contains("{"), "%s: explicación con marcador" % e.id)
+
+
+func test_company_man_pide_la_densidad_del_programa() -> void:
+	# Decisión del autor: el pedido sigue el programa, no "la actual + 0,3".
+	var tanques := _tanques()
+	var ej := Ejecucion.new(_guion("caiman_3_intermedia"))
+	ej.programa = load("res://data/programas/caiman_3_intermedia.tres")
+	_perforar(ej, tanques, 6000.0, 7100.0)
+	var pedido: Dictionary = ej.exigencias.get("c3i_subir_peso", {})
+	verificar_cerca(pedido.get("peso_minimo_ppg", 0.0), 10.5, 1e-9, "pide los 10,5 ppg del programa")
+	var aviso: Array = ej.historial.filter(func(a): return a["id"] == "c3i_subir_peso")
+	verificar(aviso.size() == 1 and "10,5" in aviso[0]["texto"], "el aviso dice el valor del programa: %s" % str(aviso))

@@ -11,6 +11,7 @@ profundidad_desde = 0.0
 profundidad_hasta = 2500.0
 sistema = "bentonitico"
 objetivo = "Perforar la formación no consolidada hasta 2.500 ft con un lodo barato y desechable que limpie el hueco, y dejarlo listo para correr y cementar el revestimiento superficial."
+densidad_programada = [[0.0, 8.7], [1500.0, 8.9]]
 rangos = {
 "densidad": [8.6, 9.0],
 "embudo": [35.0, 45.0],

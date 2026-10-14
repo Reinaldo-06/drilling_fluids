@@ -40,6 +40,11 @@ const TIPOS_ARCILLA := ["montmorillonita", "illita", "caolinita", "ninguna"]
 @export var contaminante_por_bbl_roca := 0.0
 ## Lutita frágil: se derrumba si la densidad del lodo queda bajo
 ## densidad_minima_estable_ppg, aunque la inhibición química sea buena.
+## Tendencia a pérdidas por filtración (seepage), bbl/h mientras se perfora la
+## formación, con un lodo de filtrado API de referencia y sin puenteo. Las
+## arenas y gravas permeables pierden; las lutitas no (0). Rango de filtración
+## 1–10 bbl/h (simulation-logic.md §10.1). Ver Perforacion.tasa_filtracion.
+@export var perdida_filtracion_bbl_h := 0.0
 @export var fragil_mecanicamente := false
 @export var densidad_minima_estable_ppg := 0.0
 

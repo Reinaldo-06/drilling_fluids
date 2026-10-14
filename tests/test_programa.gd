@@ -136,3 +136,20 @@ func test_formato_de_numeros() -> void:
 	verificar(P._num(8.6, 1) == "8,6", "decimal con coma")
 	verificar(P._num(15000.0, 0) == "15.000", "miles con punto")
 	verificar(P._num(0.5, 2) == "0,50", "rellena decimales")
+
+
+func test_densidad_programada_dentro_del_rango() -> void:
+	# Decisión del autor: la densidad se sube por programa al profundizar.
+	for nombre in SECCIONES:
+		var p := _programa(nombre)
+		verificar(not p.densidad_programada.is_empty(), "%s tiene programa de densidad" % nombre)
+		var previa := 0.0
+		for tramo in p.densidad_programada:
+			var ppg := float(tramo[1])
+			verificar(ppg >= p.rangos["densidad"][0] and ppg <= p.rangos["densidad"][1],
+				"%s: %.1f ppg dentro del rango" % [nombre, ppg])
+			verificar(ppg >= previa, "%s: la densidad no baja al profundizar" % nombre)
+			previa = ppg
+	var inter := _programa("intermedia")
+	verificar_cerca(inter.densidad_en(6500.0), 10.0, 1e-9, "tramo de 6.000 ft")
+	verificar_cerca(inter.densidad_en(7200.0), 10.5, 1e-9, "tramo de 7.000 ft")

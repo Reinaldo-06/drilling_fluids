@@ -11,6 +11,7 @@ profundidad_desde = 2500.0
 profundidad_hasta = 8000.0
 sistema = "kcl_phpa"
 objetivo = "Atravesar la lutita reactiva desde 3.200 ft con inhibición iónica (K⁺) y encapsulamiento (PHPA), manteniendo la densidad dentro de la ventana hasta 8.000 ft."
+densidad_programada = [[2500.0, 9.6], [6000.0, 10.0], [7000.0, 10.5]]
 rangos = {
 "densidad": [9.5, 10.8],
 "embudo": [40.0, 55.0],
