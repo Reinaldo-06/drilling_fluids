@@ -7,4 +7,4 @@ script = ExtResource("1")
 nombre = "Yeso / anhidrita"
 descripcion = "CaSO₄ de la formación. Sube el calcio y baja el pH y las alcalinidades, porque el yeso tiene pH 6–6,5 (§1.4)."
 unidad = "lb/bbl de yeso disuelto"
-aportes = {"ion_ca": 690.0, "ion_so4": 1660.0, "acido_meq": 6.0}
+aportes = {"ion_ca": 690.0, "ion_so4": 1660.0, "acido_meq": 20.0}

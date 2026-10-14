@@ -41,9 +41,11 @@ func test_cal_en_exceso_se_come_el_carbonato_de_sodio() -> void:
 	verificar(lodo.ca < ca_antes, "pero sí baja")
 
 
-# §1.3 — cemento: la dosis del manual elimina justo la cal en exceso
+# §1.3 — cemento: la dosis del manual elimina justo la cal en exceso.
+# Con 1 lb/bbl: parte de la cal se la come el tampón del lignosulfonato y el
+# resto queda sin disolver, que es lo que mide el Pm.
 func test_bicarbonato_trata_cemento() -> void:
-	var lodo = _contaminado("cemento", 0.5)
+	var lodo = _contaminado("cemento", 1.0)
 	var pm_antes: float = lodo.pm()
 	var ca_antes: float = lodo.ca
 	var exceso := F.exceso_de_cal(lodo.pm(), lodo.pf(), lodo.fw())
@@ -103,13 +105,28 @@ func test_oxido_de_cinc_trata_h2s() -> void:
 	verificar(lodo.sulfuro < 10.0, "precipitan los sulfuros (%.0f mg/l)" % lodo.sulfuro)
 
 
-# §5.2 — el desfloculante baja PC y geles
+# §5.2 — el desfloculante baja PC y geles, si va con su soda (1 saco por cada 4, SLB)
 func test_lignosulfonato_desflocula() -> void:
 	var lodo = _contaminado("sal", 8.0)
 	var pc_antes: float = lodo.pc()
 	verificar(lodo.floculacion() > 0.0, "la sal flocula")
 	_producto("lignosulfonato").aplicar(lodo, 4.0)
+	_producto("soda_caustica").aplicar(lodo, 1.0)
+	verificar(lodo.ph() > 9.5, "con su soda el pH queda donde rinde (%.2f)" % lodo.ph())
 	verificar(lodo.pc() < pc_antes, "baja el PC")
+
+
+# §1.5 — trampa: lignosulfonato sin soda baja el pH y rinde poco
+func test_lignosulfonato_sin_soda_rinde_poco() -> void:
+	var con_soda = _contaminado("sal", 8.0)
+	var sin_soda = _contaminado("sal", 8.0)
+	var ph_antes: float = sin_soda.ph()
+	_producto("lignosulfonato").aplicar(sin_soda, 4.0)
+	_producto("lignosulfonato").aplicar(con_soda, 4.0)
+	_producto("soda_caustica").aplicar(con_soda, 1.0)
+	verificar(sin_soda.ph() < ph_antes - 0.3, "el lignosulfonato es ácido (%.2f → %.2f)" % [ph_antes, sin_soda.ph()])
+	verificar(sin_soda.eficacia_lignosulfonato() < 0.7, "y bajo pH 9,5 pierde eficacia")
+	verificar(con_soda.pc() < sin_soda.pc() - 1.0, "con soda desflocula más (PC %.1f vs %.1f)" % [con_soda.pc(), sin_soda.pc()])
 
 
 # §1.5 — la dilución es la única forma económica de bajar cloruros

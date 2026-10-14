@@ -11,9 +11,11 @@ const Base := preload("res://sim/lodos_base.gd")
 const COLUMNAS := ["fv", "vp", "pc", "geles", "filtrado", "ph", "pm", "pf", "mf", "cl", "ca", "solidos"]
 
 ## Cambio mínimo para contar como "sube" o "baja" (unidades de cada columna).
+## Pm va con 0,05 ml: es una titulación de lodo entero (se lee al 0,05–0,1 ml) y
+## los sólidos inertes la bajan apenas al quitar agua (Pf·Fw), sin que nadie lo vea.
 const UMBRAL := {
 	"fv": 1.0, "vp": 0.5, "pc": 0.5, "geles": 0.5, "filtrado": 0.3, "ph": 0.05,
-	"pm": 0.02, "pf": 0.02, "mf": 0.02, "cl": 50.0, "ca": 10.0, "solidos": 0.1,
+	"pm": 0.05, "pf": 0.02, "mf": 0.02, "cl": 50.0, "ca": 10.0, "solidos": 0.1,
 }
 
 ## archivo, cantidad aplicada, flechas en el orden de COLUMNAS.

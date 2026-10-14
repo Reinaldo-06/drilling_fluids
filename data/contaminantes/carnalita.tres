@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="Contaminante" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/contaminante.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+nombre = "Carnalita (magnesio)"
+descripcion = "KMgCl₃·6H₂O de una sección salina (mud-engineer-reference.md §1.5–1.6). Aporta Mg²⁺, K⁺ y Cl⁻, y la arcilla suelta calcio por intercambio. El magnesio se come el OH⁻ precipitando Mg(OH)₂, un gel que espesa: el pH cae y la soda cáustica empeora la viscosidad. La dureza total sigue alta aunque se trate el calcio con carbonato de sodio. Por lb/bbl disuelta (PM 277,85; Fw ≈ 0,96): 10,7 mmol/l de Mg²⁺ y K⁺ y 32 de Cl⁻."
+unidad = "lb/bbl de carnalita disuelta"
+aportes = {"ion_mg": 260.8, "ion_k": 419.5, "ion_cl": 1141.0, "intercambio_ca": 10.0}

@@ -13,10 +13,10 @@ static func disperso_lignosulfonato() -> EstadoLodoScript:
 	lodo.lignosulfonato = 2.0
 	lodo.pac = 0.5
 	lodo.cal_exceso = 0.2
-	lodo.oh = 1.7                  # pH 10,0
 	lodo.ca = 120.0
 	lodo.na = 650.0
 	lodo.cl = 1000.0
-	lodo.alc_org_pf = 0.12
-	lodo.alc_org_mf = 0.24
+	# pH 10 con la soda justa: deja OH⁻ ≈ 1,7 mg/l y el tampón del lignosulfonato
+	# y la bentonita cargado (es lo que da Pf y Mf; ver EstadoLodo).
+	lodo.fijar_ph(10.0)
 	return lodo
