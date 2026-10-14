@@ -30,9 +30,9 @@ Documentos hermanos: `docs/game-design-mechanics.md` (diseño) · `docs/rig-tank
 | 10 | Eventos: pérdidas, influjo, gas de conexión, maniobras (viajes) desde la vista del ingeniero | ✅ hecho |
 | 11 | Temperatura del lodo: entrada y salida, efecto en reología | ✅ hecho |
 | 12 | **Modelo consolidado**: variables de estado y qué cambia en cada hora de juego (une los temas 1–11) | ✅ hecho (propuesta) |
-| 13 | Lutitas reactivas: MBT, consumo de KCl y PHPA, recortes blandos | pendiente |
-| 14 | Lodo de matada: cómo prepara el ingeniero el peso de matada y el lodo pesado de reserva | pendiente |
-| 15 | Asentamiento de barita (*sag*) en tanques y en el pozo | pendiente |
+| 13 | Lutitas reactivas: MBT, consumo de KCl y PHPA, recortes blandos | ✅ hecho |
+| 14 | Lodo de matada: cómo prepara el ingeniero el peso de matada y el lodo pesado de reserva | ✅ hecho |
+| 15 | Asentamiento de barita (*sag*) en tanques y en el pozo | ✅ hecho |
 
 ---
 
@@ -344,3 +344,55 @@ Cada contaminante (un Resource) declara, por unidad que entra:
 | Mezcla normal | 50 sacos/h | tema 8 👷 |
 | Bentonita al 100 % | 6 h | tema 8 |
 | Chequeo rápido | ≤ 10 min | tema 3 👷 |
+
+---
+
+## 13. Lutitas reactivas
+
+**Qué es real.**
+- El **K⁺ del KCl** se intercambia con el sodio o el calcio de las arcillas y las mantiene unidas, lo que limita el hinchamiento. Es un inhibidor que **se consume**. ✅ (patente US 6818596 + SLB; coincide con `mud-programs.md`, sistema KCl/PHPA)
+- El **PHPA recubre** la pared del pozo y **encapsula los recortes**: no se hidratan, no se pegan entre sí ni a la broca. También se consume, porque se va pegado a los recortes. ✅ (patentes US 7351680 y US 6818596)
+- Un **MBT que sube** indica que entra arcilla reactiva y que la inhibición se está quedando corta. ⚠️ (guía de proveedor; coherente con `mud-engineer-reference.md` §7)
+- El **embolamiento de la broca** (*bit balling*) es más común en lutitas blandas y con brocas PDC. Agregar más inhibidor **no siempre** lo resuelve. ⚠️ (un estudio)
+
+**Cómo entra al juego.** 🧩
+- En lutita reactiva, cada hora de perforación **consume K⁺ y PHPA** en proporción a los sólidos perforados (tema 6.1), y lo que no se inhibe entra como arcilla activa: **sube el MBT, la PV y el YP**.
+- Señales: recortes **blandos y pegajosos** en las zarandas (observación visual), MBT en aumento, K⁺ en baja.
+- Hace falta una prueba de **K⁺** en el sistema KCl/PHPA. Queda como prueba ampliada; su procedimiento está pendiente de verificar.
+
+Fuentes: [US 7351680 — High performance water-based mud system](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/7351680) · [US 6818596 — Dry mix for water based drilling fluid](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/6818596) · [KLA-CURE hydration suppressant — SLB](https://www.slb.com/products-and-services/innovating-in-oil-and-gas/well-construction/drilling-fluids/drilling-fluid-additives/shale-inhibitors/kla-cure-hydration-suppressant) · [Bit balling — Journal of Petroleum Research (RIPI)](https://pr.ripi.ir/article_1493_en.html)
+
+---
+
+## 14. Lodo de matada
+
+**Qué es real.**
+- **Lodo de matada**: lodo lo bastante pesado para que su presión hidrostática detenga el influjo. Tiene que estar **disponible rápido**, o se puede perder el control del pozo. ✅ (SLB Glossary, `domain-research.md` §4.1 con la fórmula del peso de matada)
+- Se prepara **densificando parte del sistema o un lodo de reserva** con barita. ✅ (SLB Glossary, material de curso)
+- Si el lodo ya tiene muchos sólidos, densificarlo sin diluir antes puede dejarlo **demasiado espeso para bombear**. Una **prueba piloto** en el laboratorio dice cuánto diluir antes de agregar la barita. ⚠️ (SLB Glossary; coherente con `mud-engineer-reference.md` §2.4 y §5.1)
+- La barita es el producto que **más se consume** en un pozo. ✅ (dos fuentes)
+- No encontré una norma pública de stock mínimo de barita en sitio; depende del operador y de la jurisdicción. ⚠️
+
+**Cómo entra al juego.** 🧩
+- Ante un kick, el driller entrega la presión de cierre y el jugador calcula el **peso de matada** (`domain-research.md` §4.1) y los **sacos** (`mud-engineer-reference.md` §2.1).
+- Con 250 sacos/h (tema 8), el tiempo de preparación es el reloj del evento. **Tener lodo pesado en reserva** o barita suficiente en bodega decide si la emergencia sale bien.
+- **Prueba piloto** como acción de laboratorio general: el jugador mezcla una muestra pequeña con el tratamiento que piensa aplicar y ve el resultado antes de gastar producto en el sistema. Cuesta tiempo (propuesta: 15 min), pero evita errores caros. Sirve para cualquier tratamiento, no solo para densificar.
+
+Fuentes: [Kill-weight mud — SLB Energy Glossary](https://glossary.slb.com/en/terms/k/kill-weight_mud) · [Weighted mud — SLB Energy Glossary](https://glossary.slb.com/en/terms/w/weighted_mud) · [Mud weighting — SlideShare](https://www.slideshare.net/slideshow/mud-weighting/56307173) · [Especificación de barita — OGDCL](https://ogdcl.com/sites/default/files/tender-file/18088.PDF) · [Mud Weight Window — AES Fluids](https://aesfluids.com/?p=1456)
+
+---
+
+## 15. Asentamiento de barita (*sag*)
+
+**Qué es real.**
+- La barita se asienta sobre todo a **bajas tasas de corte**: lodo poco viscoso a baja velocidad, sin circular o en pozos desviados. Hay sag **estático** (sin circulación) y **dinámico** (circulando lento). ✅ (varios artículos AADE, OGJ, Drilling Manual)
+- La lectura de **6 RPM** del Fann es una aproximación gruesa del riesgo; los **geles** ayudan a evitar el sag estático. ✅
+- La mayoría de los casos de campo revisados coincidieron con **bajar revestimiento**, sobre todo **después de adelgazar el lodo**. ⚠️ (una fuente)
+- Se han visto variaciones de densidad de hasta **±4 ppg en el flowline** al circular después de un sag. ✅ (AADE + OGJ)
+- En tanques, sin agitación, la barita también se asienta (`rig-tank-system.md` §4, regla 6). ✅
+
+**Cómo entra al juego.** 🧩
+- Si el jugador **adelgaza demasiado un lodo densificado** (6 RPM y geles bajos) y luego hay un tiempo sin circular (viaje, revestimiento), al volver a circular el chequeo rápido de densidad en la caja de llegada muestra **lodo liviano y después pesado**. Es una consecuencia retardada de una decisión anterior.
+- Es una trampa del tipo "arreglé un problema y creé otro": bajar viscosidad para controlar la PV puede causar sag.
+
+Fuentes: [Barite sag causes, indications & prevention — Drilling Manual](https://drillingmanual.com/barite-sag-prevention-causes-indications) · [Monitoring of barite sag important in deviated drilling — Oil & Gas Journal](https://www.ogj.com/home/article/17238331/monitoring-of-barite-sag-important-in-deviated-drilling) · [AADE — barite sag](https://www.aade.org/download_file/2687/490) · [AADE — barite sag (2)](https://www.aade.org/download_file/1439/396) · [Rheological characterization — Nordic Rheology Society](https://nordicrheologysociety.org/Content/Transactions/2003/Ahmadi%20Tehrani%20Rheological%20Characterization%20of%20Oil-Based%20Drilling%20Fluids%20%E2%80%93.pdf)
