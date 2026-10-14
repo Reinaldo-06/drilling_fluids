@@ -17,7 +17,17 @@ Hallazgos:
 
 ## Crítico
 
-### C1. Las reglas le revelan el contaminante al jugador
+### ~~C1. Las reglas le revelan el contaminante al jugador~~ ✅ resuelto
+
+**Resolución.**
+
+- Las reglas se evalúan sobre las lecturas del tanque (`Props.de_medido`); lo no medido es NAN y no dispara nada.
+- Para el "después" se usa lo medido más el cambio que causó la acción (`Props.proyectar`).
+- Las reglas con `debrief_real = true` también se revisan contra el estado real. Si solo ahí se disparan, quedan en el debrief con `fuente: "real"`, sin aviso.
+- El cierre del día usa solo lo medido.
+- Pruebas en `tests/test_turno.gd`.
+
+Hallazgo original:
 
 **Qué pasa.** Las reglas `al_tratar` se evalúan sobre el estado interno del lodo, no sobre lo medido.
 
@@ -45,7 +55,16 @@ Al cerrar el día, lo no medido se rellena con el valor real.
 - Las que leen `real` van al debrief, con el texto «lo que de verdad había».
 - Al cerrar el día, usar solo lo medido.
 
-### C2. El volumen no se conserva y la succión se vacía perforando
+### ~~C2. El volumen no se conserva y la succión se vacía perforando~~ ✅ resuelto
+
+**Resolución.**
+
+- El hueco nuevo sale de todos los tanques del activo según su volumen.
+- Si no alcanza el lodo, no se perfora.
+- `Tanque.minimo_bbl()` vale por omisión el 25 % de la capacidad de la succión 🧩 (pregunta 4). Bajo ese mínimo, el driller para las bombas (caudal 0, no se perfora) y avisa con su explicación. Cuando vuelve el nivel, vuelven las bombas.
+- Pruebas en `tests/test_operacion_pozo.gd`, incluido que el balance cuadra.
+
+Hallazgo original:
 
 **Qué pasa.** Un sondeo perfora 17½" a 80 ft/h:
 
@@ -217,7 +236,7 @@ Fuentes: [EP 0339762](https://data.epo.org/publication-server/rest/v1.2/patents/
 
 Propuesta: guardar el filtrado por tanque y por hora, y mostrar la edad de la muestra.
 
-**I8. La casilla de calcio del reporte.** `FILAS` dice que el Ca lo mide `dureza`, pero `dureza.tres` devuelve `dureza_total`.
+**~~I8. La casilla de calcio del reporte.~~** ✅ El Ca lo llena `calcio_magnesio` y la dureza total, `dureza`. Sigue abierta la pregunta 7 (qué especifica el programa). `FILAS` dice que el Ca lo mide `dureza`, pero `dureza.tres` devuelve `dureza_total`.
 
 Propuesta: alinear las claves y decidir si el programa pide Ca o dureza (pregunta 7).
 

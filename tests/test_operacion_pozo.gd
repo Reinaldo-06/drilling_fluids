@@ -135,3 +135,45 @@ func test_la_orden_de_sacos_de_pac_reduce_lo_perdido_en_el_turno() -> void:
 	var perdido_con: float = -con.entregar_reporte().volumen["no_explicado"]
 	verificar(perdido_sin > 20.0, "sin tratar se pierden ~8 bbl/h: %.1f bbl en 4 h" % perdido_sin)
 	verificar(perdido_con < perdido_sin - 3.0, "con PAC se pierde menos: %.1f contra %.1f" % [perdido_con, perdido_sin])
+
+
+# --- Volumen: se conserva y la succión tiene mínimo (auditoría C2) ---
+
+func test_el_hueco_sale_de_todo_el_activo_y_las_bombas_paran_sin_nivel() -> void:
+	var impermeable: Resource = SUPERFICIAL.duplicate()
+	impermeable.perdida_filtracion_bbl_h = 0.0
+	var par := _turno(null, 500.0, impermeable)
+	var t = par[0]
+	var o = par[1]
+	o.rop_ft_h = 80.0
+	t.esperar(240.0)
+	var proceso: float = t.tanque("Proceso").volumen_bbl
+	var succion: float = t.tanque("Succión").volumen_bbl
+	verificar(absf(proceso - succion) < 0.15 * proceso,
+		"los dos tanques del activo bajan parejo (proceso %.0f, succión %.0f)" % [proceso, succion])
+	t.esperar(470.0)
+	verificar(o.bombas_paradas, "con la succión bajo el mínimo, el driller para las bombas")
+	verificar(t.tanque("Succión").volumen_bbl >= t.tanque("Succión").minimo_bbl() - 15.0,
+		"no se sigue vaciando: %.0f bbl" % t.tanque("Succión").volumen_bbl)
+	var avisos: Array = t.tomar_avisos()
+	verificar(avisos.any(func(a): return a["tipo"] == "bombas_paradas"), "el driller avisa por qué paró")
+	var profundidad: float = t.profundidad_ft
+	t.esperar(5.0)
+	verificar_cerca(t.profundidad_ft, profundidad, 1e-9, "sin bombas no se perfora")
+	var r = t.entregar_reporte()
+	verificar(r.volumen["cuadra"], "el volumen se conserva: %s" % str(r.volumen))
+
+
+func test_con_volumen_de_la_reserva_las_bombas_vuelven() -> void:
+	var par := _turno(null, 500.0)
+	var t = par[0]
+	var o = par[1]
+	t.tanque("Succión").volumen_bbl = 100.0
+	t.tanque("Proceso").volumen_bbl = 100.0
+	t.esperar(10.0)
+	verificar(o.bombas_paradas, "100 bbl en una succión de 500: bajo el mínimo")
+	t.avisar_driller()
+	t.transferir("Reserva", "Succión", 100.0)
+	t.esperar(10.0)
+	verificar(not o.bombas_paradas, "con nivel, vuelven las bombas")
+	verificar(t.caudal_gpm > 0.0, "y el caudal")

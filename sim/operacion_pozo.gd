@@ -31,6 +31,9 @@ var diametro_pulg := 0.0
 ## El driller está perforando (false: circulando sin avanzar, p. ej. en una
 ## conexión larga o esperando órdenes).
 var perforando := true
+## El driller paró las bombas por falta de nivel en la succión.
+var bombas_paradas := false
+var _caudal_guardado := 0.0
 ## Equipos que apagó una falla; se vuelven a encender cuando termina.
 var _apagados_por_falla: Array = []
 var _volumen_referencia := -1.0
@@ -70,7 +73,7 @@ func reconocer_alarma(turno: RefCounted) -> void:
 
 
 func perforacion_detenida(turno: RefCounted) -> bool:
-	return not perforando or guion.perforacion_detenida(turno.tanques)
+	return not perforando or bombas_paradas or guion.perforacion_detenida(turno.tanques)
 
 
 # ======================= Enganches =======================
@@ -80,23 +83,54 @@ func _perforar(turno: RefCounted, dt: float) -> void:
 	var succion: Resource = turno.tanque_principal()
 	if succion == null:
 		return
+	_revisar_succion(turno, succion)
 	var formacion: Resource = Perforacion.formacion_en(formaciones, turno.profundidad_ft)
 	if formacion != null and not perforacion_detenida(turno):
-		var r: Dictionary = Perforacion.paso(succion, formacion, rop_ft_h, diametro_pulg, dt, control)
-		turno.profundidad_ft += r["pies"]
-		turno.volumen_pozo_bbl += r["hueco_bbl"]
-		# Neto en superficie: sale el hueco, entra lo que el lodo retiene de los recortes.
-		turno.registrar_volumen("hueco", r["hueco_bbl"] - r["retenidos_bbl"])
-		turno.registrar_volumen("descarte", r["lodo_en_recortes_bbl"])
-		# Filtración hacia una formación permeable: nadie la avisa ni se registra.
-		var filtrado: float = Perforacion.tasa_filtracion(succion.lodo, formacion) * dt / 60.0
-		if filtrado > 0.0:
-			_sin_avisar_bbl += GuionEjecucion.restar_del_activo(turno.tanques, filtrado)
+		var activos: Array = turno.tanques.filter(func(t): return t.en_sistema_activo)
+		var r: Dictionary = Perforacion.paso(succion, formacion, rop_ft_h, diametro_pulg, dt, control, activos)
+		if r["volumen_faltante_bbl"] > 0.0:
+			_parar_bombas(turno, "No hay lodo en el activo para llenar el hueco: faltan %.0f bbl." % r["volumen_faltante_bbl"])
+		elif r["pies"] > 0.0:
+			turno.profundidad_ft += r["pies"]
+			turno.volumen_pozo_bbl += r["hueco_bbl"]
+			# Neto en superficie: sale el hueco, entra lo que el lodo retiene de los recortes.
+			turno.registrar_volumen("hueco", r["hueco_bbl"] - r["retenidos_bbl"])
+			turno.registrar_volumen("descarte", r["lodo_en_recortes_bbl"])
+			# Filtración hacia una formación permeable: nadie la avisa ni se registra.
+			var filtrado: float = Perforacion.tasa_filtracion(succion.lodo, formacion) * dt / 60.0
+			if filtrado > 0.0:
+				_sin_avisar_bbl += GuionEjecucion.restar_del_activo(turno.tanques, filtrado)
 	var p: Dictionary = control.procesar(succion, dt)
 	turno.registrar_volumen("descarte", p["descarte_bbl"])
 	for e in control.equipos:
 		if e.encendido:
 			turno.horas_equipos[e.tipo] = turno.horas_equipos.get(e.tipo, 0.0) + dt / 60.0
+
+
+## Succión bajo su mínimo → la bomba aspira aire: el driller para las bombas.
+## Vuelven cuando el nivel se recupera (auditoría C2).
+func _revisar_succion(turno: RefCounted, succion: Resource) -> void:
+	var minimo: float = succion.minimo_bbl()
+	if not bombas_paradas and succion.volumen_bbl < minimo:
+		_parar_bombas(turno, "La succión bajó a %.0f bbl, bajo el mínimo de %.0f: la bomba empieza a aspirar aire." % [
+			succion.volumen_bbl, minimo])
+	elif bombas_paradas and succion.volumen_bbl >= minimo:
+		bombas_paradas = false
+		turno.caudal_gpm = _caudal_guardado
+		turno.avisos.append({"minuto": turno.reloj.minuto, "tipo": "bombas_reanudadas",
+			"quien_avisa": "driller", "texto": "Ya hay nivel en la succión. Arrancamos bombas y seguimos perforando."})
+
+
+func _parar_bombas(turno: RefCounted, causa: String) -> void:
+	if bombas_paradas:
+		return
+	bombas_paradas = true
+	_caudal_guardado = turno.caudal_gpm
+	turno.caudal_gpm = 0.0
+	turno.avisos.append({"minuto": turno.reloj.minuto, "tipo": "bombas_paradas", "quien_avisa": "driller",
+		"texto": "Inge, paré las bombas. %s Mándeme volumen al activo para seguir." % causa,
+		"explicacion": "La bomba toma de la succión. Con el nivel bajo se forma un vórtice, entra aire y la bomba pierde la succión; además, sin lodo en superficie no se puede mantener lleno el pozo. Mantener volumen en el activo (construir en la reserva y transferir con aviso al driller) es trabajo del ingeniero de lodos.",
+		"referencia": "docs/auditoria-logica.md C2; rig-tank-system.md §3"})
 
 
 func _eventos(turno: RefCounted, dt: float) -> void:

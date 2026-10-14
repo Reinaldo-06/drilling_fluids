@@ -28,6 +28,11 @@ const ROLES := ["llegada", "trampa", "proceso", "succion", "reserva", "fractanqu
 @export_enum("llegada", "trampa", "proceso", "succion", "reserva", "fractanque", "pildora") var rol := "proceso"
 @export var agitado := true
 @export var en_sistema_activo := true
+## Volumen por debajo del cual la bomba que succiona de este tanque forma
+## vórtice y aspira aire: el driller para las bombas (auditoría C2). Negativo =
+## por omisión según el rol (FRACCION_MINIMA_SUCCION en la succión, 0 en el
+## resto). 🧩 Pregunta abierta al autor: volumen mínimo real en su taladro.
+@export var volumen_minimo_bbl := -1.0
 
 var lodo: EstadoLodoScript = EstadoLodoScript.new()
 ## lb por bbl de lodo de bentonita agregada que aún no hidrata.
@@ -36,6 +41,16 @@ var bentonita_sin_hidratar := 0.0
 var edad_bentonita_h := 0.0
 ## 0 = todo en suspensión, 1 = fondo lleno de sólidos asentados.
 var sedimento := 0.0
+
+
+## 🧩 Fracción de la capacidad que se mantiene como mínimo en la succión.
+const FRACCION_MINIMA_SUCCION := 0.25
+
+
+func minimo_bbl() -> float:
+	if volumen_minimo_bbl >= 0.0:
+		return volumen_minimo_bbl
+	return capacidad_bbl * FRACCION_MINIMA_SUCCION if rol == "succion" else 0.0
 
 
 static func crear(nombre_: String, capacidad: float, rol_: String, volumen := 0.0,

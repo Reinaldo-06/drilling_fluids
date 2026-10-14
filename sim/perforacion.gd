@@ -135,8 +135,11 @@ static func avanzar_con_tiempo(tanques: Array, tanque_activo: TanqueScript, form
 
 
 ## Un paso de perforación (dt ≤ 10 min recomendado). Ver avanzar_perforacion.
+## "activos": tanques del sistema activo que comparten el llenado del hueco
+## (por omisión, solo "t"). Si no alcanza el lodo para llenar el hueco nuevo, no
+## se perfora (auditoría C2): "volumen_faltante_bbl" dice cuánto faltó.
 static func paso(t: TanqueScript, formacion: FormacionScript, rop_ft_h: float,
-		diametro_pulg: float, dt_min: float, control: RefCounted) -> Dictionary:
+		diametro_pulg: float, dt_min: float, control: RefCounted, activos: Array = []) -> Dictionary:
 	var r := _resultado_vacio()
 	if rop_ft_h <= 0.0 or dt_min <= 0.0:
 		return r
@@ -161,10 +164,18 @@ static func paso(t: TanqueScript, formacion: FormacionScript, rop_ft_h: float,
 	var dispersos := generados * fraccion_dispersa(formacion, inhib)
 	r["dispersos_bbl"] = dispersos
 
-	# 1. El hueco nuevo se llena con lodo del activo.
-	var faltante := maxf(0.0, hueco - t.volumen_bbl)
-	t.volumen_bbl = maxf(0.0, t.volumen_bbl - hueco)
-	r["volumen_faltante_bbl"] = faltante
+	# 1. El hueco nuevo se llena con lodo del activo, repartido entre sus tanques
+	# según el volumen de cada uno (están comunicados por las igualadoras).
+	var tanques: Array = activos if not activos.is_empty() else [t]
+	var disponible := 0.0
+	for x in tanques:
+		disponible += x.volumen_bbl
+	if disponible - hueco <= 0.0:
+		var vacio := _resultado_vacio()
+		vacio["volumen_faltante_bbl"] = hueco - disponible
+		return vacio
+	for x in tanques:
+		x.volumen_bbl -= hueco * x.volumen_bbl / disponible
 	if t.volumen_bbl <= 0.0:
 		return r
 	var volumen_al_llegar := t.volumen_bbl
