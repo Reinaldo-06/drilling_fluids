@@ -29,7 +29,7 @@ Documentos hermanos: `docs/game-design-mechanics.md` (diseño) · `docs/rig-tank
 | 9 | Reporte diario de lodo: qué contiene, costos, inventario | ✅ hecho |
 | 10 | Eventos: pérdidas, influjo, gas de conexión, maniobras (viajes) desde la vista del ingeniero | ✅ hecho |
 | 11 | Temperatura del lodo: entrada y salida, efecto en reología | ✅ hecho |
-| 12 | **Modelo consolidado**: variables de estado y qué cambia en cada hora de juego (une los temas 1–11) | pendiente |
+| 12 | **Modelo consolidado**: variables de estado y qué cambia en cada hora de juego (une los temas 1–11) | ✅ hecho (propuesta) |
 | 13 | Lutitas reactivas: MBT, consumo de KCl y PHPA, recortes blandos | pendiente |
 | 14 | Lodo de matada: cómo prepara el ingeniero el peso de matada y el lodo pesado de reserva | pendiente |
 | 15 | Asentamiento de barita (*sag*) en tanques y en el pozo | pendiente |
@@ -278,3 +278,69 @@ Fuentes: [Pérdidas de circulación — Univ. de Bagdad](https://joe.uobaghdad.e
 - Temperatura de salida = función de la profundidad y del caudal (modelo simple, a calibrar). Sirve para el efecto de la temperatura en la reología (tema 6.2) y para la degradación de polímeros.
 
 Fuentes: [Temperature-dependent behaviour of WBM rheological models (PMC)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6197678/) · [TerraTherm product bulletin — Newpark](https://www.newpark.com/assets/pdfs/TerraTherm%20Product%20Bulletin.pdf) · [Drilling fluid rheology in geothermal drilling, a review — Geothermics](https://gdr.openei.org/files/1446/Geothermics_Significance%20and%20complications%20of%20drilling%20fluid%20rheology%20in%20geothermal%20drilling%20A%20review.pdf) · [US 6807854 — Thermal profile of a drilling fluid](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/6807854) · [Energies 10(3):268 (2017)](https://ideas.repec.org/a/gam/jeners/v10y2017i3p268-d91303.html)
+
+---
+
+## 12. Modelo consolidado de simulación
+
+Une los temas 1–11 en una sola lógica. Todo este tema es **diseño** 🧩 construido sobre reglas ya verificadas; cada paso cita el tema de origen.
+
+### 12.1 Idea central: guardar composición, derivar propiedades
+
+El estado de cada tanque **no guarda PV, YP ni filtrado**. Guarda **de qué está hecho el lodo**, y las propiedades se calculan a partir de eso cuando alguien corre una prueba.
+
+| Grupo | Variables guardadas |
+|---|---|
+| Volumen | bbl, temperatura |
+| Fases | % agua, % aceite, **% barita**, **% sólidos livianos** (bentonita + perforados), **aire atrapado** |
+| Química del agua | pH, OH⁻ libre, Ca²⁺, Mg²⁺, Cl⁻, K⁺, CO₃²⁻, HCO₃⁻, sulfuros |
+| Productos | lb/bbl activos de cada producto (bentonita hidratada, lignosulfonato, lignito, PAC/almidón, XC, PHPA, cal en exceso…) y su **edad** (para hidratación y degradación) |
+| Estado interno | **floculación** (0–1) |
+
+**La floculación es la pieza clave.** Todo contaminante químico (cemento, yeso, sal, carbonatos, H₂S) **sube la floculación**; los desfloculantes la bajan. De la floculación salen YP, geles y filtrado. Así, **por construcción, los síntomas físicos de todos los contaminantes químicos se parecen**, y lo único que los distingue es la química del agua. El invariante 1 queda garantizado por el modelo, no por cuidado al escribir cada contaminante. (`mud-engineer-reference.md` §1.1)
+
+**Propiedades derivadas** (funciones puras, se calibran jugando):
+- Densidad ← fases (balance de masas, `mud-engineer-reference.md` §2), menos el aire si la balanza no es presurizada (observación visual).
+- **PV ← sólidos** (% livianos y barita) + polímeros + temperatura. (§5.1 del manual; tema 6.2)
+- **YP y geles ← floculación** + bentonita + XC. (§5.2 del manual)
+- Filtrado ← bentonita, controladores de filtrado vivos (no degradados) y floculación.
+- Pm, Pf, Mf, dureza, cloruros ← química del agua directamente.
+- MBT ← bentonita + arcilla perforada.
+
+### 12.2 Paso de simulación
+
+**Un paso = 10 min de juego.** Las tasas están en "por hora" y se escalan. Orden de cada paso:
+
+1. **Perforación** (si el driller está perforando): profundidad += ROP. El hueco nuevo se llena con lodo del activo. Entran sólidos `capacidad × ROP × (1 − porosidad)`. La formación del programa aporta su contaminante si corresponde. (temas 1, 6.1)
+2. **Control de sólidos**: cada equipo encendido remueve su fracción. Los hidrociclones con lodo densificado botan barita. Todo descarte resta volumen. (tema 7)
+3. **Acciones en curso**: transferencias por válvulas abiertas, mezcla del encuellador a 50 sacos/h o 250 con cuadrilla, prehidratación avanzando. (temas 4, 8; `rig-tank-system.md` §4)
+4. **Química y cinética**: los tratamientos reaccionan de a poco, la bentonita hidrata hasta llegar al 100 % a las 6 h, los polímeros se degradan con la temperatura y las bacterias, entra CO₂ por el embudo. (temas 6.2, 8; `mud-engineer-reference.md` §1.7)
+5. **Homogenización**: el activo se mezcla en un ciclo completo `(volumen del pozo + activo) / caudal`. Lo que pasa en el fondo llega a la caja de llegada un retorno de fondo después. (tema 2)
+6. **Eventos**: los guionados del nivel y los aleatorios (pérdidas, gas). (tema 10)
+7. **Detección**: el PVT compara volumen esperado contra real. Una transferencia sin avisar dispara una falsa alarma. Se actualizan las observaciones visuales. (temas 4, 11; observación visual)
+
+### 12.3 Tiempo del jugador
+
+- Caminar, observar, correr pruebas y mover válvulas **consumen minutos** del reloj del turno. Al avanzar el reloj corren los pasos de simulación que correspondan.
+- Las pruebas con espera (geles, filtrado, retorta) corren en paralelo al jugador.
+- Una prueba **lee el estado en el momento y lugar de la muestra**: succión, caja de llegada o un tanque. Si el lodo cambió después, la prueba ya está vieja.
+
+### 12.4 Contaminante como dato
+
+Cada contaminante (un Resource) declara, por unidad que entra:
+- qué agrega a la **química del agua** (por ejemplo, cemento: Ca²⁺ + OH⁻; yeso: Ca²⁺ + SO₄²⁻ y baja el pH; sal: Na⁺ + Cl⁻);
+- cuánto sube la **floculación**, escalado por el MBT (`mud-engineer-reference.md` §1.1: MBT < 15 lb/bbl → poco efecto);
+- la **vulnerabilidad por sistema** (`mud-programs.md`, tabla de vulnerabilidades);
+- sus **tratamientos válidos e inválidos**, cada uno con su explicación (invariante 4).
+
+### 12.5 Calibración inicial (CAIMÁN-3 superficial)
+
+| Dato | Valor | Origen |
+|---|---|---|
+| Retorno de fondo | ~38 min | tema 2 |
+| Ciclo completo | ~84 min | tema 2 |
+| Sólidos generados | ~17 bbl/h | tema 6.1 |
+| Sólidos que quedan (80 % de eficiencia) | ~3,3 bbl/h | tema 6.1 |
+| Mezcla normal | 50 sacos/h | tema 8 👷 |
+| Bentonita al 100 % | 6 h | tema 8 |
+| Chequeo rápido | ≤ 10 min | tema 3 👷 |
