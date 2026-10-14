@@ -84,10 +84,10 @@ Fuentes: [AAPG Wiki — cálculo de lag](https://wiki.aapg.org/Special:MobileDif
 - **Frecuencias de referencia** de una guía del sector (no del estándar API): densidad, viscosidad de embudo y pH **por parada o cada hora**; reología completa, geles, filtrado API y cloruros **2 a 4 veces al día**; retorta y HTHP **una vez al día**. ⚠️ (una fuente; contrastar)
 
 **Cómo entra al juego.** Esto ajusta el diseño del chequeo de rutina:
-- **Chequeos rápidos frecuentes** (densidad, embudo, pH): baratos, varias veces por turno. Son la segunda capa de alarma, junto con la observación visual. 🧩
+- **Chequeos rápidos frecuentes** (densidad, embudo, pH): varias veces por turno, **los hace el propio jugador** y cuestan **10 min de juego como máximo** en total. Son la segunda capa de alarma, junto con la observación visual. 👷
 - **Chequeo completo** (Fann, geles, filtrado, químicas): una o dos veces por turno de 12 h, en vez de "uno al inicio". 🧩
 - **Retorta**: una vez al día, no en cada chequeo. 🧩
-- Pendiente del tema 5: confirmar si los chequeos rápidos los hace el **encuellador** y le reporta al ingeniero. Si es así, puede ser un personaje que trae datos al jugador.
+- En el campo, las mediciones rápidas las hace un técnico de la empresa de fluidos. En el juego **las hace el jugador** para mantenerlo en el ciclo de observación. 👷
 
 Fuentes: [Mud report — SLB Energy Glossary](https://glossary.slb.com/en/terms/m/mud_report) · [How to perform mud testing during drilling operations — Rigzone](https://www.rigzone.com/insights/operational-questions-8/how-to-perform-mud-testing-during-drilling-operations-1009) · [API RP 13B-1 (ficha del estándar)](https://standards.nimonik.com/products/api/rp-13b-1/) · [What does testing tell me about drilling fluids — The Driller](https://www.thedriller.com/articles/91946-what-does-testing-tell-me-about-drilling-fluids?v=preview)
 

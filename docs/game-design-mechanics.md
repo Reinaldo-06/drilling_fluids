@@ -90,6 +90,8 @@ El chequeo de rutina incluye las pruebas químicas básicas, así que podría pa
 
 Set básico que se corre al inicio de cada turno. Los tiempos son una **propuesta inicial** a calibrar jugando, sobre un turno de 12 h (720 min).
 
+**Chequeo rápido** (decisión del autor): densidad, embudo Marsh y pH, hecho por el propio jugador varias veces por turno. **No pasa de 10 min de juego.** Es la alarma numérica entre chequeos completos, junto con la observación visual. Frecuencias de campo en `simulation-logic.md` §3.
+
 | Prueba | Muestra | Tiempo activo | Espera | Revela |
 |---|---|---|---|---|
 | **Balanza de lodo** (atmosférica) | Lodo | 5 min | — | Densidad. **Lee bajo si hay aire o gas atrapado** |
