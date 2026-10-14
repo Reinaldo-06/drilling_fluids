@@ -26,9 +26,9 @@ Documentos hermanos: `docs/game-design-mechanics.md` (diseño) · `docs/rig-tank
 | 6 | Cómo cambian las propiedades al perforar: sólidos, temperatura, degradación | ✅ hecho |
 | 7 | Control de sólidos: eficiencia de cada equipo, tasa de dilución | ✅ hecho (faltan % de eficiencia por equipo) |
 | 8 | Mezcla con el embudo: sacos por hora, tiempo de hidratación de bentonita y polímeros | ✅ hecho |
-| 9 | Reporte diario de lodo: qué contiene, costos, inventario | pendiente |
-| 10 | Eventos: pérdidas, influjo, gas de conexión, maniobras (viajes) desde la vista del ingeniero | pendiente |
-| 11 | Temperatura del lodo: entrada y salida, efecto en reología | pendiente |
+| 9 | Reporte diario de lodo: qué contiene, costos, inventario | ✅ hecho |
+| 10 | Eventos: pérdidas, influjo, gas de conexión, maniobras (viajes) desde la vista del ingeniero | ✅ hecho |
+| 11 | Temperatura del lodo: entrada y salida, efecto en reología | ✅ hecho |
 
 ---
 
@@ -190,7 +190,7 @@ Fuentes: [Solids Control Equipment in Oil & Gas — Drilling Manual](https://www
 
 **Cómo entra al juego.**
 - **Ritmos de mezcla del juego** (punto de partida, a calibrar jugando): 🧩
-  - **Encuellador solo: 50 sacos/h.** Es la mezcla normal del turno.
+  - **Encuellador solo: 50 sacos/h.** Es la mezcla normal del turno. 👷 (confirmado por el autor)
   - **Encuellador + cuadrilla de piso: 250 sacos/h.** Solo cuando el driller presta gente: en una emergencia (kick, densificar a peso de matada) o si el jugador lo pide y el driller acepta.
 - **Densificar lleva horas.** El ejemplo del manual (1.548 sacos de barita, `mud-engineer-reference.md` §2.1) son **~6 h con cuadrilla** o **~31 h con el encuellador solo**. Por eso densificar a peso de matada es una carrera contra el tiempo, y por eso conviene tener lodo pesado en reserva. 🧩
 - **El encuellador mezcla** (decisión del autor): el jugador ordena producto, cantidad, embudo y tanque; el encuellador tarda según el ritmo de sacos. Mientras tanto, el jugador hace otra cosa. 👷
@@ -198,3 +198,79 @@ Fuentes: [Solids Control Equipment in Oil & Gas — Drilling Manual](https://www
 - **Polímeros a la carrera** → ojos de pescado: el producto rinde menos y aparece la observación de grumos en la malla. 🧩
 
 Fuentes: [Mud hopper — SLB Energy Glossary](https://glossary.slb.com/terms/m/mud_hopper) · [Mud hopper — Trenchlesspedia](https://trenchlesspedia.com/definition/4208/mud-hopper-horizontal-directional-drilling) · [Ritmos de mezcla de barita — oilandgasbmps.org](https://oilandgasbmps.org/view.php?id=4540) · [Drilling fluid mixing hopper — PP Drilling Fluids (proveedor)](https://ppdrillingfluids.in/drilling-fluid-mixing-hopper/) · [Prehydration — SLB Energy Glossary](https://glossary.slb.com/terms/p/prehydration) · [Prehidratación de bentonita — Trisakti](https://e-journal.trisakti.ac.id/index.php/petro/article/download/16154/9498) · [Tips for productivity on HDD mixing systems — The Driller](https://thedriller.com/articles/91812-tips-for-productivity-on-hdd-mixing-systems) · [Derrickhand — Wikipedia](https://en.wikipedia.org/wiki/Derrickhand) · [Mixing Hoppers — ficha de proveedor (HMHW)](https://hmhw.com/wp-content/uploads/2023/09/Mixing-Hoppers.pdf) · [Increase mud weight by adding barite — Drilling Formulas](https://www.drillingformulas.com/increase-mud-weight-by-adding-barite/) · [Increase Mud Weight — KWS](https://docs.kws.tn/formulas/3/mud-weight.html) · [Bentonite Mud — Drilling for Gas](https://drillingforgas.com/drilling-fluids/mud-types/bentonite-mud/) · [How to mix bentonite spud mud on the rig — Globat Mud School](https://blog.globatmudschool.com/how-to-mix-bentonite-spud-mud-on-the-rig/) · [Effect of bentonite prehydration time — Geofluids (Wiley), 2021](https://onlinelibrary.wiley.com/doi/10.1155/2021/9957159) · [Drilling Mud Guide — Lone Star Drills](https://www.lonestardrills.com/everything-you-need-to-know-about-mud/) · [Prehydrate — SLB Energy Glossary](https://glossary.slb.com/en/terms/p/prehydrate)
+
+---
+
+## 9. Reporte diario de lodo
+
+**Qué es real.** El reporte diario incluye: ✅ (SLB Glossary, PetroSkills, OilGasLeads, plantillas públicas de reporte)
+- **Propiedades**: densidad de entrada y salida, reología (VP, PC, geles), filtrado, químicas (pH, cloruros, alcalinidades, dureza).
+- **Análisis de sólidos**: sólidos de alta y baja gravedad, sólidos perforados.
+- **Horas de uso de los equipos de control de sólidos.**
+- **Temperatura** de entrada y salida del pozo (exigida en al menos un reglamento público).
+- **Productos usados**, inventario y **costo del día y acumulado**.
+- **Contabilidad de volumen**: de dónde salió y a dónde fue cada barril.
+- **Recomendaciones** para el turno siguiente.
+
+**Cómo entra al juego.** Es el cierre del día (paso 8 del ciclo). 🧩
+- El reporte **se llena solo con las pruebas que el jugador corrió**. Una casilla vacía es visible y el company man la pregunta.
+- **Balance de volumen**: volumen inicial + lodo construido − hueco nuevo − descarte de sólidos − pérdidas = volumen final. Si no cuadra, hay una pérdida que nadie vio. Es un acertijo propio.
+- **Costo acumulado contra presupuesto** de la sección: el company man reacciona si se pasa.
+- **Recomendaciones**: el jugador elige qué deja indicado para el día siguiente; el debrief compara con lo que pasó.
+
+Fuentes: [Mud report — SLB Energy Glossary](https://glossary.slb.com/en/terms/m/mud_report) · ["Clear as Mud?" How to read a mud report — PetroSkills](https://petroskills.com/mudwebinar) · [How to decode a Daily Drilling Report — OilGasLeads](https://oilgasleads.com/how-to-decode-a-daily-drilling-report-ddr/) · [Daily mud reports, pozo geotérmico HON-GT-01 (plantilla pública)](https://geothermie.nl/images/Onderzoeken-en-rapporten/31_07_15_Verstoppingen/E15014_appx_3.4_GWW_HON-GT-01-S2_Daily_mud_reports.pdf) · [Annex 5 — Daily Drilling Report (Autoridad danesa)](https://offshore.at.dk/en/regulations/wea-guidelines/well-operations/annex-5/)
+
+---
+
+## 10. Eventos desde la vista del ingeniero
+
+### 10.1 Pérdida de circulación
+
+**Qué es real.** La clasificación por tasa **varía entre fuentes y operadoras**. Rangos frecuentes para lodo base agua: ✅ (varias fuentes coinciden en el orden de magnitud, no en los cortes)
+- **Filtración** (*seepage*): hasta ~10–25 bbl/h.
+- **Parcial**: ~25–100 bbl/h (hay fuentes que la extienden mucho más).
+- **Severa**: >100 bbl/h, hasta 500 bbl/h o más.
+- **Total**: no vuelve lodo a superficie.
+- El tipo de formación importa tanto como la tasa (alta permeabilidad, fisuras, fracturas). ✅
+- Ojo: con la ROP también se va lodo pegado a los recortes; hay que descontarlo antes de declarar una pérdida. ⚠️
+
+**Cómo entra al juego.** 🧩
+- El evento llega por el **nivel de tanques** (tema 4) o por el driller. El jugador mide la tasa con el balance de volumen.
+- Respuesta de fluidos según la severidad: filtración → material de pérdida fino en el sistema; parcial → **píldora de material de pérdida** (`mud-engineer-reference.md` §3); severa o total → píldora más grande, bajar densidad si la ventana lo permite y avisar al company man.
+- Mientras tanto hay que **reponer volumen** rápido, lo que se cruza con los ritmos de mezcla (tema 8).
+
+### 10.2 Gas
+
+**Qué es real.** ✅ (AAPG Wiki, Spec2000, Rigzone)
+- **Gas de fondo** (*background*): el que sale al triturar la roca; es la línea base.
+- **Gas de conexión**: entra cuando se paran las bombas para hacer una conexión. Significa que en ese momento el lodo está **bajo balance** en alguna zona.
+- **Gas de viaje**: el que aparece después de sacar o meter tubería, al circular el fondo arriba.
+- Gas de fondo en aumento y picos de conexión **anuncian una zona permeable o con sobrepresión**. El mud logger avisa al driller y al company man, que pueden pedir **subir densidad**.
+
+**Cómo entra al juego.** 🧩
+- El mud logger reporta gas de fondo y picos de conexión. Si los picos crecen, el company man pide subir la densidad (por ejemplo +0,2 ppg) y el jugador ejecuta la densificación.
+- El gas llega a superficie **un retorno de fondo después** (tema 2) y se ve como espuma o burbujas, con la balanza leyendo bajo (observación visual).
+
+### 10.3 Maniobras (viajes)
+
+**Qué es real.** Durante un viaje no se perfora; el pozo se llena desde el tanque de viaje y el gas de viaje aparece al volver a circular. ✅ (temas 4 y 10.2)
+
+**Cómo entra al juego.** 🧩 Un viaje es un tiempo sin entrada de sólidos ni consumo de hueco, ideal para tratar el sistema, construir lodo y preparar píldoras. Al volver a circular puede aparecer gas de viaje.
+
+Fuentes: [Pérdidas de circulación — Univ. de Bagdad](https://joe.uobaghdad.edu.iq/index.php/main/article/download/210/184/361) · [Lost circulation zones and LCM strategy — iFactory](https://ifactoryapp.com/industries/oil-and-gas/lost-circulation-zones-lcm-treatment-strategy) · [Loss of Circulation Guide — Chevron Phillips](https://www.cpchem.com/sites/default/files/2020-04/LOSS%20OF%20CIRCULATION%20Guide.pdf) · [US 10479918 — Two-component lost circulation pill](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/10479918) · [Universidad de Benin — pérdidas de circulación](https://repository.uniben.edu/sites/default/files/2026-04/FINAL.pdf) · [AAPG Wiki — gas de fondo, conexión y viaje](https://wiki.aapg.org/Special:MobileDiff/16391) · [Mud logging basics — Spec2000](https://spec2000.net/log-data-acquisition/logging-mud-logging-and-mud-gas-logging-mwd.htm) · [Role of mud logging — Rigzone](https://www.rigzone.com/insights/how-it-works-3/what-is-the-role-of-mud-logging-in-monitoring-drilling-conditions-545)
+
+---
+
+## 11. Temperatura del lodo
+
+**Qué es real.**
+- El lodo sale del pozo más caliente de lo que entra; el reporte registra **temperatura de entrada y salida**. ✅ (tema 9)
+- Es habitual reportar la reología **a 120 °F** (49 °C) y no a temperatura ambiente, para acercarse a las condiciones de flowline. ✅ (boletín de producto Newpark + estudio PMC con pruebas a 120 °F)
+- El gradiente geotérmico y el caudal son los factores que más pesan en la temperatura del lodo en el pozo. La expansión térmica del lodo puede bajar su densidad efectiva en pozos calientes. ⚠️
+- No hay un valor estándar de temperatura en el flowline; depende del pozo. ⚠️
+
+**Cómo entra al juego.** 🧩
+- El Fann de la caseta tiene una **copa térmica**: la prueba se corre a 120 °F. Correrla en frío da lecturas más altas que las reales y el juego lo puede marcar.
+- Temperatura de salida = función de la profundidad y del caudal (modelo simple, a calibrar). Sirve para el efecto de la temperatura en la reología (tema 6.2) y para la degradación de polímeros.
+
+Fuentes: [Temperature-dependent behaviour of WBM rheological models (PMC)](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6197678/) · [TerraTherm product bulletin — Newpark](https://www.newpark.com/assets/pdfs/TerraTherm%20Product%20Bulletin.pdf) · [Drilling fluid rheology in geothermal drilling, a review — Geothermics](https://gdr.openei.org/files/1446/Geothermics_Significance%20and%20complications%20of%20drilling%20fluid%20rheology%20in%20geothermal%20drilling%20A%20review.pdf) · [US 6807854 — Thermal profile of a drilling fluid](https://image-ppubs.uspto.gov/dirsearch-public/print/downloadPdf/6807854) · [Energies 10(3):268 (2017)](https://ideas.repec.org/a/gam/jeners/v10y2017i3p268-d91303.html)
