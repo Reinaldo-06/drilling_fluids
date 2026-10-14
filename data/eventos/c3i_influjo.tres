@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/evento.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "c3i_influjo"
+titulo = "Influjo: el pozo fluye"
+tipo = "influjo"
+disparador = "condicion"
+profundidad_ft = 7400.0
+condicion = "props.densidad < 10.2"
+profundidad_hasta_ft = 8000.0
+sidpp_psi = 260.0
+tvd_ft = 7400.0
+ganancia_bbl = 15.0
+quien_avisa = "driller"
+aviso = "¡Ganancia de {ganancia} bbl en tanques! Pozo cerrado. SIDPP {sidpp} psi a {tvd} ft de TVD, con lodo de {densidad} ppg. Necesito peso de matada ya."
+aviso_es_observacion = false
+explicacion = "El gas de conexión venía avisando y la densidad no se subió: la presión de la formación superó a la hidrostática y el pozo fluyó. El driller cerró el pozo (eso no es tu trabajo); el tuyo es el lodo de matada: KMW = MW + SIDPP / (0,052 × TVD) = {densidad} + {sidpp} / (0,052 × {tvd}) = {peso_matada_exacto} ppg, redondeado arriba a {peso_matada} ppg. Con barita a la mano y lodo pesado en reserva, la emergencia dura horas; sin eso, días."
+referencia = "simulation-logic.md §14; domain-research.md §4.1"

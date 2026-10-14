@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/evento.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "c3s_viaje_revestimiento"
+titulo = "Viaje para bajar el revestimiento superficial"
+tipo = "viaje"
+disparador = "profundidad"
+profundidad_ft = 2500.0
+duracion_h = 12.0
+detiene_perforacion = true
+quien_avisa = "driller"
+aviso = "Llegamos a {profundidad} ft, el punto de revestimiento. Sacamos tubería para bajar el revestidor y cementar: no se perfora por unas horas."
+aviso_es_observacion = false
+explicacion = "Durante un viaje no entran sólidos ni se consume hueco: es el momento de tratar el sistema, construir lodo en reserva y prepararse para la sección siguiente. En CAIMÁN-3 lo que viene es el cemento de la zapata contra un sistema KCl/PHPA, el más vulnerable al calcio."
+referencia = "simulation-logic.md §10.3"

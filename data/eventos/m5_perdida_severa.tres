@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/evento.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "m5_perdida_severa"
+titulo = "Pérdida severa en la base de la sal"
+tipo = "perdida_circulacion"
+disparador = "profundidad"
+profundidad_ft = 4300.0
+duracion_h = 2.0
+tasa_perdida_bbl_h = 150.0
+quien_avisa = "driller"
+aviso = "¡Perdimos casi todo el retorno! Los tanques bajan rápido. Necesito volumen y una píldora."
+explicacion = "Una pérdida de {tasa} bbl/h es {clasificacion}: en dos horas se van 300 bbl. Lo primero es reponer volumen para que el pozo no quede vacío (la columna que baja puede provocar un influjo); después, una píldora grande de material de pérdida, bajar la densidad si la ventana lo deja y avisar al company man."
+referencia = "reference-wells.md §6 (MÉDANO-5); simulation-logic.md §10.1"

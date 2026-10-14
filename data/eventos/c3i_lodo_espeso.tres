@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/evento.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "c3i_lodo_espeso"
+titulo = "Lodo espeso en la llegada"
+tipo = "aviso"
+disparador = "condicion"
+profundidad_ft = 2500.0
+condicion = "contexto.disparados.has('c3i_cemento_zapata') and props.ph > 10.5"
+profundidad_hasta_ft = 4000.0
+quien_avisa = "encuellador"
+aviso = "Ingeniero, el lodo está saliendo más espeso en la caja de llegada y la zaranda empieza a rebosar."
+explicacion = "El encuellador ve el síntoma, no la causa: un lodo que se espesa puede ser sólidos, cemento, yeso, sal o carbonatos. Solo las pruebas químicas (Pm, Pf/Mf, dureza, cloruros) dicen cuál. Aquí el pH pasó de 10,5 después de rotar la zapata: la pista apunta al cemento, pero hay que medirlo."
+referencia = "simulation-logic.md §12.1 (invariante 1)"

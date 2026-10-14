@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="Evento" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/evento.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "c3i_gas_viaje"
+titulo = "Gas de viaje al volver a fondo"
+tipo = "gas_viaje"
+disparador = "condicion"
+profundidad_ft = 5500.0
+condicion = "contexto.disparados.has('c3i_viaje_broca') and not contexto.activos.has('c3i_viaje_broca')"
+profundidad_hasta_ft = 8000.0
+gas_unidades = 90.0
+quien_avisa = "mud_logger"
+aviso = "Fondo arriba después del viaje: pico de {gas} unidades de gas. Ya está bajando."
+explicacion = "El gas de viaje es el que entra mientras el pozo está quieto y sale al circular el primer fondo arriba. Un pico que baja enseguida es normal; si no baja, o se repite en cada viaje, el lodo está corto de peso. En superficie se ve como espuma y la balanza atmosférica lee bajo: usa la presurizada."
+referencia = "simulation-logic.md §10.2"
