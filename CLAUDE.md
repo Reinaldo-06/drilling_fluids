@@ -25,7 +25,7 @@ Leer en este orden antes de proponer nada:
 - **Unidades de campo** (ppg, bbl, psi, lb/bbl, lb/100 ft², cP, mg/l). Las fórmulas traen constantes embebidas (0,052 · 1470 · 35); no convertir a métrico.
 - **Pozos ficticios** con rangos plausibles. Nunca usar datos de pozos reales.
 - **Overworld caminable** en vista cenital, estética pixel art estilo Pokémon FireRed.
-- **Tiempo por turnos / días de pozo.**
+- **Tiempo por turnos / días de pozo.** El jugador juega el turno de día (12 h); el turno de noche corre simulado según las recomendaciones que dejó en el reporte.
 - **Feedback explícito al fallar**: el juego explica el porqué, no solo marca el error.
 - Documentación y UI **en español**.
 - **Motor: Godot 4.7.2 (stable)**, la última estable de mantenimiento al momento de decidir. No usar betas ni versiones de desarrollo.
@@ -60,7 +60,6 @@ Leer en este orden antes de proponer nada:
 
 **Pendientes de investigación:**
 - Procedimiento de **desplazamiento / cambio de fluido**: secuencia en `rig-tank-system.md` §5, ya validada en parte por el autor. Quedan abiertos el criterio para desviar retornos y la composición del circuito corto (§7).
-- **Turnos por día de pozo**: propuesta en `game-design-mechanics.md` (turno de día jugado, turno de noche simulado según las recomendaciones del reporte). Falta confirmación del autor.
 - **Gráficos I y II** de tratamiento de carbonatos: son imágenes del PDF y no sobrevivieron a la extracción de texto. **Solo recuperables en la máquina local** (ver abajo).
 - Estética concreta: paleta, tamaño de tile, sprite del personaje.
 

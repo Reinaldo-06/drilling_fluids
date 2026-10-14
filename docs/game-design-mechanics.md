@@ -275,14 +275,14 @@ Ejemplos del catálogo (se amplía con la matriz del reference):
 
 ## Pendientes
 
-1. **Con el autor**: criterio para desviar retornos en el desplazamiento y composición del circuito corto (`rig-tank-system.md` §7); cuántos turnos juega el jugador por día de pozo (ver abajo).
+1. **Con el autor**: criterio para desviar retornos en el desplazamiento y composición del circuito corto (`rig-tank-system.md` §7).
 2. Recuperar los **Gráficos I y II** de tratamiento de carbonatos leyendo esas páginas del PDF como imagen (no sobrevivieron a la extracción de texto).
 3. Calibrar constantes de los modelos simplificados y los tiempos de las pruebas — se ajustan jugando.
 4. Estética concreta: paleta, tamaño de tile, sprite del personaje.
 
-### Pregunta abierta: turnos por día de pozo
+### Turnos por día de pozo (decisión del autor)
 
-El diseño usa un turno de 12 h pero el ciclo se llama "día de pozo" (24 h). Propuesta para decidir:
+Un día de pozo son 24 h:
 - El jugador **juega el turno de día** (12 h).
 - El **turno de noche corre simulado**: el pozo sigue perforando, entra sólido y se consume volumen. Lo que pase depende de las **recomendaciones** que el jugador dejó en el reporte (por ejemplo, "mantener 1 lb/bbl de PHPA cada 100 bbl construidos").
 - Al día siguiente el jugador encuentra las consecuencias. Así el reporte y las recomendaciones tienen peso real.
