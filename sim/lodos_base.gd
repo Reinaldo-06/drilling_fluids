@@ -20,3 +20,22 @@ static func disperso_lignosulfonato() -> EstadoLodoScript:
 	# y la bentonita cargado (es lo que da Pf y Mf; ver EstadoLodo).
 	lodo.fijar_ph(10.0)
 	return lodo
+
+
+## KCl/PHPA de la intermedia de CAIMÁN-3 (mud-programs.md, sistema 3): inhibición
+## iónica con K⁺ y PHPA. pH 9,3 (rango 9–9,5), Ca bajo, poca arcilla. Calibración
+## provisional 🧩 (auditoría I11: falta ajustar todas las propiedades al programa).
+static func kcl_phpa() -> EstadoLodoScript:
+	var lodo := EstadoLodoScript.new()
+	lodo.bentonita = 6.0
+	lodo.frac_lgs = 0.02
+	lodo.phpa = 1.0
+	lodo.xc = 0.75
+	lodo.almidon = 4.0
+	lodo.pac = 0.5
+	lodo.ca = 80.0
+	lodo.k = 20000.0
+	lodo.na = 500.0
+	lodo.cl = 20000.0
+	lodo.fijar_ph(9.3)
+	return lodo

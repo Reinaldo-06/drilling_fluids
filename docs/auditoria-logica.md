@@ -87,7 +87,28 @@ Hallazgo original:
 - Si no hay volumen, `pies` = 0.
 - Agregar una prueba de conservación (tanques + pozo).
 
-### C3. La catástrofe del cemento en KCl/PHPA no existe
+### ~~C3. La catástrofe del cemento en KCl/PHPA no existe~~ ✅ resuelto (parcial)
+
+**Resolución (constantes 🧩; pregunta 2 abierta).**
+
+- El PHPA se degrada en el tiempo (`Cinetica.degradar_phpa`) por dos mecanismos:
+  - **Calcio.** Desde ~400 mg/l entrecruza y precipita el PHPA, que queda como `phpa_danado`. Este espesa el lodo: PC +14 y gel +3 por lb/bbl.
+  - **pH.** Sobre 10 lo hidroliza y lo deja inactivo.
+- Con 0,5 lb/bbl de cemento en el KCl/PHPA, el PHPA baja de 1,0 a ~0,2 lb/bbl en 8 h. PC y geles salen de programa, el filtrado sube a ~13 ml y se pierde la inhibición.
+- Un pretratamiento con bicarbonato evita el entrecruzamiento. Tratar con bicarbonato y luego ácido cítrico lo frena.
+- Fuentes: [US 5028341](https://patents.justia.com/patent/5028341), [Drilling Manual](https://www.drillingmanual.com/mud-contamination-cement-precautions/).
+- Pruebas: `tests/test_phpa.gd` (fallan 9 si se apaga la degradación) y `tests/test_operacion_pozo.gd`.
+- Se agregó `LodosBase.kcl_phpa()`, un lodo provisional.
+
+**Sigue pendiente de este hallazgo:**
+
+- Observación de olor a amoníaco (`nh3`).
+- Prueba de PHPA (I10).
+- La floculación por MBT con piso de 0,2 queda como está.
+- Prueba de Tabla 4 por sistema, con el orden spud < disperso < KCl/PHPA.
+- El campo `vulnerabilidades` de los sistemas sigue sin leerlo ningún código.
+
+Hallazgo original:
 
 **Qué pasa.** Se agrega 1 lb/bbl de cemento:
 
@@ -266,7 +287,7 @@ Propuesta: gradiente geotérmico como dato, temperatura de salida simple y degra
 
 Fuentes: [OGJ, PHPA](https://ogj.com/home/article/17219889/method-aids-calculation-of-phpa-depletion-rates), [US 5557103](https://patents.google.com/patent/US5557103), [SLB XC](https://glossary.slb.com/terms/x/xc_polymer), [SLB bactericida](https://glossary.slb.com/terms/b/bactericide).
 
-**I11. Solo existe un lodo base, el disperso.** CAIMÁN-3 usa bentonítico, KCl/PHPA y RDF. El KCl/PHPA armado según su programa da filtrado 12,8 ml (el programa pide 4–6) y MBT 0.
+**I11. Solo existe un lodo base, el disperso.** (Parcial: ahora hay un `kcl_phpa()` provisional, con filtrado ~9 ml frente a los 4–6 del programa y floculación 0,27 por los cloruros.) CAIMÁN-3 usa bentonítico, KCl/PHPA y RDF. El KCl/PHPA armado según su programa da filtrado 12,8 ml (el programa pide 4–6) y MBT 0.
 
 Propuesta: un lodo base por sistema, como dato, con una prueba de que cumple su programa.
 

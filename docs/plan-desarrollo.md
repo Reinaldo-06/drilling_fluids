@@ -14,7 +14,7 @@
 | `main` | mismo commit que la rama |
 | Commit | `8235e75` |
 | Godot | 4.7.2.stable.official.ed1daf0bf |
-| Pruebas | **234 pasando, 0 fallas** (23 archivos en `tests/`); después de C4, 236 |
+| Pruebas | **234 pasando, 0 fallas** (23 archivos en `tests/`); después de C4, 236; después de C3, 245 |
 
 Las 228 del contexto eran anteriores a C1 y C2; el estado real es 234.
 
@@ -24,7 +24,7 @@ Las 228 del contexto eran anteriores a C1 y C2; el estado real es 234.
 |---|---|---|
 | C1. Reglas revelan el contaminante | ✅ corregido, con regresiones | `tests/test_turno.gd` |
 | C2. Volumen y succión mínima | ✅ corregido, con regresiones | `tests/test_operacion_pozo.gd` |
-| C3. Cemento en KCl/PHPA | ⏳ abierto | `docs/auditoria-logica.md` |
+| C3. Cemento en KCl/PHPA | ✅ corregido (parcial: faltan olor a amoníaco y prueba de PHPA) | `tests/test_phpa.gd` |
 | C4. Cemento de zapata como formación | ✅ corregido (supuesto: 80 ft de cemento) | `tests/test_operacion_pozo.gd` |
 | I8. Calcio/dureza en el reporte | ✅ corregido (queda la pregunta 7) | `sim/reporte_diario.gd` |
 

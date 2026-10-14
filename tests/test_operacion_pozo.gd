@@ -187,11 +187,12 @@ const CEMENTO := preload("res://data/formaciones/caiman_3_cemento_zapata.tres")
 const INTERMEDIA_SUP := preload("res://data/formaciones/caiman_3_intermedia_superior.tres")
 
 
-func _intermedia() -> Array:
+func _intermedia(kcl_phpa := false) -> Array:
+	var base := (Base.kcl_phpa() if kcl_phpa else Base.disperso_lignosulfonato())
 	var tanques := [
-		Tanque.crear("Proceso", 500.0, "proceso", 400.0, Base.disperso_lignosulfonato()),
-		Tanque.crear("Succión", 500.0, "succion", 400.0, Base.disperso_lignosulfonato()),
-		Tanque.crear("Reserva", 500.0, "reserva", 300.0, Base.disperso_lignosulfonato(), false),
+		Tanque.crear("Proceso", 500.0, "proceso", 400.0, base.copiar()),
+		Tanque.crear("Succión", 500.0, "succion", 400.0, base.copiar()),
+		Tanque.crear("Reserva", 500.0, "reserva", 300.0, base.copiar(), false),
 	]
 	var t = Turno.crear(tanques, PROGRAMA_INT, {"barita": 500.0})
 	t.caudal_gpm = 600.0
@@ -232,3 +233,19 @@ func test_el_cemento_contamina_una_sola_vez() -> void:
 	var historial: Array = par[1].guion.historial
 	verificar(historial.filter(func(a): return a["id"] == "c3i_cemento_zapata").size() == 1, "un solo aviso")
 	verificar(not historial.any(func(a): return a["tipo"] == "contaminacion"), "ningún evento contamina además")
+
+
+func test_rotar_el_cemento_en_kcl_phpa_degrada_el_polimero() -> void:
+	# El escenario central de CAIMÁN-3 (auditoría C3): el cemento de la zapata
+	# cae en el KCl/PHPA de la intermedia. Horas después el lodo no cumple.
+	var par := _intermedia(true)
+	var t = par[0]
+	var pc0: float = t.tanque("Succión").lodo.pc()
+	t.esperar(120.0)        # rota los 80 ft de cemento y sale a formación nueva
+	t.esperar(240.0)        # y cuatro horas más circulando
+	var s = t.tanque("Succión").lodo
+	verificar(s.phpa < 0.6, "queda %.2f lb/bbl de PHPA de 1,0" % s.phpa)
+	verificar(s.phpa_danado > 0.1, "hay PHPA entrecruzado (%.2f)" % s.phpa_danado)
+	verificar(s.pc() > pc0 + 3.0, "el lodo se espesó: PC %.1f → %.1f" % [pc0, s.pc()])
+	verificar(s.filtrado_api() > t.tanque("Reserva").lodo.filtrado_api() + 1.0, "y perdió control de filtrado frente a la reserva")
+	verificar_cerca(t.tanque("Reserva").lodo.phpa, 1.0, 1e-9, "la reserva, aislada, sigue intacta")

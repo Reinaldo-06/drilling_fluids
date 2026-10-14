@@ -46,6 +46,9 @@ const DENSIDAD_CACO3_PPG := 22.6       ## SG 2,71
 const VP_POR_LB_PHPA := 2.0
 const PC_POR_LB_PHPA := 3.0
 const GEL_POR_LB_PHPA := 0.5
+## PHPA entrecruzado por calcio: "el fluido se vuelve viscoso" (US 5028341). 🧩
+const PC_POR_LB_PHPA_DANADO := 14.0
+const GEL_POR_LB_PHPA_DANADO := 3.0
 const VP_POR_LB_ALMIDON := 0.8
 const CONTROL_FILTRADO_ALMIDON := 0.5  ## el PAC es 0,6
 const CONTROL_FILTRADO_PHPA := 0.2
@@ -124,6 +127,9 @@ var almidon := 0.0           ## controlador de filtrado; tolera sal (mud-program
 var lignito := 0.0           ## desfloculante y control de filtrado; entra ácido como el lignosulfonato
 var amina := 0.0             ## inhibidor principal del sistema amina/PHPA (simulation-logic §13.2)
 var arcilla_activa := 0.0    ## arcilla perforada reactiva (suma al MBT)
+## PHPA entrecruzado por calcio (auditoría C3): ya no encapsula ni controla
+## filtrado, y espesa el lodo. Lo genera sim/cinetica.gd (degradar_phpa).
+var phpa_danado := 0.0
 ## Cal en exceso: reserva alcalina sin disolver, en lb/bbl de Ca(OH)₂. No se
 ## disuelve sola; solo reacciona con ácidos, bicarbonatos y carbonatos. Es lo que
 ## separa Pm de Pf·Fw. (Los finos de cemento, que sí se disuelven solos, van aparte.)
@@ -286,7 +292,8 @@ func vp() -> float:
 
 func pc() -> float:
 	return 0.8 * bentonita + 4.0 * xc + 25.0 * floculacion() + mg_oh2 / MG_OH2_POR_PUNTO_PC \
-		+ PC_POR_LB_PHPA * phpa + PC_POR_LB_ARCILLA_ACTIVA * arcilla_activa
+		+ PC_POR_LB_PHPA * phpa + PC_POR_LB_ARCILLA_ACTIVA * arcilla_activa \
+		+ PC_POR_LB_PHPA_DANADO * phpa_danado
 
 
 func lectura_600() -> float:
@@ -303,7 +310,8 @@ func va() -> float:
 
 func gel_10s() -> float:
 	return 0.25 * bentonita + 0.3 * lgs_pct() + 12.0 * floculacion() + 1.5 * xc + mg_oh2 / MG_OH2_POR_PUNTO_GEL \
-		+ GEL_POR_LB_PHPA * phpa + GEL_POR_LB_ARCILLA_ACTIVA * arcilla_activa
+		+ GEL_POR_LB_PHPA * phpa + GEL_POR_LB_ARCILLA_ACTIVA * arcilla_activa \
+		+ GEL_POR_LB_PHPA_DANADO * phpa_danado
 
 
 func gel_10min() -> float:
@@ -535,7 +543,7 @@ const _CAMPOS_FILTRADO := ["oh", "co3", "hco3", "ca", "mg", "na", "k", "cl", "so
 	"mg_oh2", "co2", "tampon_base", "alc_org_pf", "alc_org_mf"]
 const _CAMPOS_POR_BBL := ["frac_barita", "frac_lgs", "frac_aceite", "frac_caco3", "bentonita",
 	"lignosulfonato", "lignito", "pac", "xc", "phpa", "almidon", "amina", "arcilla_activa",
-	"cal_exceso", "finos_cemento"]
+	"phpa_danado", "cal_exceso", "finos_cemento"]
 
 
 ## Todo lo que está "por bbl de lodo" se reparte en (1 + v) bbl. Si lo que entra

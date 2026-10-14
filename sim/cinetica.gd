@@ -63,12 +63,46 @@ static func paso(tanques: Array, dt_min: float, caudal_gpm: float, volumen_pozo_
 		if t.volumen_bbl <= 0.0:
 			continue
 		disolver_finos(t.lodo, dt_min, ciclo)
+		degradar_phpa(t.lodo, dt_h)
 		hidratar_bentonita(t, dt_h)
 		asentar(t, dt_h)
 	homogenizar_activo(tanques, dt_min, caudal_gpm, volumen_pozo_bbl)
 
 
 # ======================= Cinética =======================
+
+## Degradación del PHPA (auditoría C3; simulation-logic.md §13.3). Dos
+## mecanismos, con constantes 🧩 de calibración:
+## - Calcio: el Ca²⁺ entrecruza o precipita el PHPA; el daño empieza hacia los
+##   400 mg/l (las fuentes hablan de 500 a 5.000 mg/l como dañino y el programa
+##   KCl/PHPA pide Ca ≤ 200). Lo precipitado queda como phpa_danado y espesa.
+##   US 5028341 (https://patents.justia.com/patent/5028341).
+## - pH alto: sobre ~10 el PHPA se hidroliza a poliacrilato y pierde su función.
+const PHPA_CA_UMBRAL_MG_L := 400.0
+const PHPA_CA_ESCALA_MG_L := 400.0
+const PHPA_CA_TASA_POR_H := 0.3
+const PHPA_PH_UMBRAL := 10.0
+const PHPA_PH_TASA_POR_H_Y_UNIDAD := 0.1
+
+
+## Fracción de PHPA que se pierde por hora con la química actual del lodo:
+## [por calcio, por pH].
+static func tasas_phpa(lodo: EstadoLodoScript) -> Array:
+	var insulto_ca := clampf((lodo.ca - PHPA_CA_UMBRAL_MG_L) / PHPA_CA_ESCALA_MG_L, 0.0, 3.0)
+	var insulto_ph := clampf(lodo.ph() - PHPA_PH_UMBRAL, 0.0, 3.0)
+	return [PHPA_CA_TASA_POR_H * insulto_ca, PHPA_PH_TASA_POR_H_Y_UNIDAD * insulto_ph]
+
+
+static func degradar_phpa(lodo: EstadoLodoScript, dt_h: float) -> void:
+	if lodo.phpa <= 0.0:
+		return
+	var tasas := tasas_phpa(lodo)
+	var total: float = tasas[0] + tasas[1]
+	if total <= 0.0:
+		return
+	var perdido := lodo.phpa * (1.0 - exp(-total * dt_h))
+	lodo.phpa -= perdido
+	lodo.phpa_danado += perdido * tasas[0] / total   # lo del calcio precipita y espesa
 
 ## Finos de cemento que pasan a solución: 2 OH⁻ y 1 Ca²⁺ por mmol, igual que
 ## EstadoLodo.agregar_cal, pero de a poco y nunca por encima de saturación.
