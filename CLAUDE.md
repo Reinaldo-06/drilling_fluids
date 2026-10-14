@@ -16,6 +16,7 @@ Leer en este orden antes de proponer nada:
 | `docs/rig-tank-system.md` | Tanques del taladro: qué contiene cada uno, cómo se conectan, reglas de mezcla y volumen, cambio de fluido (validado en parte por el autor). **Base del manejo de tanques.** |
 | `docs/simulation-logic.md` | Reglas de simulación contrastadas con fuentes (≥ 2 por dato), con marca de confianza y lista de temas pendientes. **Antes de implementar una regla, buscarla aquí.** |
 | `docs/reference-wells.md` | Programas y casos **públicos** de otras cuencas (Pérmica, Colombia, Medio Oriente, mar del Norte) usados como referencia de patrones, y tres pozos ficticios derivados (MÉDANO-5, PIEDEMONTE-2, ESTRATO-9). |
+| `docs/auditoria-logica.md` | Auditoría de la lógica: hallazgos críticos, importantes y menores, con propuestas y preguntas para el autor. **Lista de trabajo pendiente.** |
 | `docs/domain-research.md` | Entorno del taladro: circulación, válvulas, control de pozo. Hoy es **contexto**, no mecánica — relevante solo para la expansión futura de circulación. |
 
 ## Decisiones cerradas — no re-litigar
