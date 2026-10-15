@@ -70,8 +70,8 @@ func test_interactuar_con_la_caseta_abre_el_menu() -> void:
 	for o in menu.opciones:
 		por_accion[o["accion"]] = o["habilitada"]
 	verificar(por_accion.get("chequeo_rapido", false), "el chequeo rápido se puede hacer")
-	verificar(por_accion.has("correr_prueba") and not por_accion["correr_prueba"],
-		"correr una prueba espera su pantalla")
+	verificar(por_accion.get("correr_prueba", false) and por_accion.get("diagnosticar", false),
+		"las pruebas y el diagnóstico también, con su asistente")
 	verificar_cerca(m["turno"].reloj.minuto, 0.0, 1e-9, "abrir el menú no cuesta")
 	_limpiar(m)
 
@@ -91,23 +91,49 @@ func test_elegir_una_accion_la_ejecuta_y_la_cuenta() -> void:
 	_limpiar(m)
 
 
-func test_las_opciones_apagadas_no_se_pueden_elegir() -> void:
+func test_tratar_pregunta_producto_dosis_y_tanque() -> void:
 	var m := _montar()
 	_interactuar_con(m, "embudo_abajo")
 	var menu: Node = m["puente"].menu
-	menu.seleccion = 0
-	verificar(not menu.opciones[0]["habilitada"], "tratar espera su pantalla (Hito 3)")
+	menu.confirmar()   # "Tratar con un producto"
+	verificar(menu.abierto and menu.opciones.any(func(o): return o["nombre"].begins_with("PAC")),
+		"primero pregunta el producto: %s" % str(menu.opciones.map(func(o): return o["nombre"])))
+	var elegir := func(nombre: String):
+		var i: int = menu.opciones.map(func(o): return o["nombre"]).find(nombre) \
+			if nombre in menu.opciones.map(func(o): return o["nombre"]) else -1
+		if i < 0:
+			for j in menu.opciones.size():
+				if menu.opciones[j]["nombre"].begins_with(nombre):
+					i = j
+		menu.seleccion = i
+		menu.confirmar()
+	elegir.call("PAC")
+	verificar(menu.opciones.any(func(o): return o["nombre"] == "0,5 lb/bbl"), "luego la dosis")
+	elegir.call("0,5 lb/bbl")
+	verificar(menu.opciones.any(func(o): return o["nombre"].begins_with("Succión")), "y el tanque")
+	elegir.call("Succión")
+	verificar(not menu.abierto, "con todo elegido, se ejecuta")
+	verificar(m["turno"].tanque("Succión").lodo.pac > 0.5 + 0.2, "el PAC entró al lodo")
+	verificar(m["turno"].reloj.minuto > 5.0, "y costó tiempo")
+	_limpiar(m)
+
+
+func test_cancelar_en_medio_del_asistente_no_hace_nada() -> void:
+	var m := _montar()
+	_interactuar_con(m, "embudo_abajo")
+	var menu: Node = m["puente"].menu
 	menu.confirmar()
-	verificar(menu.abierto, "sigue abierto")
-	verificar_cerca(m["turno"].reloj.minuto, 0.0, 1e-9, "y no pasó nada")
+	menu.cancelar()
+	verificar_cerca(m["turno"].reloj.minuto, 0.0, 1e-9, "no pasó nada")
+	verificar(m["puente"]._accion == "", "el asistente se cierra")
 	_limpiar(m)
 
 
 func test_estacion_sin_acciones_muestra_su_texto() -> void:
 	var m := _montar()
-	_interactuar_con(m, "zarandas")
+	_interactuar_con(m, "bombas_lodo")
 	verificar(not m["puente"].menu.abierto, "no hay menú")
-	verificar(m["ow"].dialogo.abierto and " ".join(m["ow"].dialogo.paginas).contains("mallas"),
+	verificar(m["ow"].dialogo.abierto and " ".join(m["ow"].dialogo.paginas).contains("Bombas"),
 		"muestra qué es: %s" % str(m["ow"].dialogo.paginas))
 	_limpiar(m)
 
@@ -144,3 +170,18 @@ func test_el_dialogo_respeta_los_saltos_de_linea() -> void:
 	var paginas: Array[String] = load("res://game/ui/dialogo.gd").paginar(["uno\ndos\ntres"])
 	verificar(paginas.size() == 2 and paginas[0] == "uno\ndos" and paginas[1] == "tres",
 		"dos líneas por página: %s" % str(paginas))
+
+
+func test_al_empezar_se_muestra_el_objetivo_del_turno() -> void:
+	var arbol := Engine.get_main_loop() as SceneTree
+	var ow: Node2D = ESCENA.instantiate()
+	arbol.root.add_child(ow)
+	ow.construir()
+	var e: Dictionary = Escenarios.caiman_3_superficial()
+	var puente := Puente.new()
+	arbol.root.add_child(puente)
+	puente.conectar(ow, e["sesion"], true)
+	verificar(ow.dialogo.abierto and " ".join(ow.dialogo.paginas).contains("pierde") or " ".join(ow.dialogo.paginas).contains("volumen"),
+		"el objetivo: %s" % str(ow.dialogo.paginas))
+	puente.free()
+	ow.free()

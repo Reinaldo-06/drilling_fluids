@@ -9,20 +9,21 @@ const Hud := preload("res://game/ui/hud_turno.gd")
 const Menu := preload("res://game/ui/menu_acciones.gd")
 const Datos := preload("res://game/overworld/mapa_locacion.gd")
 
-## Parámetros por omisión de las acciones que el menú puede lanzar sin pantalla
-## propia. Las demás (tratar, transferir, correr_prueba…) esperan a las
-## pantallas del Hito 2 y 3 y salen apagadas.
-const PARAMETROS_POR_OMISION := {"esperar": {"minutos": 10.0}}
-
 var overworld: Node2D
 var sesion: RefCounted
 var hud: CanvasLayer
 var menu: CanvasLayer
 var _opciones_en_curso: Array = []
 var _fin_avisado := false
+## Asistente de parámetros: la acción elegida, sus pasos, lo ya elegido y las
+## opciones del paso en curso (el menú devuelve su posición).
+var _accion := ""
+var _pasos: Array = []
+var _elegidos: Dictionary = {}
+var _opciones_del_paso: Array = []
 
 
-func conectar(overworld_: Node2D, sesion_: RefCounted) -> void:
+func conectar(overworld_: Node2D, sesion_: RefCounted, mostrar_objetivo := false) -> void:
 	overworld = overworld_
 	sesion = sesion_
 	overworld.mostrar_texto_estaciones = false
@@ -38,8 +39,12 @@ func conectar(overworld_: Node2D, sesion_: RefCounted) -> void:
 	menu.name = "MenuAcciones"
 	overworld.add_child(menu)
 	menu.elegido.connect(_al_elegir)
-	menu.cancelado.connect(_liberar_jugador)
+	menu.cancelado.connect(_al_cancelar)
 	_refrescar()
+	if mostrar_objetivo:
+		var resumen: Dictionary = sesion.turno.resumen_caso()
+		if not resumen.is_empty():
+			_decir([resumen["objetivo"]], "Objetivo del turno")
 
 
 func _refrescar() -> void:
@@ -63,26 +68,60 @@ func _al_interactuar(id_estacion: String) -> void:
 	if m["menu"].is_empty():
 		_decir([_texto_de_estacion(id_estacion), m["mensaje"]], _nombre_de_estacion(id_estacion))
 		return
-	_opciones_en_curso = []
-	for o in m["menu"]:
-		var sin_pantalla := false
-		for p: String in o["parametros"]:
-			if not p.ends_with("?") and not PARAMETROS_POR_OMISION.get(o["accion"], {}).has(p):
-				sin_pantalla = true
-		_opciones_en_curso.append({"accion": o["accion"], "nombre": o["nombre"], "habilitada": not sin_pantalla})
+	_accion = ""
+	_opciones_en_curso = m["menu"].map(func(o): return {"accion": o["accion"], "nombre": o["nombre"], "habilitada": true})
 	overworld.jugador.bloqueado = true
 	menu.mostrar(_nombre_de_estacion(id_estacion), _opciones_en_curso)
 
 
-func _al_elegir(accion: String) -> void:
-	var r: Dictionary = sesion.ejecutar(accion, PARAMETROS_POR_OMISION.get(accion, {}))
-	_refrescar()
-	_decir(_textos_de_resultado(r), _nombre_de_estacion(sesion.estacion_mapa))
+## Elegir en el menú: o una acción de la estación, o la opción de un parámetro.
+func _al_elegir(clave: String) -> void:
+	if _accion == "":
+		_iniciar_asistente(clave)
+	else:
+		_elegir_parametro(int(clave))
+
+
+## Una acción con parámetros pregunta de a uno (producto, dosis, tanque…); una
+## sin parámetros se ejecuta ya.
+func _iniciar_asistente(accion: String) -> void:
+	_accion = accion
+	_pasos = sesion.pasos_de(accion)
+	_elegidos = {}
+	_siguiente_paso()
+
+
+func _siguiente_paso() -> void:
+	if _elegidos.size() >= _pasos.size():
+		var accion := _accion
+		_accion = ""
+		var r: Dictionary = sesion.ejecutar(accion, _elegidos)
+		_refrescar()
+		_decir(_textos_de_resultado(r), _nombre_de_estacion(sesion.estacion_mapa))
+		return
+	var paso: Dictionary = _pasos[_elegidos.size()]
+	_opciones_del_paso = sesion.opciones_de(_accion, paso["nombre"], _elegidos)
+	var opciones: Array = []
+	for i in _opciones_del_paso.size():
+		opciones.append({"accion": str(i), "nombre": _opciones_del_paso[i]["nombre"], "habilitada": true})
+	overworld.jugador.bloqueado = true
+	menu.mostrar(paso["pregunta"], opciones)
+
+
+func _elegir_parametro(indice: int) -> void:
+	var paso: Dictionary = _pasos[_elegidos.size()]
+	_elegidos[paso["nombre"]] = _opciones_del_paso[indice]["valor"]
+	_siguiente_paso()
 
 
 func _al_hablar(id_personaje: String) -> void:
 	sesion.hablar_con(id_personaje)
 	_refrescar()
+
+
+func _al_cancelar() -> void:
+	_accion = ""
+	_liberar_jugador()
 
 
 func _liberar_jugador() -> void:

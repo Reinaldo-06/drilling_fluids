@@ -30,6 +30,8 @@ const Encuellador := preload("res://sim/encuellador.gd")
 const Inventario := preload("res://sim/turno_inventario.gd")
 const Reporte := preload("res://sim/reporte_diario.gd")
 const Noche := preload("res://sim/turno_noche.gd")
+const Seguimiento := preload("res://sim/seguimiento_caso.gd")
+const Observacion := preload("res://sim/observacion.gd")
 const Cinetica := preload("res://sim/cinetica.gd")
 const Lab := preload("res://sim/laboratorio.gd")
 const Evaluador := preload("res://sim/evaluador_reglas.gd")
@@ -79,6 +81,17 @@ var enganches_antes: Array[Callable] = []
 var enganches_despues: Array[Callable] = []
 ## f(turno, origen, destino, bbl): transferencia sin aviso (falsa alarma del PVT).
 var enganches_alarma_pvt: Array[Callable] = []
+## Lo que el pozo sabe y el jugador puede preguntar (sim/operacion_pozo.gd):
+##   observadores: f(turno, estacion) → Array de textos de lo que se ve ahí
+##   balance_volumen: f(turno, ventana_min) → {perdida_bbl_h, ventana_min}
+var observadores: Array[Callable] = []
+## Quien conectó los enganches (sim/operacion_pozo.gd). Un Callable no mantiene
+## vivo a su objeto: sin esta referencia, la operación se libera y el pozo deja
+## de perforar sin avisar.
+var operacion: RefCounted = null
+var balance_volumen: Callable = Callable()
+## Caso en curso (sim/caso.gd) y el avance del jugador (sim/seguimiento_caso.gd).
+var seguimiento: RefCounted = null
 ## f(turno, personaje) -> Variant: diálogo (lo pone la capa del juego).
 var al_hablar: Callable = Callable()
 
@@ -217,6 +230,75 @@ func avanzar_tiempo(minutos: float) -> float:
 
 
 # ======================= Acciones del jugador =======================
+
+## Activa un caso: de ahora en adelante el turno lleva el avance del jugador.
+func activar_caso(caso: Resource) -> void:
+	seguimiento = Seguimiento.new(caso)
+
+
+## Resumen del caso para la oficina; {} si no hay caso.
+func resumen_caso() -> Dictionary:
+	return seguimiento.resumen() if seguimiento != null else {}
+
+
+## Recorrer una zona del taladro y mirar: las zarandas (recortes y mallas) o los
+## tanques (niveles y derrames), más las observaciones visuales del lodo
+## (data/observaciones/). Solo se ve lo que se ve: nunca la química (invariante 1).
+func observar(estacion := "") -> Dictionary:
+	var donde := estacion if estacion != "" else ubicacion
+	if not donde in ["zarandas", "tanques"]:
+		return {"error": "Desde aquí no se ve nada útil del lodo: ve a las zarandas o a los tanques."}
+	var minutos := Accion.minutos("observar")
+	var costo := _caminata(donde) + minutos
+	if not reloj.cabe(costo):
+		return _sin_tiempo(costo)
+	var inicio := reloj.minuto
+	_ir_a(donde)
+	avanzar_tiempo(minutos)
+	var textos: Array = []
+	if donde == "tanques":
+		for t in tanques:
+			textos.append("%s: %d bbl de %d%s." % [t.nombre, roundi(t.volumen_bbl), roundi(t.capacidad_bbl),
+				" (mínimo %d)" % roundi(t.minimo_bbl()) if t.minimo_bbl() > 0.0 else ""])
+	var principal := tanque_principal()
+	for o: Resource in catalogo_observaciones():
+		if o.visible_en(donde) and principal != null:
+			textos.append(o.evaluar(principal.lodo))
+	for f in observadores:
+		textos.append_array(f.call(self, donde))
+	var evidencia := "recortes" if donde == "zarandas" else "niveles"
+	if seguimiento != null:
+		seguimiento.registrar_evidencia(evidencia, reloj.minuto)
+	if not evidencia in pruebas_corridas:
+		pruebas_corridas.append(evidencia)
+	acciones.append(Accion.registro("observar", inicio, reloj.minuto - inicio, {"estacion": donde}))
+	return {"minutos": reloj.minuto - inicio, "textos": textos}
+
+
+## El mud logger compara el volumen que sale del pozo con el que debería: lo que
+## falta es lo que el pozo se está llevando (bbl/h). No dice la causa.
+func revisar_balance(ventana_min := 60.0) -> Dictionary:
+	if not balance_volumen.is_valid():
+		return {"error": "El mud logger no tiene datos de volumen todavía."}
+	var minutos := Accion.minutos("revisar_balance")
+	var costo := _caminata("mud_logger") + minutos
+	if not reloj.cabe(costo):
+		return _sin_tiempo(costo)
+	var inicio := reloj.minuto
+	_ir_a("mud_logger")
+	avanzar_tiempo(minutos)
+	var b: Dictionary = balance_volumen.call(self, ventana_min)
+	var h: Array = []
+	if seguimiento != null:
+		seguimiento.registrar_evidencia("balance_volumen", reloj.minuto)
+		h = seguimiento.registrar_balance(float(b["perdida_bbl_h"]))
+		_registrar_del_caso(h, "al_revisar_balance", {"tipo": "revisar_balance"})
+	if not "balance_volumen" in pruebas_corridas:
+		pruebas_corridas.append("balance_volumen")
+	acciones.append(Accion.registro("revisar_balance", inicio, reloj.minuto - inicio, b))
+	return {"minutos": reloj.minuto - inicio, "perdida_bbl_h": b["perdida_bbl_h"],
+		"ventana_min": b["ventana_min"], "hallazgos": h}
+
 
 ## Minutos de caminata hasta una estación (0 si el mapa ya cobró cada casilla).
 func _caminata(hacia: String) -> float:
@@ -381,6 +463,8 @@ func tratar(producto_id: String, lb_bbl: float, tanque_nombre := "", prehidratad
 		"volumen_bbl": t.volumen_bbl, "prehidratada": prehidratada}
 	var h := _evaluar("al_tratar", accion, antes, t.lodo, t.nombre)
 	tratamientos_previos.append(producto_id)
+	if seguimiento != null:
+		seguimiento.registrar_tratamiento(producto_id, cantidad)
 	avanzar_tiempo(minutos)
 	acciones.append(Accion.registro("tratar", inicio, reloj.minuto - inicio, accion))
 	return {"minutos": reloj.minuto - inicio, "cantidad": cantidad, "lb_bbl": lb_real,
@@ -414,6 +498,8 @@ func ordenar_mezcla(producto_id: String, sacos: float, tanque_nombre := "", cuad
 		"volumen_bbl": t.volumen_bbl, "mezcla": true, "sacos": sacos, "cuadrilla": cuadrilla}
 	var h := _evaluar("al_tratar", accion, t.lodo, previsto.lodo, t.nombre)
 	tratamientos_previos.append(producto_id)
+	if seguimiento != null:
+		seguimiento.registrar_tratamiento(producto_id, sacos)
 	var mezcla: Dictionary = mezclador.ordenar(producto_id, p, sacos, t, cuadrilla, reloj.minuto)
 	var aviso := ""
 	if inventario.disponible(producto_id) < sacos:
@@ -446,6 +532,10 @@ func diagnosticar(diagnostico: String) -> Dictionary:
 	var accion := {"tipo": "diagnosticar", "diagnostico": diagnostico}
 	var h := _evaluar("al_diagnosticar", accion, t.lodo if t else null, t.lodo if t else null,
 		t.nombre if t else "")
+	if seguimiento != null:
+		var del_caso: Array = seguimiento.registrar_diagnostico(diagnostico)
+		_registrar_del_caso(del_caso, "al_diagnosticar", accion)
+		h.append_array(del_caso)
 	avanzar_tiempo(Accion.minutos("diagnosticar"))
 	acciones.append(Accion.registro("diagnosticar", reloj.minuto, 0.0, accion))
 	return {"minutos": 0.0, "hallazgos": h}
@@ -614,6 +704,13 @@ func _evaluar(momento: String, accion: Dictionary, antes, despues, tanque_nombre
 	return h
 
 
+## Los hallazgos del caso van al debrief y al aviso igual que los de las reglas.
+func _registrar_del_caso(hallazgos_: Array, momento: String, accion: Dictionary) -> void:
+	for x: Dictionary in hallazgos_:
+		_guardar_hallazgo(x, momento, accion, "caso")
+		avisos.append({"minuto": reloj.minuto, "tipo": "hallazgo_" + x["tipo"], "texto": x["titulo"]})
+
+
 func _guardar_hallazgo(x: Dictionary, momento: String, accion: Dictionary, fuente: String) -> void:
 	var registro := x.duplicate()
 	registro["minuto"] = reloj.minuto
@@ -621,6 +718,19 @@ func _guardar_hallazgo(x: Dictionary, momento: String, accion: Dictionary, fuent
 	registro["accion"] = accion
 	registro["fuente"] = fuente
 	hallazgos.append(registro)
+
+
+static var _observaciones: Array = []
+
+
+## Catálogo de observaciones visuales (data/observaciones/), cargado una vez.
+static func catalogo_observaciones() -> Array:
+	if _observaciones.is_empty():
+		for archivo in DirAccess.get_files_at("res://data/observaciones"):
+			archivo = archivo.trim_suffix(".remap")
+			if archivo.ends_with(".tres"):
+				_observaciones.append(load("res://data/observaciones/%s" % archivo))
+	return _observaciones
 
 
 func _contabilizar(r: Dictionary) -> void:

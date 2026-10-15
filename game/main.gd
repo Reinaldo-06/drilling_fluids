@@ -17,4 +17,4 @@ func _ready() -> void:
 	puente = Puente.new()
 	puente.name = "PuenteTurno"
 	add_child(puente)
-	puente.conectar(overworld, escenario["sesion"])
+	puente.conectar(overworld, escenario["sesion"], true)

@@ -23,6 +23,7 @@ extends RefCounted
 const Turno := preload("res://sim/turno.gd")
 const Accion := preload("res://sim/accion.gd")
 const Resultado := preload("res://sim/resultado_accion.gd")
+const Lab := preload("res://sim/laboratorio.gd")
 const TABLA := preload("res://data/turno/estaciones_mapa.tres")
 
 ## Acciones que siguen disponibles con el turno terminado.
@@ -122,6 +123,84 @@ func valvula(id_valvula: String, abierta: bool) -> Dictionary:
 	return {"ok": true, "mensaje": "La válvula quedó %s." % ("abierta" if abierta else "cerrada")}
 
 
+# ======================= Parámetros: lo que elige el jugador =======================
+
+## Los parámetros que hay que elegir para una acción, en orden:
+## [{nombre, pregunta}]. Los opcionales (con "?") toman su valor por omisión.
+func pasos_de(accion: String) -> Array:
+	var pasos: Array = []
+	var preguntas: Dictionary = TABLA.valor("parametros")
+	if not TABLA.valor("acciones").has(accion):
+		return pasos
+	for p: String in TABLA.valor("acciones")[accion]["parametros"]:
+		if not p.ends_with("?"):
+			pasos.append({"nombre": p, "pregunta": preguntas.get(p, p)})
+	return pasos
+
+
+## Las opciones de un parámetro: [{valor, nombre}]. "elegidos" son los
+## parámetros ya elegidos (la dosis del agua no es la de un polvo).
+func opciones_de(accion: String, parametro: String, elegidos: Dictionary = {}) -> Array:
+	var fijas: Dictionary = TABLA.valor("opciones_fijas")
+	match parametro:
+		"producto":
+			return _opciones_de_producto(accion)
+		"tanque", "origen", "destino":
+			return turno.tanques.map(func(t): return {"valor": t.nombre,
+				"nombre": "%s (%d bbl)" % [t.nombre, roundi(t.volumen_bbl)]})
+		"prueba":
+			return _opciones_de_prueba()
+		"diagnostico":
+			return _opciones_de_diagnostico()
+		"lb_bbl":
+			var clave := "lb_bbl_agua" if elegidos.get("producto", "") == "agua" else "lb_bbl"
+			return _de_pares(fijas[clave])
+	if fijas.has(parametro):
+		return _de_pares(fijas[parametro])
+	return []
+
+
+static func _de_pares(pares: Array) -> Array:
+	return pares.map(func(p): return {"valor": p[0], "nombre": p[1]})
+
+
+func _opciones_de_producto(accion: String) -> Array:
+	var ids: Array = []
+	if turno.programa != null:
+		ids = Array(turno.programa.productos_aprobados)
+	else:
+		ids = turno.inventario.sacos.keys()
+	var o: Array = []
+	for id: String in ids:
+		if id == "agua" and accion == "ordenar_mezcla":
+			continue
+		var p: Resource = turno.inventario.producto(id)
+		if p == null:
+			continue
+		var stock := "" if id == "agua" else " (%d sacos)" % floori(turno.inventario.disponible(id))
+		o.append({"valor": id, "nombre": "%s%s" % [p.nombre, stock]})
+	return o
+
+
+func _opciones_de_prueba() -> Array:
+	var o: Array = []
+	var todas: Dictionary = Lab.cargar_todas()
+	var ids := todas.keys()
+	ids.sort()
+	for id in ids:
+		o.append({"valor": id, "nombre": todas[id].nombre})
+	return o
+
+
+func _opciones_de_diagnostico() -> Array:
+	var o: Array = []
+	if turno.seguimiento != null:
+		for c: Dictionary in turno.seguimiento.caso.causas:
+			o.append({"valor": c["id"], "nombre": c["nombre"]})
+	o.append({"valor": "no_se", "nombre": "Todavía no sé"})
+	return o
+
+
 # ======================= Internos =======================
 
 func _datos_estacion(id: String):
@@ -166,4 +245,13 @@ func _llamar(accion: String, p: Dictionary) -> Dictionary:
 			return {"minutos": turno.reloj.minuto - antes, "reporte": reporte, "tarde": reporte.tarde}
 		"inventario":
 			return {"minutos": 0.0, "inventario": turno.inventario.sacos.duplicate()}
+		"observar":
+			return turno.observar()
+		"revisar_balance":
+			return turno.revisar_balance()
+		"ver_resumen":
+			var resumen: Dictionary = turno.resumen_caso()
+			if resumen.is_empty():
+				return {"error": "Hoy no hay un caso asignado: el turno es de rutina."}
+			return {"minutos": 0.0, "resumen": resumen}
 	return {"error": "Acción desconocida: %s." % accion}

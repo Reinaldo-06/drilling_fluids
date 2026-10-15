@@ -13,6 +13,7 @@ const F := preload("res://sim/formulas.gd")
 const PROGRAMA_SUPERFICIAL := "res://data/programas/caiman_3_superficial.tres"
 const FORMACION_SUPERFICIAL := "res://data/formaciones/caiman_3_superficial.tres"
 const GUION_SUPERFICIAL := "res://data/guiones/caiman_3_superficial.tres"
+const CASO_PERDIDA := "res://data/casos/caiman_3_perdida_gravas.tres"
 
 ## 🧩 Sacos de cada producto aprobado en la bodega al empezar.
 const SACOS_INICIALES := 60.0
@@ -37,6 +38,8 @@ static func caiman_3_superficial(semilla := 1) -> Dictionary:
 	for id in programa.productos_aprobados:
 		if id != "agua":
 			inventario[id] = SACOS_INICIALES
+	inventario["pac"] = 40.0
+	inventario["carbonato_de_calcio"] = 200.0   # 10 lb/bbl en 800 bbl son 160 sacos
 	var turno = Turno.crear(tanques, programa, inventario)
 	turno.caudal_gpm = CAUDAL_GPM
 	turno.profundidad_ft = PROFUNDIDAD_INICIAL_FT
@@ -44,4 +47,5 @@ static func caiman_3_superficial(semilla := 1) -> Dictionary:
 	var operacion = Operacion.crear([load(FORMACION_SUPERFICIAL)], load(GUION_SUPERFICIAL),
 		ROP_FT_H, DIAMETRO_PULG, semilla)
 	operacion.conectar(turno)
+	turno.activar_caso(load(CASO_PERDIDA))
 	return {"turno": turno, "operacion": operacion, "sesion": Sesion.crear(turno)}

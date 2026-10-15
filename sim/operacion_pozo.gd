@@ -21,6 +21,10 @@ const GuionEjecucion := preload("res://sim/guion_ejecucion.gd")
 const MonitorTanques := preload("res://sim/monitor_tanques.gd")
 
 const RUTA_MONITOR := "res://data/eventos/monitor_pvt.tres"
+const Reporte := preload("res://sim/reporte_diario.gd")
+
+## 🧩 El mud logger redondea la pérdida que reporta a 0,5 bbl/h.
+const RESOLUCION_BALANCE_BBL_H := 0.5
 
 var formaciones: Array = []
 var control: RefCounted = null
@@ -56,7 +60,14 @@ static func crear(formaciones_: Array, guion_seccion: Resource, rop: float, diam
 	return o
 
 
+## Historial para el balance del mud logger: [minuto, no_explicado_bbl] cada paso.
+var _historial_balance: Array = []
+
+
 func conectar(turno: RefCounted) -> void:
+	turno.operacion = self
+	turno.balance_volumen = _balance
+	turno.observadores.append(_observar)
 	if guion.programa == null:
 		guion.programa = turno.programa
 	monitor.referenciar(turno.tanques)
@@ -153,7 +164,55 @@ func _eventos(turno: RefCounted, dt: float) -> void:
 		turno.avisos.append({"minuto": minuto, "tipo": "alarma_pvt", "texto": lectura["aviso"],
 			"quien_avisa": lectura["quien_avisa"], "explicacion": lectura["explicacion"],
 			"referencia": lectura["referencia"]})
+		if turno.seguimiento != null:
+			turno.seguimiento.registrar_alarma()
 	_volumen_referencia = MonitorTanques.volumen_activo(tanques)
+	_anotar_balance(turno, minuto)
+
+
+## Guarda cuánto volumen falta sin explicar (lo que el pozo se llevó) en cada paso.
+func _anotar_balance(turno: RefCounted, minuto: float) -> void:
+	if not _historial_balance.is_empty() and minuto < _historial_balance[-1][0]:
+		_historial_balance.clear()   # empezó otro turno: el reloj volvió a cero
+	var b: Dictionary = Reporte.balance_volumen(turno.volumen, turno.volumen_superficie())
+	_historial_balance.append([minuto, b["no_explicado"]])
+
+
+## Pérdida (bbl/h) que el pozo se llevó en la última "ventana_min", redondeada.
+func _balance(turno: RefCounted, ventana_min: float) -> Dictionary:
+	if _historial_balance.size() < 2:
+		return {"perdida_bbl_h": 0.0, "ventana_min": 0.0}
+	var ultimo: Array = _historial_balance[-1]
+	var primero: Array = _historial_balance[0]
+	for p in _historial_balance:
+		if ultimo[0] - p[0] <= ventana_min + 1e-6:
+			primero = p
+			break
+	var minutos: float = ultimo[0] - primero[0]
+	if minutos <= 0.0:
+		return {"perdida_bbl_h": 0.0, "ventana_min": 0.0}
+	var por_hora: float = maxf(0.0, (primero[1] - ultimo[1]) / minutos * 60.0)
+	return {"perdida_bbl_h": snappedf(por_hora, RESOLUCION_BALANCE_BBL_H), "ventana_min": minutos}
+
+
+## Lo que se ve en una zona del taladro, según el pozo (no la química del lodo).
+func _observar(turno: RefCounted, estacion: String) -> Array:
+	var textos: Array = []
+	if estacion == "zarandas":
+		var formacion: Resource = Perforacion.formacion_en(formaciones, turno.profundidad_ft)
+		if formacion != null and formacion.descripcion_recortes != "":
+			textos.append(formacion.descripcion_recortes)
+		var zaranda: Resource = control.equipo("zaranda")
+		if zaranda != null:
+			if not zaranda.encendido:
+				textos.append("La zaranda está apagada: los recortes se van al tanque.")
+			elif zaranda.estado == "malla_rota":
+				textos.append("Hay una malla rota: pasa lodo con recortes por el hueco.")
+			else:
+				textos.append("Las mallas están enteras y el descarte lleva poco lodo pegado.")
+	elif estacion == "tanques":
+		textos.append("No hay derrames: el piso, las canaletas y las líneas están secos.")
+	return textos
 
 
 func _aplicar_fallas() -> void:

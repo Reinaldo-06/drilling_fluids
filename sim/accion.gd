@@ -19,6 +19,7 @@ const ESTACION_DE := {
 	"tratar": "embudo",
 	"avisar_driller": "piso",
 	"entregar_reporte": "oficina",
+	"revisar_balance": "mud_logger",
 }
 
 ## Dónde está cada personaje (game-design-mechanics.md y simulation-logic.md §5).

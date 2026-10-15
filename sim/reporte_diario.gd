@@ -97,6 +97,8 @@ var recomendaciones_invalidas: Array = []
 var hallazgos_cierre: Array = []
 ## Todos los hallazgos del turno (aviso inmediato y debrief).
 var hallazgos_turno: Array = []
+## Avance del caso del turno (sim/seguimiento_caso.gd), {} si no hubo caso.
+var caso: Dictionary = {}
 ## Resumen del turno de noche anterior (sim/turno_noche.gd), si lo hubo.
 var noche_anterior: Dictionary = {}
 
@@ -179,6 +181,7 @@ static func desde_turno(turno: RefCounted, recomendaciones: Array) -> RefCounted
 		else:
 			r.recomendaciones_invalidas.append({"recomendacion": rec, "error": error})
 	r.noche_anterior = turno.resumen_noche_anterior
+	r.caso = turno.resumen_caso()
 	return r
 
 
@@ -207,6 +210,10 @@ func texto() -> String:
 	for p in productos:
 		lineas.append("  %s: %.1f %s, USD %.0f" % [p["producto"], p["sacos"], p["unidad"], p["costo"]])
 	lineas.append("Costo del período USD %.0f, acumulado USD %.0f" % [costo_dia, costo_acumulado])
+	if not caso.is_empty():
+		lineas.append("Caso: %s%s" % [caso["titulo"], " (resuelto)" if caso["resuelto"] else " (abierto)"])
+		for p: Dictionary in caso["pasos"]:
+			lineas.append("  %s %s" % ["[x]" if p["hecho"] else "[ ]", p["texto"]])
 	for rec in recomendaciones:
 		lineas.append("  Recomendación: " + Noche.describir(rec))
 	return "\n".join(lineas)

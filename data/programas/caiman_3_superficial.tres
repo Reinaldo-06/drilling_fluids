@@ -23,14 +23,16 @@ rangos = {
 "ca": [0.0, 200.0],
 "mbt": [15.0, 30.0]
 }
-productos_aprobados = PackedStringArray("bentonita", "carbonato_de_sodio", "soda_caustica", "barita", "agua")
+productos_aprobados = PackedStringArray("bentonita", "carbonato_de_sodio", "soda_caustica", "barita", "pac", "carbonato_de_calcio", "agua")
 concentraciones = {
 "bentonita": [15.0, 25.0],
 "carbonato_de_sodio": [0.25, 1.0],
-"soda_caustica": [0.25, 0.5]
+"soda_caustica": [0.25, 0.5],
+"pac": [0.25, 1.0],
+"carbonato_de_calcio": [5.0, 15.0]
 }
 productos_por_crear = PackedStringArray()
-advertencias = PackedStringArray("Formación no consolidada: derrumbes, alta tasa de penetración y enorme volumen de recortes.", "Barridos viscosos cada parada para limpiar el hueco de 17½\".", "Filtrado sin control: el sistema no lo pide en esta sección.", "El agua de mezcla puede venir dura: tratar el calcio con carbonato de sodio antes de agregar la bentonita.", "La densidad sube sola con los recortes: vigilar sólidos y diluir a tiempo.")
+advertencias = PackedStringArray("Formación no consolidada: derrumbes, alta tasa de penetración y enorme volumen de recortes.", "Barridos viscosos cada parada para limpiar el hueco de 17½\".", "El filtrado no se controla de rutina, pero las arenas y gravas sueltas pueden tomar lodo: si hay pérdidas, sube el controlador de filtrado (PAC) y puentea con carbonato de calcio.", "El agua de mezcla puede venir dura: tratar el calcio con carbonato de sodio antes de agregar la bentonita.", "La densidad sube sola con los recortes: vigilar sólidos y diluir a tiempo.")
 criterios_cambio_fluido = "A 2.500 ft: sacar, correr y cementar el revestimiento superficial. El KCl/PHPA de la intermedia se construye en reserva durante la sección y se desplaza directo, sin bache espaciador (rig-tank-system.md §5). El bentonítico se descarta."
 explicaciones = {
 "pc_bajo": "El spud mud vive de su punto cedente: con PC bajo no levanta los recortes grandes de un hueco de 17½\" a alta ROP. Sube la bentonita (prehidratada).",

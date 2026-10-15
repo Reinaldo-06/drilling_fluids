@@ -1,0 +1,37 @@
+[gd_resource type="Resource" script_class="Caso" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/caso.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "caiman_3_perdida_gravas"
+titulo = "El activo pierde lodo en la superficial"
+objetivo = "Perforas la superficial de CAIMÁN-3. Vigila los niveles: si el volumen del activo baja y nadie movió lodo, averigua adónde se va, trátalo y comprueba que la pérdida baje."
+causas = [{
+"id": "filtracion_formacion",
+"nombre": "Filtración hacia la formación",
+"correcta": true,
+"explicacion": "Los recortes son arena y grava sueltas, sin consolidar: una formación muy permeable. Si el lodo no forma un revoque delgado y poco permeable, se le escapa filtrado al pozo mientras se perfora. Las zarandas descartan lo normal y no hay derrames: lo que falta en los tanques no sale por superficie. Se trata subiendo el controlador de filtrado (PAC) y puenteando los poros con carbonato de calcio."
+}, {
+"id": "descarte_excesivo",
+"nombre": "Descarte de lodo en las zarandas",
+"correcta": false,
+"explicacion": "Las zarandas están normales: las mallas enteras, sin rebose y con poco lodo pegado a los recortes. El lodo que se va con los recortes ya está en el balance de volumen; lo que sigue faltando no se explica por el descarte."
+}, {
+"id": "derrame_superficie",
+"nombre": "Derrame en superficie",
+"correcta": false,
+"explicacion": "Al recorrer los tanques no hay derrames: el piso y las canaletas están secos. Un derrame se vería en superficie, y esta pérdida no deja rastro afuera del pozo."
+}]
+evidencias_requeridas = PackedStringArray("balance_volumen", "recortes", "niveles")
+nombres_de_evidencia = {
+"balance_volumen": "el balance de volumen del mud logger",
+"recortes": "los recortes y las zarandas",
+"niveles": "el recorrido por los tanques"
+}
+explicacion_sin_evidencia = "Diagnosticar sin comparar es adivinar. Una pérdida puede venir de la formación, del descarte o de un derrame, y se distinguen mirando el balance, los recortes y los tanques."
+tasa_objetivo_bbl_h = 4.0
+productos_de_tratamiento = PackedStringArray("pac", "carbonato_de_calcio", "bentonita")
+explicacion_tratamiento_insuficiente = "El controlador de filtrado ayuda pero no basta en una arena tan permeable: hay que puentear las gargantas porales con carbonato de calcio dimensionado, y después dejar que el lodo dé una vuelta antes de volver a medir."
+explicacion_exito = "El PAC afina el revoque y el carbonato de calcio puentea los poros: el lodo ya no se escapa hacia la arena. Es el orden habitual contra filtración en formaciones permeables."
+referencia = "simulation-logic.md §10.1"

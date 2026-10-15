@@ -14,7 +14,9 @@ valores = {
 "diagnosticar": 0.0,
 "entregar_reporte": 30.0,
 "hablar": 10.0,
+"observar": 3.0,
 "orden_encuellador": 5.0,
+"revisar_balance": 5.0,
 "transferencia_bbl_por_min": 12.0,
 "tratar_base": 5.0,
 "tratar_sacos_por_h": 50.0

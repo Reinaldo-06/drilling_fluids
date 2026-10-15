@@ -493,4 +493,5 @@ Solo después de cumplir este criterio se debe ampliar el contenido hacia píldo
 
 - **Hito 0:** C1, C2, C3 y C4 corregidos con pruebas (ver tabla de referencia técnica).
 - **Paso 2 (contrato de integración):** hecho. Mapa → sesión → turno con resultado estándar y reloj visible; ver `docs/game-design-mechanics.md`, "Contrato overworld ↔ turno". Quedan para el Hito 1 las instrucciones iniciales y bloquear/explicar acciones por estado de válvulas y equipos.
-- **Siguiente:** Paso 3 del plan (primer caso de CAIMÁN-3): una alarma, sus causas, las pruebas mínimas, la pantalla del laboratorio.
+- **Paso 3 (primer caso de CAIMÁN-3):** hecho como caso de pérdida por filtración en las gravas (`docs/game-design-mechanics.md`, "Primer caso jugable"), con alarma, evidencia, diagnóstico, tratamiento y verificación jugables desde el menú y 15 pruebas. **Pendiente de este paso:** la pantalla propia del laboratorio con unidades (hoy las lecturas salen como texto en el diálogo) y probar el caso del cemento como segundo caso.
+- **Siguiente:** Hito 2 completo (laboratorio con interpretación) o Hito 3 (válvulas conectadas a las rutas de tanques); a decidir.

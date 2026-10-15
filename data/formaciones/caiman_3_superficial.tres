@@ -13,3 +13,4 @@ porosidad = 0.3
 cic_meq_100g = 2.0
 tipo_arcilla = "caolinita"
 perdida_filtracion_bbl_h = 8.0
+descripcion_recortes = "Salen arena y grava sueltas, sin consolidar, con algo de arcilla blanda. Los granos se desgranan al tocarlos."

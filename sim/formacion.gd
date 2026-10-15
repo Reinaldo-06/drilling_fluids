@@ -24,6 +24,9 @@ const TIPOS_ARCILLA := ["montmorillonita", "illita", "caolinita", "ninguna"]
 @export var tope_ft := 0.0
 @export var base_ft := 0.0
 ## Fracción de poros: la parte del hueco que no es roca (§6.1).
+## Cómo se ven los recortes en las zarandas (lo que cuenta el mud logger). Solo
+## lo que se ve: tamaño, forma, consolidación. Nunca química (invariante 1).
+@export_multiline var descripcion_recortes := ""
 @export var porosidad := 0.2
 ## Capacidad de intercambio catiónico de la roca (meq/100 g). La bentonita
 ## comercial anda en 70–90; una lutita reactiva, 15–30; una arena, casi 0. Es

@@ -57,6 +57,22 @@ static func _resumen(accion: String, r: Dictionary) -> String:
 				partes.append(str(r["aviso"]))
 		"transferir":
 			partes.append("Pasaste %.0f bbl en %d min." % [float(r.get("movido_bbl", 0.0)), roundi(minutos)])
+		"diagnosticar":
+			partes.append("Anotaste tu diagnóstico.")
+		"observar":
+			partes.append_array(PackedStringArray(r.get("textos", [])))
+		"revisar_balance":
+			var perdida := float(r.get("perdida_bbl_h", 0.0))
+			if perdida <= 0.0:
+				partes.append("El mud logger: el balance cuadra, el pozo no se está llevando lodo.")
+			else:
+				partes.append("El mud logger: en los últimos %d min el pozo se llevó unos %.1f bbl/h que no se explican por el hueco ni por el descarte." % [
+					roundi(float(r.get("ventana_min", 0.0))), perdida])
+		"ver_resumen":
+			var res: Dictionary = r.get("resumen", {})
+			partes.append(str(res.get("objetivo", "")))
+			for p: Dictionary in res.get("pasos", []):
+				partes.append("%s %s" % ["[x]" if p["hecho"] else "[ ]", p["texto"]])
 		_:
 			partes.append("Hecho en %d min." % roundi(minutos))
 	return "\n".join(partes)

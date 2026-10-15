@@ -308,3 +308,26 @@ El mapa no sabe nada del reloj ni de la simulación: emite señales y la **sesi�
 **Qué se puede hacer hoy desde el menú:** chequeo rápido, chequeo completo, esperar, avisar al driller, entregar el reporte y ver el inventario. Las acciones que piden parámetros (correr una prueba, diagnosticar, tratar, mezclar, transferir) salen en gris con "(pronto)": cada una necesita su pantalla (Hitos 2 y 3).
 
 `sim/escenarios.gd` arma el día de la superficial de CAIMÁN-3 (tanques, bodega, perforación y eventos conectados). `docs/img/turno_menu.png` y `turno_resultado.png` se regeneran con `xvfb-run -a godot --path . --script res://tools/captura_turno.gd`.
+
+## Primer caso jugable: la pérdida en las gravas (Paso 3 del plan)
+
+Superficial de CAIMÁN-3. Es el caso de aprendizaje: el núcleo **alarma → acertijo → tratamiento → verificación**, de punta a punta con lo que ya existe. Todo es dato (`data/casos/caiman_3_perdida_gravas.tres`) y se juega solo desde el menú.
+
+| Fase | Qué hace el jugador | Dónde |
+|---|---|---|
+| **Alarma** | El PVT avisa que el activo perdió lodo y nadie movió nada. **No dice la causa.** | Aviso del driller al caminar |
+| **Acertijo** | Reúne evidencia: el **balance de volumen** (cuánto se está llevando el pozo), los **recortes y las mallas** (zarandas) y el **recorrido por los tanques** (niveles, derrames). | Cabina del mud logger, zarandas, tanques |
+| **Diagnóstico** | Elige una causa: filtración hacia la formación, descarte en las zarandas o derrame en superficie. Se explica por qué sí o por qué no con la evidencia, y se advierte si diagnosticó sin reunirla. | Caseta de lodos |
+| **Tratamiento** | PAC (afina el revoque) y carbonato de calcio (puentea los poros), por el encuellador o el obrero de patio. | Tanques (asistente: producto → sacos → tanque → quién) |
+| **Verificación** | Espera una vuelta y vuelve a pedir el balance: tiene que bajar de 4 bbl/h. Con solo PAC la pérdida sigue en ~6 bbl/h y el juego lo dice. | Cabina del mud logger |
+
+**Qué se puede hacer desde el menú, por estación:** caseta (chequeos, correr una prueba, diagnosticar, esperar); tanques (observar, ordenar mezcla, transferir); zarandas (observar); mud logger (balance); embudo (tratar); bodega (inventario); piso (avisar al driller); oficina (resumen del caso y reporte). Cada acción con parámetros pregunta de a uno, con opciones.
+
+**Reglas del caso (cada una con prueba, `tests/test_caso_perdida.gd`):**
+- La alarma y el balance nunca nombran la causa (invariante 1).
+- Sin evidencia, el diagnóstico se advierte; uno equivocado se explica con la evidencia y se puede corregir.
+- Tratar sin diagnosticar funciona pero no se da por resuelto, y lo dice.
+- El programa manda: sacar el PAC de los productos aprobados lo quita del menú (invariante 6).
+- Cabe en el turno: alarma hacia las 07:20, evidencia y diagnóstico antes de las 08:00, mezclas ~2 h y verificación, con tiempo de sobra.
+
+Constantes 🧩: objetivo de 4 bbl/h, la filtración de las gravas (8 bbl/h) y el efecto del PAC y del carbonato (ver `simulation-logic.md` §10.1). Capturas: `docs/img/caso_*.png` (`xvfb-run -a godot --path . --script res://tools/captura_caso.gd`).
