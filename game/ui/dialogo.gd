@@ -171,7 +171,10 @@ func paginar(textos: Array) -> Array[String]:
 	var ancho := CAJA.size.x - 2 * MARGEN.x - 10  # deja sitio a la flecha
 	var resultado: Array[String] = []
 	for t in textos:
-		var lineas := envolver(str(t), ancho)
+		# un salto de línea del texto es un salto de línea en la caja
+		var lineas := PackedStringArray()
+		for parrafo in str(t).split("\n"):
+			lineas.append_array(envolver(parrafo, ancho))
 		for i in range(0, lineas.size(), LINEAS_POR_PAGINA):
 			resultado.append("\n".join(lineas.slice(i, i + LINEAS_POR_PAGINA)))
 	if resultado.is_empty():

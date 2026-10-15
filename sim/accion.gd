@@ -28,6 +28,7 @@ const ESTACION_DE_PERSONAJE := {
 	"encuellador": "tanques",
 	"mud_logger": "mud_logger",
 	"company_man": "oficina",
+	"cuadrillero": "zarandas",
 }
 
 

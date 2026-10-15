@@ -119,6 +119,11 @@ func interactuar_con(celda: Vector2i) -> void:
 		_abrir_dialogo([texto], est.nombre)
 
 
+## Abre la caja de diálogo con textos de afuera (la integración con el turno).
+func mostrar_dialogo(textos: Array, quien: String) -> void:
+	_abrir_dialogo(textos, quien)
+
+
 func _abrir_dialogo(textos: Array, quien: String) -> void:
 	jugador.bloqueado = true
 	dialogo.mostrar(textos, quien)

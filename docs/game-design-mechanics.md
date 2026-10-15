@@ -286,3 +286,25 @@ Un día de pozo son 24 h:
 - El jugador **juega el turno de día** (12 h).
 - El **turno de noche corre simulado**: el pozo sigue perforando, entra sólido y se consume volumen. Lo que pase depende de las **recomendaciones** que el jugador dejó en el reporte (por ejemplo, "mantener 1 lb/bbl de PHPA cada 100 bbl construidos").
 - Al día siguiente el jugador encuentra las consecuencias. Así el reporte y las recomendaciones tienen peso real.
+
+## Contrato overworld ↔ turno (Paso 2 del plan)
+
+El mapa no sabe nada del reloj ni de la simulación: emite señales y la **sesión** (`sim/sesion_turno.gd`) las traduce. `game/puente_turno.gd` solo conecta las señales y dibuja el resultado.
+
+| Señal del mapa | Sesión | Qué pasa |
+|---|---|---|
+| `caminado(n)` | `al_caminar(n)` | Cada casilla cuesta 0,15 min 🧩 y **aleja de la estación**. |
+| `interactuado(id)` | `interactuar(id)` | No cuesta. Fija la estación y devuelve el menú de acciones que ofrece (`data/turno/estaciones_mapa.tres`). |
+| elegir en el menú | `ejecutar(accion, parámetros)` | La acción cobra lo suyo **sin sumar caminata** y devuelve el resultado estándar. |
+| `hablado_con(id)` | `hablar_con(id)` | Cuesta 10 min. |
+| `valvula_cambiada(id, abierta)` | `valvula(id, abierta)` | Se anota; el Hito 3 la conecta a las rutas. |
+
+**Reglas, cada una con prueba (`tests/test_sesion_turno.gd`, `tests/test_puente_turno.gd`):**
+1. El tiempo se cobra **una sola vez**: caminar por casilla, interactuar gratis, la acción sin caminata.
+2. **No se actúa a distancia:** caminar invalida la estación; hay que volver a interactuar.
+3. Todas las acciones devuelven el **resultado estándar** (`sim/resultado_accion.gd`): `ok`, `accion`, `minutos`, `mensaje` (el porqué si falla), `hallazgos`, `avisos`, `detalle`, `hora`, `minutos_restantes`, `estacion`. Un fallo no gasta tiempo.
+4. Con el turno terminado solo queda **entregar el reporte** (se entrega tarde y lo dice).
+
+**Qué se puede hacer hoy desde el menú:** chequeo rápido, chequeo completo, esperar, avisar al driller, entregar el reporte y ver el inventario. Las acciones que piden parámetros (correr una prueba, diagnosticar, tratar, mezclar, transferir) salen en gris con "(pronto)": cada una necesita su pantalla (Hitos 2 y 3).
+
+`sim/escenarios.gd` arma el día de la superficial de CAIMÁN-3 (tanques, bodega, perforación y eventos conectados). `docs/img/turno_menu.png` y `turno_resultado.png` se regeneran con `xvfb-run -a godot --path . --script res://tools/captura_turno.gd`.

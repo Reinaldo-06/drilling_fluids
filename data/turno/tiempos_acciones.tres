@@ -10,6 +10,7 @@ valores = {
 "abrir_valvulas": 5.0,
 "agua_bbl_por_min": 10.0,
 "avisar_driller": 5.0,
+"caminar_casilla": 0.15,
 "diagnosticar": 0.0,
 "entregar_reporte": 30.0,
 "hablar": 10.0,

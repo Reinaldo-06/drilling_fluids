@@ -58,6 +58,10 @@ var cuadrilla_disponible := false
 ## false = el Fann se corre en frío (lee alto).
 var copa_termica := true
 var en_noche := false
+## true: el jugador camina de verdad por el mapa (sim/sesion_turno.gd). La
+## caminata se cobra por casilla (caminar_casillas) y las acciones ya no suman la
+## de la tabla de distancias: sería descontarla dos veces.
+var caminata_en_mapa := false
 
 # --- Estado del pozo que mantienen los enganches ---
 var caudal_gpm := 0.0
@@ -214,6 +218,23 @@ func avanzar_tiempo(minutos: float) -> float:
 
 # ======================= Acciones del jugador =======================
 
+## Minutos de caminata hasta una estación (0 si el mapa ya cobró cada casilla).
+func _caminata(hacia: String) -> float:
+	return 0.0 if caminata_en_mapa else Accion.minutos_caminar(ubicacion, hacia)
+
+
+## Caminar "n" casillas del mapa: cada una cuesta Accion.minutos("caminar_casilla").
+## Si no entran, no se camina y no se gasta tiempo.
+func caminar_casillas(n: int) -> Dictionary:
+	var m := float(n) * Accion.minutos("caminar_casilla")
+	if n <= 0:
+		return {"minutos": 0.0}
+	if not reloj.cabe(m):
+		return _sin_tiempo(m)
+	avanzar_tiempo(m)
+	return {"minutos": m}
+
+
 func esperar(minutos: float) -> Dictionary:
 	var m := avanzar_tiempo(minutos)
 	acciones.append(Accion.registro("esperar", reloj.minuto - m, m))
@@ -223,7 +244,7 @@ func esperar(minutos: float) -> Dictionary:
 func caminar(destino: String) -> Dictionary:
 	if not Accion.es_estacion(destino):
 		return {"error": "No existe la estación %s." % destino}
-	var m := Accion.minutos_caminar(ubicacion, destino)
+	var m := _caminata(destino)
 	if not reloj.cabe(m):
 		return _sin_tiempo(m)
 	_ir_a(destino)
@@ -255,7 +276,7 @@ func correr_prueba(id: String, tanque_nombre := "") -> Dictionary:
 		return {"error": "No hay un tanque llamado %s." % tanque_nombre}
 	if not prueba.faltantes(pruebas_corridas).is_empty():
 		return {"error": prueba.ejecutar(t.lodo, {"hechas": pruebas_corridas})["error"]}
-	var caminata := Accion.minutos_caminar(ubicacion, "caseta")
+	var caminata := _caminata("caseta")
 	var espera_equipo := maxf(0.0, float(equipo_libre.get(prueba.equipo, 0.0)) - reloj.minuto - caminata)
 	var costo: float = caminata + espera_equipo + prueba.minutos_activos
 	if not reloj.cabe(costo):
@@ -279,7 +300,7 @@ func correr_prueba(id: String, tanque_nombre := "") -> Dictionary:
 
 ## Avisar al driller (y al mud logger) antes de transferir.
 func avisar_driller() -> Dictionary:
-	var costo := Accion.minutos_caminar(ubicacion, "piso") + Accion.minutos("avisar_driller")
+	var costo := _caminata("piso") + Accion.minutos("avisar_driller")
 	if not reloj.cabe(costo):
 		return _sin_tiempo(costo)
 	var inicio := reloj.minuto
@@ -301,7 +322,7 @@ func transferir(origen_nombre: String, destino_nombre: String, bbl: float) -> Di
 	if movible <= 0.0:
 		return {"error": "No hay lodo para mover o el destino está lleno."}
 	var minutos := Accion.minutos("abrir_valvulas") + movible / Accion.minutos("transferencia_bbl_por_min")
-	var costo := Accion.minutos_caminar(ubicacion, "tanques") + minutos
+	var costo := _caminata("tanques") + minutos
 	if not reloj.cabe(costo):
 		return _sin_tiempo(costo)
 	var inicio := reloj.minuto
@@ -346,7 +367,7 @@ func tratar(producto_id: String, lb_bbl: float, tanque_nombre := "", prehidratad
 	if inventario.disponible(producto_id) < cantidad - 1e-6:
 		return {"error": "En la bodega quedan %d sacos de %s y hacen falta %d." % [
 			floori(inventario.disponible(producto_id)), p.nombre, roundi(cantidad)]}
-	var costo := Accion.minutos_caminar(ubicacion, "embudo") + minutos
+	var costo := _caminata("embudo") + minutos
 	if not reloj.cabe(costo):
 		return _sin_tiempo(costo)
 	var inicio := reloj.minuto
@@ -380,7 +401,7 @@ func ordenar_mezcla(producto_id: String, sacos: float, tanque_nombre := "", cuad
 		return {"error": "Producto, tanque o cantidad no válidos."}
 	if cuadrilla and not cuadrilla_disponible:
 		return {"error": "El driller no prestó la cuadrilla de piso."}
-	var costo := Accion.minutos_caminar(ubicacion, "tanques") + Accion.minutos("orden_encuellador")
+	var costo := _caminata("tanques") + Accion.minutos("orden_encuellador")
 	if not reloj.cabe(costo):
 		return _sin_tiempo(costo)
 	var inicio := reloj.minuto
@@ -408,7 +429,7 @@ func hablar(personaje: String) -> Dictionary:
 	if not Accion.ESTACION_DE_PERSONAJE.has(personaje):
 		return {"error": "No hay nadie llamado %s." % personaje}
 	var estacion: String = Accion.ESTACION_DE_PERSONAJE[personaje]
-	var costo := Accion.minutos_caminar(ubicacion, estacion) + Accion.minutos("hablar")
+	var costo := _caminata(estacion) + Accion.minutos("hablar")
 	if not reloj.cabe(costo):
 		return _sin_tiempo(costo)
 	var inicio := reloj.minuto
@@ -434,7 +455,7 @@ func diagnosticar(diagnostico: String) -> Dictionary:
 ## Lo que queda del turno de día corre después en simular_noche().
 func entregar_reporte(recomendaciones: Array = []) -> RefCounted:
 	var inicio := reloj.minuto
-	var costo := Accion.minutos_caminar(ubicacion, "oficina") + Accion.minutos("entregar_reporte")
+	var costo := _caminata("oficina") + Accion.minutos("entregar_reporte")
 	var tarde := not reloj.cabe(costo)
 	_ir_a("oficina")
 	avanzar_tiempo(Accion.minutos("entregar_reporte"))
@@ -515,7 +536,7 @@ func _chequeo(pruebas: Array, tipo: String, tanque_nombre: String) -> Dictionary
 	var plan := Lab.planificar(pruebas)
 	if plan.has("error"):
 		return {"error": plan["error"]}
-	var costo: float = Accion.minutos_caminar(ubicacion, "caseta") + plan["total_min"]
+	var costo: float = _caminata("caseta") + plan["total_min"]
 	if not reloj.cabe(costo):
 		return _sin_tiempo(costo)
 	var inicio := reloj.minuto
@@ -610,7 +631,7 @@ func _contabilizar(r: Dictionary) -> void:
 
 
 func _ir_a(estacion: String) -> void:
-	var m := Accion.minutos_caminar(ubicacion, estacion)
+	var m := _caminata(estacion)
 	if m > 0.0:
 		var inicio := reloj.minuto
 		avanzar_tiempo(m)

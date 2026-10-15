@@ -1,0 +1,154 @@
+[gd_resource type="Resource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://sim/turno_tabla.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+id = "estaciones_mapa"
+descripcion = "Puente entre el overworld y el turno (docs/plan-desarrollo.md, Paso 2). \"estaciones\": cada id de estación del mapa (game/overworld/mapa_locacion.gd) → la estación del turno donde está (sim/accion.gd, ESTACIONES) y las acciones que se pueden hacer ahí. \"acciones\": nombre para el menú y parámetros (con ? los opcionales). Las acciones que piden estar en cierta estación salen de Accion.ESTACION_DE; este archivo solo dice qué ofrece cada lugar del mapa. Las válvulas no ofrecen acciones todavía (Hito 3)."
+valores = {
+"acciones": {
+"chequeo_rapido": {
+"nombre": "Chequeo rápido",
+"parametros": ["tanque?"]
+},
+"chequeo_completo": {
+"nombre": "Chequeo completo",
+"parametros": ["tanque?", "con_retorta?"]
+},
+"correr_prueba": {
+"nombre": "Correr una prueba",
+"parametros": ["prueba", "tanque?"]
+},
+"diagnosticar": {
+"nombre": "Formular diagnóstico",
+"parametros": ["diagnostico"]
+},
+"esperar": {
+"nombre": "Esperar",
+"parametros": ["minutos"]
+},
+"tratar": {
+"nombre": "Tratar con un producto",
+"parametros": ["producto", "lb_bbl", "tanque?", "prehidratada?"]
+},
+"ordenar_mezcla": {
+"nombre": "Ordenar una mezcla",
+"parametros": ["producto", "sacos", "tanque?", "quien?", "cuadrilla?"]
+},
+"transferir": {
+"nombre": "Transferir lodo",
+"parametros": ["origen", "destino", "bbl"]
+},
+"avisar_driller": {
+"nombre": "Avisar al driller",
+"parametros": []
+},
+"entregar_reporte": {
+"nombre": "Entregar el reporte",
+"parametros": ["recomendaciones?"]
+},
+"inventario": {
+"nombre": "Ver el inventario",
+"parametros": []
+}
+},
+"estaciones": {
+"caseta_lodos": {
+"estacion": "caseta",
+"acciones": ["chequeo_rapido", "chequeo_completo", "correr_prueba", "diagnosticar", "esperar"]
+},
+"embudo_abajo": {
+"estacion": "embudo",
+"acciones": ["tratar"]
+},
+"embudo_arriba": {
+"estacion": "embudo",
+"acciones": ["tratar"]
+},
+"tanque_succion": {
+"estacion": "tanques",
+"acciones": ["transferir", "ordenar_mezcla"]
+},
+"tanque_proceso": {
+"estacion": "tanques",
+"acciones": ["transferir", "ordenar_mezcla"]
+},
+"tanque_pildora": {
+"estacion": "tanques",
+"acciones": ["transferir", "ordenar_mezcla"]
+},
+"reserva_1": {
+"estacion": "tanques",
+"acciones": ["transferir", "ordenar_mezcla"]
+},
+"reserva_2": {
+"estacion": "tanques",
+"acciones": ["transferir", "ordenar_mezcla"]
+},
+"fractanque_1": {
+"estacion": "tanques",
+"acciones": ["transferir", "ordenar_mezcla"]
+},
+"fractanque_2": {
+"estacion": "tanques",
+"acciones": ["transferir", "ordenar_mezcla"]
+},
+"tanque_viaje": {
+"estacion": "piso",
+"acciones": []
+},
+"trampa_arena": {
+"estacion": "zarandas",
+"acciones": []
+},
+"valvula_igualadora": {
+"estacion": "tanques",
+"acciones": []
+},
+"valvula_pildora": {
+"estacion": "tanques",
+"acciones": []
+},
+"valvula_reserva_1": {
+"estacion": "tanques",
+"acciones": []
+},
+"valvula_reserva_2": {
+"estacion": "tanques",
+"acciones": []
+},
+"valvula_fractanques": {
+"estacion": "tanques",
+"acciones": []
+},
+"bodega_quimicos": {
+"estacion": "bodega",
+"acciones": ["inventario"]
+},
+"zarandas": {
+"estacion": "zarandas",
+"acciones": []
+},
+"caja_de_llegada": {
+"estacion": "zarandas",
+"acciones": []
+},
+"piso_perforacion": {
+"estacion": "piso",
+"acciones": ["avisar_driller"]
+},
+"bombas_lodo": {
+"estacion": "piso",
+"acciones": []
+},
+"cabina_mud_logger": {
+"estacion": "mud_logger",
+"acciones": []
+},
+"oficina_company_man": {
+"estacion": "oficina",
+"acciones": ["entregar_reporte"]
+}
+}
+}
